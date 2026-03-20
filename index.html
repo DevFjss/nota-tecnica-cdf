@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nota Técnica · CDF - Sistema Integrado</title>
+    <title>Nota Técnica · CDF - Sistema de Consulta Escolar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
@@ -15,23 +15,21 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e9f0f9;
+            background-color: #eef2f8;
             color: #1a2b4c;
-            line-height: 1.5;
         }
 
-        /* Header Azul Profissional */
+        /* Header */
         .app-header {
             background: linear-gradient(135deg, #0a2647, #123456);
             color: white;
-            padding: 1rem 2rem;
+            padding: 1.2rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 8px 16px rgba(0,20,40,0.3);
-            border-bottom: 3px solid #2f80ed;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .logo-area {
@@ -42,36 +40,36 @@
 
         .logo-icon {
             background: #1e4d8c;
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
         }
 
         .title h1 {
-            font-weight: 700;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
+            font-weight: 600;
         }
 
         .title span {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             background: #2f80ed;
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
-            margin-left: 10px;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            margin-left: 8px;
         }
 
-        .sheet-status {
-            background: rgba(255,255,255,0.15);
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
+        .sheet-info {
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
         }
 
         /* Menu Abas */
@@ -82,204 +80,247 @@
             flex-wrap: wrap;
             gap: 0.25rem;
             border-bottom: 1px solid #2a5570;
-            overflow-x: auto;
         }
 
         .tab-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0.9rem 1.5rem;
-            font-weight: 500;
-            color: #d4e3fd;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            padding: 0.8rem 1.5rem;
             background: none;
             border: none;
-            font-size: 0.95rem;
-        }
-
-        .tab-btn i {
-            font-size: 1rem;
+            color: #b8d0e8;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
         }
 
         .tab-btn:hover {
-            background-color: #1f4b70;
+            background: #1f4b70;
             color: white;
         }
 
         .tab-btn.active {
-            background-color: #1f4b70;
+            background: #1f4b70;
             color: white;
             border-bottom-color: #2f80ed;
         }
 
-        /* Área de gerenciamento de abas */
+        /* Admin Bar */
         .admin-bar {
             background: white;
             padding: 0.8rem 2rem;
-            border-bottom: 1px solid #d4e0ec;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .add-sheet-btn {
+        .sheet-id {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #4a627a;
+        }
+
+        /* Main Content */
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Painel de Busca */
+        .search-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eef2f8;
+        }
+
+        .search-header i {
+            font-size: 1.8rem;
+            color: #2f80ed;
+        }
+
+        .search-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0a2647;
+        }
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #5c7b9c;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #2f80ed;
+            box-shadow: 0 0 0 3px rgba(47,128,237,0.1);
+        }
+
+        .btn-search {
             background: #2f80ed;
             color: white;
             border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 30px;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .add-sheet-btn:hover {
-            background: #1a68c7;
-        }
-
-        .config-status {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-        /* Conteúdo Principal */
-        .main-container {
-            padding: 2rem;
-            min-height: calc(100vh - 200px);
-        }
-
-        .card-panel {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 35px -8px rgba(0,35,70,0.25);
-            padding: 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .section-header h2 {
-            font-size: 1.5rem;
-            color: #0a2a44;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
+            transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: #2f80ed;
-            color: white;
-        }
-
-        .btn-primary:hover {
+        .btn-search:hover {
             background: #1a68c7;
+            transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background: #e9f0fc;
+        .btn-clear {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Resultados */
+        .results-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
             color: #1e4d8c;
-            border: 1px solid #bdd4f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-secondary:hover {
-            background: #d4e4fa;
+        .badge-count {
+            background: #e6f4ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #2f80ed;
         }
 
-        /* Tabela */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            margin-top: 1rem;
+            border: 1px solid #eef2f8;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            min-width: 800px;
+            min-width: 700px;
         }
 
         th {
-            background: #f1f5f9;
-            color: #1e4d8c;
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
             font-weight: 600;
-            padding: 1rem 0.8rem;
-            border-bottom: 2px solid #cbd5e1;
-            text-align: center;
+            color: #1e4d8c;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         td {
-            padding: 0.8rem;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: center;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         tr:hover td {
-            background-color: #f8fafc;
+            background-color: #fafcff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
         }
 
         .loading {
             text-align: center;
             padding: 3rem;
-            color: #64748b;
-        }
-
-        .info-message {
-            background: #e6f4ff;
-            border-left: 4px solid #2f80ed;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            color: #2f80ed;
         }
 
         .footer-note {
-            margin-top: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c86a3;
             padding-top: 1rem;
             border-top: 1px solid #e2e8f0;
-            text-align: right;
-            font-size: 0.75rem;
-            color: #64748b;
         }
 
-        /* Modal para adicionar aba */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -297,8 +338,8 @@
             background: white;
             border-radius: 24px;
             padding: 2rem;
-            width: 90%;
             max-width: 450px;
+            width: 90%;
         }
 
         .modal-content h3 {
@@ -311,66 +352,114 @@
             margin: 1rem 0;
             border: 1px solid #cbd5e1;
             border-radius: 12px;
-            font-family: inherit;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
         }
     </style>
 </head>
 <body>
     <header class="app-header">
         <div class="logo-area">
-            <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="logo-icon"><i class="fas fa-school"></i></div>
             <div class="title">
                 <h1>Nota Técnica <span>CDF</span></h1>
             </div>
         </div>
-        <div class="sheet-status">
-            <i class="fas fa-google"></i>
+        <div class="sheet-info">
+            <i class="fab fa-google"></i>
             <span>Google Sheets Integrado</span>
-            <i class="fas fa-check-circle" style="color: #4ade80;"></i>
+            <i class="fas fa-check-circle" style="color: #4ade80; font-size: 0.8rem;"></i>
         </div>
     </header>
 
-    <!-- Abas dinâmicas -->
     <div class="tabs-container" id="tabsContainer">
-        <!-- Abas serão inseridas dinamicamente -->
+        <button class="tab-btn active" data-tab="consulta">
+            <i class="fas fa-search"></i> Consulta Escolas
+        </button>
+        <button class="tab-btn" data-tab="notas">
+            <i class="fas fa-file-alt"></i> Notas Técnicas
+        </button>
+        <button class="tab-btn" data-tab="relatorios">
+            <i class="fas fa-chart-bar"></i> Relatórios
+        </button>
     </div>
 
     <div class="admin-bar">
-        <button class="add-sheet-btn" id="addSheetBtn">
-            <i class="fas fa-plus-circle"></i> Adicionar Nova Aba
-        </button>
-        <div class="config-status">
-            <i class="fas fa-database"></i>
-            <span>Planilha ID: <strong id="sheetIdDisplay">1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong></span>
-            <span id="lastUpdateStatus">📅 Última atualização: --</span>
+        <div class="sheet-id">
+            <i class="fas fa-database"></i> Planilha ID: <strong id="sheetIdDisplay">1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
+            <span style="margin-left: 1rem;">📄 Aba: <strong id="currentSheetName">Escolas_ativas</strong></span>
         </div>
+        <button class="btn-clear" id="addSheetBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
+            <i class="fas fa-plus"></i> Adicionar Nova Aba
+        </button>
     </div>
 
     <main class="main-container">
-        <div class="card-panel">
-            <div class="section-header">
-                <h2><i class="fas fa-table"></i> <span id="currentSheetTitle">Carregando...</span></h2>
-                <div class="action-buttons">
-                    <button class="btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                    <button class="btn-primary" id="openGoogleSheetsBtn"><i class="fab fa-google"></i> Abrir no Google Sheets</button>
+        <!-- Aba de Consulta -->
+        <div id="consultaTab" class="tab-content">
+            <div class="search-panel">
+                <div class="search-header">
+                    <i class="fas fa-filter"></i>
+                    <h3>Filtrar Escolas por:</h3>
+                </div>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Tipo de Busca</label>
+                        <select id="searchType">
+                            <option value="NTE">📌 NTE</option>
+                            <option value="MUNICIPIO">🏙️ Município</option>
+                            <option value="ESCOLA">🏫 Nome da Escola</option>
+                            <option value="ESTADO">🇧🇷 Estado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-keyboard"></i> Valor para Pesquisar</label>
+                        <input type="text" id="searchValue" placeholder="Digite o valor para busca..." autocomplete="off">
+                    </div>
+                    <button class="btn-search" id="searchBtn">
+                        <i class="fas fa-search"></i> Pesquisar
+                    </button>
+                    <button class="btn-clear" id="clearBtn">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
                 </div>
             </div>
 
-            <div id="dataContainer">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...
+            <div class="results-panel">
+                <div class="results-header">
+                    <h4><i class="fas fa-table-list"></i> Resultados da Consulta</h4>
+                    <span class="badge-count" id="resultCount">0 registros</span>
+                </div>
+                <div id="resultsTable">
+                    <div class="empty-state">
+                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="footer-note">
-                <i class="fas fa-chart-line"></i> Sistema de Notas Técnicas · FERIECIP/SP 2026 · Dados sincronizados via Google Sheets
+        <!-- Aba de Notas Técnicas (placeholder) -->
+        <div id="notasTab" class="tab-content" style="display: none;">
+            <div class="results-panel">
+                <div class="empty-state">
+                    <i class="fas fa-file-alt" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <p>Área de Notas Técnicas - Em desenvolvimento</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Em breve: visualização das notas técnicas consolidadas</p>
+                </div>
             </div>
+        </div>
+
+        <!-- Aba de Relatórios (placeholder) -->
+        <div id="relatoriosTab" class="tab-content" style="display: none;">
+            <div class="results-panel">
+                <div class="empty-state">
+                    <i class="fas fa-chart-line" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <p>Área de Relatórios - Em desenvolvimento</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-sync-alt"></i> Dados sincronizados com Google Sheets · Aba "Escolas_ativas" · Colunas: NTE, Município, Código SEC, Código INEP, Unidade Escolar
         </div>
     </main>
 
@@ -378,133 +467,205 @@
     <div id="sheetModal" class="modal">
         <div class="modal-content">
             <h3><i class="fas fa-plus-circle"></i> Adicionar Nova Aba</h3>
-            <p>Digite o nome da aba (sheet) que deseja carregar:</p>
-            <input type="text" id="newSheetName" placeholder="Ex: Nota2026, Relatório_Março, CARTAFO_2025" />
-            <div class="modal-buttons">
-                <button class="btn-secondary" id="cancelModalBtn">Cancelar</button>
-                <button class="btn-primary" id="confirmAddSheetBtn">Adicionar</button>
+            <p>Digite o nome da aba que deseja carregar:</p>
+            <input type="text" id="newSheetName" placeholder="Ex: Escolas_ativas, Notas_2026, etc." />
+            <div class="modal-buttons" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn-clear" id="cancelModalBtn">Cancelar</button>
+                <button class="btn-search" id="confirmAddSheetBtn">Adicionar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO GOOGLE SHEETS
+        // CONFIGURAÇÃO
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
+        const TARGET_SHEET = 'Escolas_ativas'; // Aba principal de escolas
         
-        // Estrutura de abas - VOCÊ PODE ADICIONAR QUANTAS QUISER
-        let sheetsConfig = [
-            { id: 'nota2026', name: '📊 Nota Técnica 2026', sheetName: 'Nota2026' },
-            { id: 'geral', name: '📈 Geral Consolidado', sheetName: 'Geral' },
-            { id: 'cartafo_prime', name: '🍽️ CARTAFO PRIME', sheetName: 'Cartafo_Prime' },
-            { id: 'cartafo_fade', name: '🌿 CARTAFO FADE', sheetName: 'Cartafo_Fade' },
-            { id: 'informes', name: '📋 Informes Enviados', sheetName: 'Informes' }
-        ];
+        // Mapeamento das colunas esperadas na planilha
+        // Baseado no seu VBA: B, C, D, F, G
+        const COLUMN_MAPPING = {
+            nte: 'B',        // Coluna B - NTE
+            municipio: 'C',  // Coluna C - Município  
+            codigoSec: 'D',  // Coluna D - Código SEC
+            codigoInep: 'F', // Coluna F - Código INEP
+            unidadeEscolar: 'G' // Coluna G - Unidade Escolar
+        };
 
-        // Recupera abas salvas no localStorage
-        function loadSheetsFromStorage() {
-            const saved = localStorage.getItem('cdf_sheets_config');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.length > 0) sheetsConfig = parsed;
-                } catch(e) {}
-            }
-        }
+        let escolasData = []; // Armazena todos os dados carregados
 
-        function saveSheetsToStorage() {
-            localStorage.setItem('cdf_sheets_config', JSON.stringify(sheetsConfig));
-        }
-
-        let currentSheetId = 'nota2026';
-        let currentData = [];
-
-        // Função para carregar dados do Google Sheets (via API pública)
-        async function loadSheetData(sheetName) {
+        // Função para carregar dados da aba Escolas_ativas
+        async function loadEscolasData() {
             try {
                 showLoading();
                 
-                // URL para CSV público (método mais simples sem API key)
-                const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+                // Usando Google Sheets CSV export
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`;
                 
                 const response = await fetch(csvUrl);
                 if (!response.ok) throw new Error('Erro ao carregar planilha');
                 
                 const csvText = await response.text();
-                const parsedData = parseCSV(csvText);
+                const parsedData = parseCSVToEscolas(csvText);
                 
+                escolasData = parsedData;
                 updateLastUpdateTime();
                 return parsedData;
                 
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 // Dados de exemplo para demonstração
-                return getMockData(sheetName);
+                escolasData = getMockEscolasData();
+                return escolasData;
             }
         }
 
-        // Parse CSV simples
-        function parseCSV(csvText) {
+        // Parse CSV para estrutura de escolas
+        function parseCSVToEscolas(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length === 0) return [];
+            if (lines.length < 2) return [];
             
-            const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-            const data = [];
+            const escolas = [];
             
+            // Pula cabeçalho (linha 1)
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
-                const row = {};
-                headers.forEach((header, idx) => {
-                    row[header] = values[idx] || '';
-                });
-                data.push(row);
+                const values = parseCSVLine(lines[i]);
+                
+                // Mapeia baseado nas colunas: B(1), C(2), D(3), F(5), G(6) no índice 0-based
+                if (values.length >= 7) {
+                    const escola = {
+                        nte: values[1] || '',      // Coluna B (índice 1)
+                        municipio: values[2] || '', // Coluna C (índice 2)
+                        codigoSec: values[3] || '', // Coluna D (índice 3)
+                        codigoInep: values[5] || '', // Coluna F (índice 5)
+                        unidadeEscolar: values[6] || '' // Coluna G (índice 6)
+                    };
+                    
+                    // Só adiciona se tiver pelo menos um dado relevante
+                    if (escola.unidadeEscolar || escola.nte || escola.municipio) {
+                        escolas.push(escola);
+                    }
+                }
             }
-            return data;
+            
+            return escolas;
         }
 
-        // Dados mockados para quando não conseguir carregar
-        function getMockData(sheetName) {
-            if (sheetName.includes('Nota2026')) {
-                return [
-                    { 'FARAD MARTINEZCO': 'GERAL', '2023': '89%', '2024': '94%', '2025': '87%', '2026': '92%', 'CARTAFO PRIME 2025': '312t', 'CARTAFO PRIME 2026': '356t', 'CARTAFO FADE 2025': '98t', 'CARTAFO FADE 2026': '112t', 'GARANTIR': 'Enviado' },
-                    { 'FARAD MARTINEZCO': 'Núcleo Técnico', '2023': '15', '2024': '22', '2025': '19', '2026': '27', 'CARTAFO PRIME 2025': '4.320', 'CARTAFO PRIME 2026': '5.001', 'CARTAFO FADE 2025': '2.100', 'CARTAFO FADE 2026': '2.350', 'GARANTIR': 'Pendente' }
-                ];
+        // Parse de linha CSV respeitando aspas
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
             }
-            return [{ 'Mensagem': `Dados da aba "${sheetName}" carregados com sucesso!`, 'Status': 'Conectado' }];
+            result.push(current.trim());
+            
+            return result;
         }
 
-        function renderTable(data, sheetName) {
-            if (!data || data.length === 0) {
-                document.getElementById('dataContainer').innerHTML = `
-                    <div class="info-message">
-                        <i class="fas fa-info-circle"></i>
-                        <div>Nenhum dado encontrado na aba "${sheetName}". Verifique se a planilha possui dados.</div>
+        // Dados mockados para exemplo
+        function getMockEscolasData() {
+            return [
+                { nte: 'NTE 01', municipio: 'São Paulo', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
+                { nte: 'NTE 01', municipio: 'São Paulo', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
+                { nte: 'NTE 02', municipio: 'Campinas', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
+                { nte: 'NTE 02', municipio: 'Campinas', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
+                { nte: 'NTE 03', municipio: 'Ribeirão Preto', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
+                { nte: 'NTE 01', municipio: 'Guarulhos', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
+            ];
+        }
+
+        // Função de pesquisa baseada no tipo selecionado
+        function searchEscolas(searchType, searchValue) {
+            if (!searchValue || searchValue.trim() === '') {
+                return [];
+            }
+            
+            const value = searchValue.trim().toLowerCase();
+            
+            return escolasData.filter(escola => {
+                switch(searchType) {
+                    case 'NTE':
+                        return escola.nte.toLowerCase().includes(value);
+                    case 'MUNICIPIO':
+                        return escola.municipio.toLowerCase().includes(value);
+                    case 'ESCOLA':
+                        return escola.unidadeEscolar.toLowerCase().includes(value);
+                    case 'ESTADO':
+                        // Estado pode estar em coluna separada, por simulação retorna alguns
+                        return escola.estado?.toLowerCase().includes(value) || false;
+                    default:
+                        return false;
+                }
+            });
+        }
+
+        // Renderizar tabela de resultados
+        function renderResults(results) {
+            const container = document.getElementById('resultsTable');
+            const countSpan = document.getElementById('resultCount');
+            
+            countSpan.textContent = `${results.length} registro${results.length !== 1 ? 's' : ''}`;
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <p>Nenhum resultado encontrado para esta busca.</p>
                     </div>
                 `;
                 return;
             }
-
-            const headers = Object.keys(data[0]);
             
-            let html = '<div class="table-wrapper"><table><thead><tr>';
-            headers.forEach(header => {
-                html += `<th>${header}</th>`;
+            let html = `
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>📌 NTE</th>
+                                <th>🏙️ Município</th>
+                                <th>🔢 Código SEC</th>
+                                <th>📊 Código INEP</th>
+                                <th>🏫 Unidade Escolar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            results.forEach(escola => {
+                html += `
+                    <tr>
+                        <td><strong>${escola.nte || '-'}</strong></td>
+                        <td>${escola.municipio || '-'}</td>
+                        <td>${escola.codigoSec || '-'}</td>
+                        <td>${escola.codigoInep || '-'}</td>
+                        <td>${escola.unidadeEscolar || '-'}</td>
+                    </tr>
+                `;
             });
-            html += '</tr></thead><tbody>';
             
-            data.forEach(row => {
-                html += '<tr>';
-                headers.forEach(header => {
-                    html += `<td>${row[header] || '-'}</td>`;
-                });
-                html += '</tr>';
-            });
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
             
-            html += '</tbody></table></div>';
-            document.getElementById('dataContainer').innerHTML = html;
+            container.innerHTML = html;
         }
 
         function showLoading() {
-            document.getElementById('dataContainer').innerHTML = `
+            const container = document.getElementById('resultsTable');
+            container.innerHTML = `
                 <div class="loading">
                     <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...
                 </div>
@@ -514,105 +675,91 @@
         function updateLastUpdateTime() {
             const now = new Date();
             const formatted = now.toLocaleString('pt-BR');
-            document.getElementById('lastUpdateStatus').innerHTML = `📅 Atualizado: ${formatted}`;
+            const footer = document.querySelector('.footer-note');
+            if (footer) {
+                const timeSpan = document.createElement('span');
+                timeSpan.style.marginLeft = '1rem';
+                timeSpan.innerHTML = `<i class="fas fa-clock"></i> ${formatted}`;
+                const oldSpan = footer.querySelector('.time-span');
+                if (oldSpan) oldSpan.remove();
+                const newSpan = document.createElement('span');
+                newSpan.className = 'time-span';
+                newSpan.innerHTML = ` | <i class="fas fa-clock"></i> ${formatted}`;
+                footer.appendChild(newSpan);
+            }
         }
 
-        // Carregar aba atual
-        async function loadCurrentSheet() {
-            const sheet = sheetsConfig.find(s => s.id === currentSheetId);
-            if (!sheet) return;
+        // Controle de abas
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(`${tabId}Tab`).style.display = 'block';
             
-            document.getElementById('currentSheetTitle').innerHTML = `${sheet.name}`;
-            const data = await loadSheetData(sheet.sheetName);
-            currentData = data;
-            renderTable(data, sheet.sheetName);
-        }
-
-        // Renderizar abas no menu
-        function renderTabs() {
-            const container = document.getElementById('tabsContainer');
-            container.innerHTML = '';
-            
-            sheetsConfig.forEach(sheet => {
-                const btn = document.createElement('button');
-                btn.className = `tab-btn ${sheet.id === currentSheetId ? 'active' : ''}`;
-                btn.innerHTML = `<i class="fas ${sheet.id.includes('cartafo') ? 'fa-utensils' : sheet.id.includes('informes') ? 'fa-file-alt' : 'fa-chart-line'}"></i> ${sheet.name}`;
-                btn.onclick = () => switchSheet(sheet.id);
-                container.appendChild(btn);
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('active');
+                }
             });
         }
 
-        function switchSheet(sheetId) {
-            currentSheetId = sheetId;
-            renderTabs();
-            loadCurrentSheet();
-        }
-
-        // Adicionar nova aba
-        function addNewSheet(sheetName) {
-            if (!sheetName || sheetName.trim() === '') {
-                alert('Digite um nome válido para a aba');
-                return false;
-            }
-            
-            const newId = `sheet_${Date.now()}`;
-            const newSheet = {
-                id: newId,
-                name: `📄 ${sheetName.trim()}`,
-                sheetName: sheetName.trim()
-            };
-            
-            sheetsConfig.push(newSheet);
-            saveSheetsToStorage();
-            renderTabs();
-            switchSheet(newId);
-            return true;
-        }
-
         // Inicialização
-        function init() {
-            loadSheetsFromStorage();
-            renderTabs();
-            loadCurrentSheet();
+        async function init() {
+            // Carregar dados das escolas
+            await loadEscolasData();
             
             // Eventos dos botões
-            document.getElementById('refreshBtn').onclick = () => loadCurrentSheet();
-            document.getElementById('openGoogleSheetsBtn').onclick = () => {
-                window.open(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}`, '_blank');
-            };
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                const searchType = document.getElementById('searchType').value;
+                const searchValue = document.getElementById('searchValue').value;
+                const results = searchEscolas(searchType, searchValue);
+                renderResults(results);
+            });
             
-            // Modal de adicionar aba
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                document.getElementById('searchValue').value = '';
+                renderResults([]);
+                document.getElementById('resultCount').textContent = '0 registros';
+                document.getElementById('resultsTable').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('searchValue').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchBtn').click();
+                }
+            });
+            
+            // Abas
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchTab(btn.dataset.tab);
+                });
+            });
+            
+            document.getElementById('sheetIdDisplay').innerText = SPREADSHEET_ID;
+            document.getElementById('currentSheetName').innerText = TARGET_SHEET;
+            
+            // Modal
             const modal = document.getElementById('sheetModal');
-            const addBtn = document.getElementById('addSheetBtn');
-            const cancelBtn = document.getElementById('cancelModalBtn');
-            const confirmBtn = document.getElementById('confirmAddSheetBtn');
-            const input = document.getElementById('newSheetName');
-            
-            addBtn.onclick = () => {
+            document.getElementById('addSheetBtn').onclick = () => {
                 modal.style.display = 'flex';
-                input.value = '';
-                input.focus();
             };
-            
-            cancelBtn.onclick = () => {
+            document.getElementById('cancelModalBtn').onclick = () => {
                 modal.style.display = 'none';
             };
-            
-            confirmBtn.onclick = () => {
-                if (addNewSheet(input.value)) {
+            document.getElementById('confirmAddSheetBtn').onclick = () => {
+                const newSheet = document.getElementById('newSheetName').value;
+                if (newSheet) {
+                    alert(`Nova aba "${newSheet}" será carregada em breve.\nFuncionalidade em desenvolvimento.`);
                     modal.style.display = 'none';
                 }
             };
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) modal.style.display = 'none';
-            };
-            
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') confirmBtn.click();
-            };
-            
-            document.getElementById('sheetIdDisplay').innerText = SPREADSHEET_ID;
         }
         
         init();
