@@ -103,6 +103,13 @@
         .loading { text-align: center; padding: 3rem; color: #2f80ed; }
         .footer-note { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #6c86a3; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
         .search-info { background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8rem; }
+        .config-box {
+            background: #e6f4ff;
+            border: 1px solid #2f80ed;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -139,6 +146,14 @@
 
     <main class="main-container">
         <div id="consultaTab" class="tab-content">
+            <div class="config-box" id="configBox">
+                <i class="fas fa-cog"></i> 
+                <strong>Configure a URL do seu Google Apps Script:</strong><br>
+                <input type="text" id="scriptUrl" placeholder="Cole aqui a URL do seu Apps Script" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; border-radius: 8px; border: 1px solid #cbd5e1;">
+                <button id="saveUrlBtn" class="btn-clear" style="padding: 0.3rem 1rem;">Salvar URL</button>
+                <span id="urlStatus" style="margin-left: 0.5rem; font-size: 0.7rem;"></span>
+            </div>
+            
             <div class="search-panel">
                 <div class="search-header">
                     <i class="fas fa-filter"></i>
@@ -167,7 +182,7 @@
                 </div>
                 <div class="search-info">
                     <i class="fas fa-info-circle"></i> 
-                    <span id="searchInfoText">Busca EXATA em Município (Coluna C)</span>
+                    <span id="searchInfoText">Busca EXATA em Município</span>
                 </div>
             </div>
 
@@ -179,7 +194,8 @@
                 <div id="resultsTable">
                     <div class="empty-state">
                         <i class="fas fa-cloud-download-alt" style="font-size: 3rem;"></i>
-                        <p>Clique em <strong>"Carregar Dados"</strong> para buscar sua planilha</p>
+                        <p>1. Configure a URL do Google Apps Script acima</p>
+                        <p style="font-size: 0.8rem;">2. Depois clique em <strong>"Carregar Dados"</strong></p>
                     </div>
                 </div>
             </div>
@@ -198,18 +214,15 @@
         </div>
 
         <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Dados carregados via Google Sheets API<br>
+            <i class="fas fa-sync-alt"></i> Dados carregados via Google Apps Script da sua planilha<br>
             <strong>Estrutura:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
         </div>
     </main>
 
     <script>
-        // CONFIGURAÇÃO
-        const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
-        const SHEET_NAME = 'Escolas_ativas';
-        
         let escolasData = [];
         let isLoading = false;
+        let scriptUrl = localStorage.getItem('scriptUrl') || '';
 
         const SEARCH_MAPPING = {
             'NTE': { campo: 'nte', label: 'NTE - Busca EXATA' },
@@ -218,51 +231,32 @@
             'ESTADO': { campo: 'todos', label: 'TODOS os registros' }
         };
 
-        // Função para carregar dados usando o proxy do Google Sheets (JSONP alternativo)
+        // Carregar dados do Google Apps Script
         async function loadSheetData() {
             if (isLoading) return;
-            isLoading = true;
             
+            if (!scriptUrl) {
+                alert('Por favor, configure a URL do Google Apps Script no campo acima!');
+                return;
+            }
+            
+            isLoading = true;
             const container = document.getElementById('resultsTable');
             const countSpan = document.getElementById('recordCount');
             
-            container.innerHTML = `
-                <div class="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...<br>
-                    <small style="font-size: 0.7rem;">Aguarde, buscando na aba "${SHEET_NAME}"</small>
-                </div>
-            `;
+            container.innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...</div>`;
             
             try {
-                // Usando o formato de exportação CSV do Google Sheets (funciona com planilhas públicas OU com permissão)
-                // Para planilhas privadas, o usuário precisa estar logado na conta Google
-                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+                const response = await fetch(scriptUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                console.log('Carregando:', url);
+                const data = await response.json();
                 
-                const response = await fetch(url, {
-                    credentials: 'include', // Tenta usar credenciais se estiver logado
-                    mode: 'cors'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV recebido, tamanho:', csvText.length);
-                
-                if (csvText.length < 100) {
-                    throw new Error('Dados insuficientes');
-                }
-                
-                const parsedData = parseCSVToEscolas(csvText);
-                
-                if (parsedData.length === 0) {
+                if (!Array.isArray(data) || data.length === 0) {
                     throw new Error('Nenhum dado encontrado');
                 }
                 
-                escolasData = parsedData;
+                escolasData = data;
                 countSpan.innerHTML = `✅ ${escolasData.length} registros`;
                 countSpan.style.background = '#d1fae5';
                 countSpan.style.color = '#065f46';
@@ -271,145 +265,32 @@
                     <div class="empty-state">
                         <i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i>
                         <p>✅ Dados carregados com sucesso!</p>
-                        <p style="font-size: 0.8rem;">${escolasData.length} escolas encontradas na aba "${SHEET_NAME}"</p>
-                        <p style="font-size: 0.7rem;">Exemplos de NTE: ${[...new Set(escolasData.slice(0, 10).map(e => e.nte).filter(v => v))].slice(0, 5).join(', ')}</p>
+                        <p style="font-size: 0.8rem;">${escolasData.length} escolas encontradas na aba "Escolas_ativas"</p>
                         <p style="font-size: 0.7rem;">Exemplos de Municípios: ${[...new Set(escolasData.slice(0, 10).map(e => e.municipio).filter(v => v))].slice(0, 5).join(', ')}</p>
                     </div>
                 `;
                 
                 console.log('✅ Dados carregados:', escolasData.length);
-                return true;
+                console.log('Primeiros 3 registros:', escolasData.slice(0, 3));
                 
             } catch (error) {
                 console.error('Erro:', error);
-                
-                // Se falhar, tentar método alternativo com JSON
-                try {
-                    const jsonUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-                    const jsonResponse = await fetch(jsonUrl, { credentials: 'include' });
-                    const jsonText = await jsonResponse.text();
-                    
-                    // Parse do JSONP
-                    const jsonData = JSON.parse(jsonText.substring(47, jsonText.length - 2));
-                    const parsedData = parseGoogleJSON(jsonData);
-                    
-                    if (parsedData.length > 0) {
-                        escolasData = parsedData;
-                        countSpan.innerHTML = `✅ ${escolasData.length} registros`;
-                        container.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i><p>✅ Dados carregados! ${escolasData.length} registros</p></div>`;
-                        return true;
-                    }
-                } catch(e2) {
-                    console.error('Método alternativo falhou:', e2);
-                }
-                
                 countSpan.innerHTML = `⚠️ Erro`;
                 countSpan.style.background = '#fee2e2';
                 countSpan.style.color = '#dc2626';
                 
-                // Dados de exemplo para demonstração (para você testar a busca)
-                escolasData = getExampleData();
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
-                        <p>⚠️ Não foi possível carregar sua planilha</p>
-                        <p style="font-size: 0.8rem;">Verifique se você está logado no Google e tem acesso à planilha</p>
-                        <p style="font-size: 0.8rem;">Clique aqui para abrir: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Abrir Planilha</a></p>
-                        <p style="font-size: 0.7rem; margin-top: 0.5rem;">Usando dados de exemplo para demonstração. Após abrir a planilha, clique em "Carregar Dados" novamente.</p>
+                        <p>Erro ao carregar dados</p>
+                        <p style="font-size: 0.8rem;">${error.message}</p>
+                        <p style="font-size: 0.8rem;">Verifique se a URL do Apps Script está correta e publicada</p>
+                        <p style="font-size: 0.7rem;">URL atual: ${scriptUrl}</p>
                     </div>
                 `;
-                return false;
             } finally {
                 isLoading = false;
             }
-        }
-
-        function parseGoogleJSON(jsonData) {
-            const escolas = [];
-            if (!jsonData.table || !jsonData.table.rows) return [];
-            
-            const headers = jsonData.table.cols.map(col => col.label);
-            
-            for (const row of jsonData.table.rows) {
-                if (!row.c) continue;
-                const values = row.c.map(cell => cell ? cell.v : '');
-                
-                if (values.length >= 7) {
-                    escolas.push({
-                        nte: values[1] || '',
-                        municipio: values[2] || '',
-                        codigoSec: values[3] || '',
-                        codigoInep: values[5] || '',
-                        unidadeEscolar: values[6] || ''
-                    });
-                }
-            }
-            return escolas;
-        }
-
-        function parseCSVToEscolas(csvText) {
-            const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-            
-            const escolas = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                if (!line.trim()) continue;
-                
-                const values = parseCSVLine(line);
-                
-                if (values.length >= 7) {
-                    const escola = {
-                        nte: cleanValue(values[1]),
-                        municipio: cleanValue(values[2]),
-                        codigoSec: cleanValue(values[3]),
-                        codigoInep: cleanValue(values[5]),
-                        unidadeEscolar: cleanValue(values[6])
-                    };
-                    
-                    if (escola.nte || escola.municipio || escola.unidadeEscolar) {
-                        escolas.push(escola);
-                    }
-                }
-            }
-            
-            return escolas;
-        }
-
-        function cleanValue(value) {
-            if (!value) return '';
-            return value.replace(/^"|"$/g, '').trim();
-        }
-
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current);
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current);
-            return result;
-        }
-
-        function getExampleData() {
-            return [
-                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
-                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
-                { nte: '08', municipio: 'SÃO PAULO', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
-                { nte: '12', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
-                { nte: '03', municipio: 'RIBEIRÃO PRETO', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
-            ];
         }
 
         function searchEscolas(searchType, searchValue) {
@@ -444,9 +325,9 @@
                 return;
             }
             
-            let html = `<div class="table-wrapper"><table><thead><tr>
+            let html = `<div class="table-wrapper"> <table> <thead> <tr>
                 <th>📌 NTE</th><th>🏙️ Município</th><th>🔢 Código SEC</th><th>📊 Código INEP</th><th>🏫 Unidade Escolar</th>
-            </tr></thead><tbody>`;
+            </tr> </thead> <tbody>`;
             
             results.forEach(escola => {
                 html += `<tr>
@@ -458,7 +339,7 @@
                 </tr>`;
             });
             
-            html += `</tbody></table></div>`;
+            html += `</tbody> </table> </div>`;
             container.innerHTML = html;
         }
 
@@ -480,19 +361,35 @@
             });
         }
 
-        async function init() {
-            // Tenta carregar automaticamente
-            await loadSheetData();
+        // Inicialização
+        function init() {
+            const urlInput = document.getElementById('scriptUrl');
+            const urlStatus = document.getElementById('urlStatus');
             
-            updateSearchInfo('MUNICIPIO');
+            if (scriptUrl) {
+                urlInput.value = scriptUrl;
+                urlStatus.innerHTML = '✅ URL salva';
+                urlStatus.style.color = '#10b981';
+            }
             
-            document.getElementById('searchType').addEventListener('change', (e) => {
-                updateSearchInfo(e.target.value);
-                if (e.target.value === 'ESTADO') {
-                    document.getElementById('searchValue').placeholder = 'Digite qualquer valor (retorna todos)';
+            document.getElementById('saveUrlBtn').addEventListener('click', () => {
+                const newUrl = urlInput.value.trim();
+                if (newUrl) {
+                    scriptUrl = newUrl;
+                    localStorage.setItem('scriptUrl', newUrl);
+                    urlStatus.innerHTML = '✅ URL salva! Clique em "Carregar Dados"';
+                    urlStatus.style.color = '#10b981';
                 } else {
-                    document.getElementById('searchValue').placeholder = 'Digite o valor exato para busca...';
+                    alert('Digite a URL do seu Google Apps Script');
                 }
+            });
+            
+            document.getElementById('refreshDataBtn').addEventListener('click', () => {
+                if (!scriptUrl) {
+                    alert('Configure a URL primeiro!');
+                    return;
+                }
+                loadSheetData();
             });
             
             document.getElementById('searchBtn').addEventListener('click', () => {
@@ -522,17 +419,17 @@
                 `;
             });
             
-            document.getElementById('refreshDataBtn').addEventListener('click', async () => {
-                await loadSheetData();
-            });
-            
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') document.getElementById('searchBtn').click();
             });
             
+            document.getElementById('searchType').addEventListener('change', (e) => updateSearchInfo(e.target.value));
+            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => switchTab(btn.dataset.tab));
             });
+            
+            updateSearchInfo('MUNICIPIO');
         }
         
         init();
