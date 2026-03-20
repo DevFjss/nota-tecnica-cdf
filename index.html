@@ -172,7 +172,7 @@
 
         .form-group {
             flex: 1;
-            min-width: 180px;
+            min-width: 200px;
         }
 
         .form-group label {
@@ -231,6 +231,11 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
         }
 
         /* Resultados */
@@ -262,10 +267,11 @@
 
         .badge-count {
             background: #e6f4ff;
-            padding: 0.2rem 0.8rem;
+            padding: 0.3rem 1rem;
             border-radius: 20px;
             font-size: 0.8rem;
             color: #2f80ed;
+            font-weight: 600;
         }
 
         .table-wrapper {
@@ -303,6 +309,11 @@
             text-align: center;
             padding: 3rem;
             color: #94a3b8;
+        }
+
+        .empty-state i {
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         .loading {
@@ -353,6 +364,16 @@
             border: 1px solid #cbd5e1;
             border-radius: 12px;
         }
+
+        .search-info {
+            background: #f8fafc;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #475569;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -402,16 +423,16 @@
                 </div>
                 <div class="search-form">
                     <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Tipo de Busca</label>
+                        <label><i class="fas fa-tag"></i> TIPO DE BUSCA</label>
                         <select id="searchType">
                             <option value="NTE">📌 NTE</option>
-                            <option value="MUNICIPIO">🏙️ Município</option>
-                            <option value="ESCOLA">🏫 Nome da Escola</option>
-                            <option value="ESTADO">🇧🇷 Estado</option>
+                            <option value="MUNICIPIO" selected>🏙️ Município</option>
+                            <option value="ESCOLA">🏫 Nome da Escola (Código SEC)</option>
+                            <option value="INEP">📊 Código INEP</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-keyboard"></i> Valor para Pesquisar</label>
+                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR</label>
                         <input type="text" id="searchValue" placeholder="Digite o valor para busca..." autocomplete="off">
                     </div>
                     <button class="btn-search" id="searchBtn">
@@ -420,6 +441,9 @@
                     <button class="btn-clear" id="clearBtn">
                         <i class="fas fa-eraser"></i> Limpar
                     </button>
+                </div>
+                <div class="search-info" id="searchInfo">
+                    <i class="fas fa-info-circle"></i> Buscando na coluna: <strong id="searchColumnLabel">C (Município)</strong>
                 </div>
             </div>
 
@@ -430,8 +454,9 @@
                 </div>
                 <div id="resultsTable">
                     <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exemplo: Município = "BARRA" ou NTE = "15"</p>
                     </div>
                 </div>
             </div>
@@ -441,9 +466,8 @@
         <div id="notasTab" class="tab-content" style="display: none;">
             <div class="results-panel">
                 <div class="empty-state">
-                    <i class="fas fa-file-alt" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <i class="fas fa-file-alt" style="font-size: 3rem;"></i>
                     <p>Área de Notas Técnicas - Em desenvolvimento</p>
-                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Em breve: visualização das notas técnicas consolidadas</p>
                 </div>
             </div>
         </div>
@@ -452,14 +476,15 @@
         <div id="relatoriosTab" class="tab-content" style="display: none;">
             <div class="results-panel">
                 <div class="empty-state">
-                    <i class="fas fa-chart-line" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <i class="fas fa-chart-line" style="font-size: 3rem;"></i>
                     <p>Área de Relatórios - Em desenvolvimento</p>
                 </div>
             </div>
         </div>
 
         <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Dados sincronizados com Google Sheets · Aba "Escolas_ativas" · Colunas: NTE, Município, Código SEC, Código INEP, Unidade Escolar
+            <i class="fas fa-sync-alt"></i> Dados sincronizados com Google Sheets · Aba "Escolas_ativas"<br>
+            <strong>Estrutura de retorno:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
         </div>
     </main>
 
@@ -479,26 +504,33 @@
     <script>
         // CONFIGURAÇÃO
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
-        const TARGET_SHEET = 'Escolas_ativas'; // Aba principal de escolas
+        const TARGET_SHEET = 'Escolas_ativas';
         
-        // Mapeamento das colunas esperadas na planilha
-        // Baseado no seu VBA: B, C, D, F, G
-        const COLUMN_MAPPING = {
-            nte: 'B',        // Coluna B - NTE
-            municipio: 'C',  // Coluna C - Município  
-            codigoSec: 'D',  // Coluna D - Código SEC
-            codigoInep: 'F', // Coluna F - Código INEP
-            unidadeEscolar: 'G' // Coluna G - Unidade Escolar
+        // Mapeamento das colunas na planilha (índices base 0 para array)
+        // Estrutura: [NTE, Municipio, CodigoSEC, CodigoINEP, UnidadeEscolar]
+        // Baseado na sua planilha:
+        // Coluna B = NTE (índice 1)
+        // Coluna C = Município (índice 2)
+        // Coluna D = Código SEC (índice 3)
+        // Coluna F = Código INEP (índice 5)
+        // Coluna G = Unidade Escolar (índice 6)
+        
+        // Mapeamento do tipo de busca para a coluna e índice
+        const SEARCH_MAPPING = {
+            'NTE': { coluna: 'B', indice: 1, label: 'B (NTE)' },
+            'MUNICIPIO': { coluna: 'C', indice: 2, label: 'C (Município)' },
+            'ESCOLA': { coluna: 'D', indice: 3, label: 'D (Código SEC)' },
+            'INEP': { coluna: 'F', indice: 5, label: 'F (Código INEP)' }
         };
+        
+        let escolasData = []; // Armazena todos os dados carregados da planilha
 
-        let escolasData = []; // Armazena todos os dados carregados
-
-        // Função para carregar dados da aba Escolas_ativas
+        // Função para carregar dados da aba Escolas_ativas do Google Sheets
         async function loadEscolasData() {
             try {
                 showLoading();
                 
-                // Usando Google Sheets CSV export
+                // Usando Google Sheets CSV export (público)
                 const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`;
                 
                 const response = await fetch(csvUrl);
@@ -509,6 +541,7 @@
                 
                 escolasData = parsedData;
                 updateLastUpdateTime();
+                console.log(`Dados carregados: ${escolasData.length} registros`);
                 return parsedData;
                 
             } catch (error) {
@@ -530,14 +563,15 @@
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
                 
-                // Mapeia baseado nas colunas: B(1), C(2), D(3), F(5), G(6) no índice 0-based
+                // Mapeia baseado nas colunas:
+                // B(1): NTE, C(2): Município, D(3): Código SEC, F(5): Código INEP, G(6): Unidade Escolar
                 if (values.length >= 7) {
                     const escola = {
-                        nte: values[1] || '',      // Coluna B (índice 1)
-                        municipio: values[2] || '', // Coluna C (índice 2)
-                        codigoSec: values[3] || '', // Coluna D (índice 3)
-                        codigoInep: values[5] || '', // Coluna F (índice 5)
-                        unidadeEscolar: values[6] || '' // Coluna G (índice 6)
+                        nte: values[1] ? values[1].replace(/^"|"$/g, '').trim() : '',
+                        municipio: values[2] ? values[2].replace(/^"|"$/g, '').trim() : '',
+                        codigoSec: values[3] ? values[3].replace(/^"|"$/g, '').trim() : '',
+                        codigoInep: values[5] ? values[5].replace(/^"|"$/g, '').trim() : '',
+                        unidadeEscolar: values[6] ? values[6].replace(/^"|"$/g, '').trim() : ''
                     };
                     
                     // Só adiciona se tiver pelo menos um dado relevante
@@ -562,26 +596,28 @@
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
+                    result.push(current);
                     current = '';
                 } else {
                     current += char;
                 }
             }
-            result.push(current.trim());
+            result.push(current);
             
             return result;
         }
 
-        // Dados mockados para exemplo
+        // Dados mockados para demonstração (simulando sua planilha)
         function getMockEscolasData() {
             return [
-                { nte: 'NTE 01', municipio: 'São Paulo', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
-                { nte: 'NTE 01', municipio: 'São Paulo', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
-                { nte: 'NTE 02', municipio: 'Campinas', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
-                { nte: 'NTE 02', municipio: 'Campinas', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
-                { nte: 'NTE 03', municipio: 'Ribeirão Preto', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
-                { nte: 'NTE 01', municipio: 'Guarulhos', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
+                { nte: 'NTE 01', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
+                { nte: 'NTE 01', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
+                { nte: 'NTE 02', municipio: 'BARRA DO GARÇAS', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
+                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
+                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
+                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
+                { nte: 'NTE 03', municipio: 'BARRA MANSA', codigoSec: 'SEC203', codigoInep: '355203', unidadeEscolar: 'EE Barra Mansa' },
+                { nte: 'NTE 08', municipio: 'SÃO PAULO', codigoSec: 'SEC015', codigoInep: '355015', unidadeEscolar: 'EMEF Santo Antônio' },
             ];
         }
 
@@ -592,26 +628,38 @@
             }
             
             const value = searchValue.trim().toLowerCase();
+            const mapping = SEARCH_MAPPING[searchType];
             
-            return escolasData.filter(escola => {
+            if (!mapping) return [];
+            
+            const results = escolasData.filter(escola => {
+                let campo = '';
+                
                 switch(searchType) {
                     case 'NTE':
-                        return escola.nte.toLowerCase().includes(value);
+                        campo = escola.nte.toLowerCase();
+                        break;
                     case 'MUNICIPIO':
-                        return escola.municipio.toLowerCase().includes(value);
+                        campo = escola.municipio.toLowerCase();
+                        break;
                     case 'ESCOLA':
-                        return escola.unidadeEscolar.toLowerCase().includes(value);
-                    case 'ESTADO':
-                        // Estado pode estar em coluna separada, por simulação retorna alguns
-                        return escola.estado?.toLowerCase().includes(value) || false;
+                        campo = escola.codigoSec.toLowerCase();
+                        break;
+                    case 'INEP':
+                        campo = escola.codigoInep.toLowerCase();
+                        break;
                     default:
                         return false;
                 }
+                
+                return campo.includes(value);
             });
+            
+            return results;
         }
 
         // Renderizar tabela de resultados
-        function renderResults(results) {
+        function renderResults(results, searchType, searchValue) {
             const container = document.getElementById('resultsTable');
             const countSpan = document.getElementById('resultCount');
             
@@ -620,8 +668,9 @@
             if (results.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
-                        <p>Nenhum resultado encontrado para esta busca.</p>
+                        <i class="fas fa-search" style="font-size: 3rem;"></i>
+                        <p>Nenhum resultado encontrado para "${searchValue}" na coluna ${SEARCH_MAPPING[searchType]?.coluna || '?'}</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Verifique se o valor digitado está correto.</p>
                     </div>
                 `;
                 return;
@@ -632,11 +681,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>📌 NTE</th>
-                                <th>🏙️ Município</th>
-                                <th>🔢 Código SEC</th>
-                                <th>📊 Código INEP</th>
-                                <th>🏫 Unidade Escolar</th>
+                                <th>📌 NTE (Coluna B)</th>
+                                <th>🏙️ Município (Coluna C)</th>
+                                <th>🔢 Código SEC (Coluna D)</th>
+                                <th>📊 Código INEP (Coluna F)</th>
+                                <th>🏫 Unidade Escolar (Coluna G)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -677,15 +726,24 @@
             const formatted = now.toLocaleString('pt-BR');
             const footer = document.querySelector('.footer-note');
             if (footer) {
-                const timeSpan = document.createElement('span');
-                timeSpan.style.marginLeft = '1rem';
-                timeSpan.innerHTML = `<i class="fas fa-clock"></i> ${formatted}`;
                 const oldSpan = footer.querySelector('.time-span');
                 if (oldSpan) oldSpan.remove();
                 const newSpan = document.createElement('span');
                 newSpan.className = 'time-span';
-                newSpan.innerHTML = ` | <i class="fas fa-clock"></i> ${formatted}`;
+                newSpan.style.display = 'block';
+                newSpan.style.marginTop = '0.5rem';
+                newSpan.style.fontSize = '0.7rem';
+                newSpan.innerHTML = `<i class="fas fa-clock"></i> Última atualização: ${formatted}`;
                 footer.appendChild(newSpan);
+            }
+        }
+
+        // Atualizar informação da coluna de busca
+        function updateSearchInfo(searchType) {
+            const mapping = SEARCH_MAPPING[searchType];
+            const label = document.getElementById('searchColumnLabel');
+            if (label && mapping) {
+                label.innerHTML = `${mapping.coluna} (${mapping.label.split(' ')[0]})`;
             }
         }
 
@@ -709,26 +767,42 @@
             // Carregar dados das escolas
             await loadEscolasData();
             
-            // Eventos dos botões
+            // Atualizar info inicial
+            updateSearchInfo('MUNICIPIO');
+            
+            // Evento de mudança do tipo de busca
+            document.getElementById('searchType').addEventListener('change', (e) => {
+                updateSearchInfo(e.target.value);
+            });
+            
+            // Evento de pesquisa
             document.getElementById('searchBtn').addEventListener('click', () => {
                 const searchType = document.getElementById('searchType').value;
                 const searchValue = document.getElementById('searchValue').value;
+                
+                if (!searchValue.trim()) {
+                    alert('Digite um valor para pesquisar!');
+                    return;
+                }
+                
                 const results = searchEscolas(searchType, searchValue);
-                renderResults(results);
+                renderResults(results, searchType, searchValue);
             });
             
+            // Evento de limpar
             document.getElementById('clearBtn').addEventListener('click', () => {
                 document.getElementById('searchValue').value = '';
-                renderResults([]);
                 document.getElementById('resultCount').textContent = '0 registros';
                 document.getElementById('resultsTable').innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exemplo: Município = "BARRA" ou NTE = "15"</p>
                     </div>
                 `;
             });
             
+            // Enter para pesquisar
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     document.getElementById('searchBtn').click();
@@ -756,9 +830,12 @@
             document.getElementById('confirmAddSheetBtn').onclick = () => {
                 const newSheet = document.getElementById('newSheetName').value;
                 if (newSheet) {
-                    alert(`Nova aba "${newSheet}" será carregada em breve.\nFuncionalidade em desenvolvimento.`);
+                    alert(`Nova aba "${newSheet}" será carregada.\nFuncionalidade em desenvolvimento.`);
                     modal.style.display = 'none';
                 }
+            };
+            window.onclick = (e) => {
+                if (e.target === modal) modal.style.display = 'none';
             };
         }
         
