@@ -19,7 +19,6 @@
             color: #1a2b4c;
         }
 
-        /* Header */
         .app-header {
             background: linear-gradient(135deg, #0a2647, #123456);
             color: white;
@@ -72,7 +71,6 @@
             gap: 8px;
         }
 
-        /* Menu Abas */
         .tabs-container {
             background: #103450;
             padding: 0 2rem;
@@ -108,7 +106,6 @@
             border-bottom-color: #2f80ed;
         }
 
-        /* Admin Bar */
         .admin-bar {
             background: white;
             padding: 0.8rem 2rem;
@@ -126,14 +123,24 @@
             color: #4a627a;
         }
 
-        /* Main Content */
+        .debug-info {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: #92400e;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
         .main-container {
             padding: 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* Painel de Busca */
         .search-panel {
             background: white;
             border-radius: 24px;
@@ -238,7 +245,6 @@
             background: #e2e8f0;
         }
 
-        /* Resultados */
         .results-panel {
             background: white;
             border-radius: 24px;
@@ -331,7 +337,6 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -351,18 +356,6 @@
             padding: 2rem;
             max-width: 450px;
             width: 90%;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 1rem;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
         }
 
         .search-info {
@@ -391,7 +384,7 @@
         </div>
     </header>
 
-    <div class="tabs-container" id="tabsContainer">
+    <div class="tabs-container">
         <button class="tab-btn active" data-tab="consulta">
             <i class="fas fa-search"></i> Consulta Escolas
         </button>
@@ -405,16 +398,16 @@
 
     <div class="admin-bar">
         <div class="sheet-id">
-            <i class="fas fa-database"></i> Planilha ID: <strong id="sheetIdDisplay">1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
+            <i class="fas fa-database"></i> Planilha ID: <strong>1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
             <span style="margin-left: 1rem;">📄 Aba: <strong id="currentSheetName">Escolas_ativas</strong></span>
+            <span style="margin-left: 1rem;" id="recordCount"></span>
         </div>
-        <button class="btn-clear" id="addSheetBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
-            <i class="fas fa-plus"></i> Adicionar Nova Aba
+        <button class="btn-clear" id="refreshDataBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
+            <i class="fas fa-sync-alt"></i> Recarregar Dados
         </button>
     </div>
 
     <main class="main-container">
-        <!-- Aba de Consulta -->
         <div id="consultaTab" class="tab-content">
             <div class="search-panel">
                 <div class="search-header">
@@ -425,15 +418,15 @@
                     <div class="form-group">
                         <label><i class="fas fa-tag"></i> TIPO DE BUSCA</label>
                         <select id="searchType">
-                            <option value="NTE">📌 NTE</option>
-                            <option value="MUNICIPIO" selected>🏙️ Município</option>
-                            <option value="ESCOLA">🏫 Nome da Escola (Código SEC)</option>
-                            <option value="INEP">📊 Código INEP</option>
+                            <option value="NTE">📌 NTE (Coluna B)</option>
+                            <option value="MUNICIPIO" selected>🏙️ Município (Coluna C)</option>
+                            <option value="ESCOLA">🏫 Código SEC (Coluna D)</option>
+                            <option value="INEP">📊 Código INEP (Coluna F)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR</label>
-                        <input type="text" id="searchValue" placeholder="Digite o valor para busca..." autocomplete="off">
+                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR (BUSCA EXATA)</label>
+                        <input type="text" id="searchValue" placeholder="Digite o valor exato para busca..." autocomplete="off">
                     </div>
                     <button class="btn-search" id="searchBtn">
                         <i class="fas fa-search"></i> Pesquisar
@@ -442,8 +435,8 @@
                         <i class="fas fa-eraser"></i> Limpar
                     </button>
                 </div>
-                <div class="search-info" id="searchInfo">
-                    <i class="fas fa-info-circle"></i> Buscando na coluna: <strong id="searchColumnLabel">C (Município)</strong>
+                <div class="search-info">
+                    <i class="fas fa-info-circle"></i> Busca EXATA em: <strong id="searchColumnLabel">Coluna C (Município)</strong> - Ignora maiúsculas/minúsculas
                 </div>
             </div>
 
@@ -455,14 +448,12 @@
                 <div id="resultsTable">
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exemplo: Município = "BARRA" ou NTE = "15"</p>
+                        <p>Carregando dados da planilha...</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Aba de Notas Técnicas (placeholder) -->
         <div id="notasTab" class="tab-content" style="display: none;">
             <div class="results-panel">
                 <div class="empty-state">
@@ -472,7 +463,6 @@
             </div>
         </div>
 
-        <!-- Aba de Relatórios (placeholder) -->
         <div id="relatoriosTab" class="tab-content" style="display: none;">
             <div class="results-panel">
                 <div class="empty-state">
@@ -483,99 +473,133 @@
         </div>
 
         <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Dados sincronizados com Google Sheets · Aba "Escolas_ativas"<br>
-            <strong>Estrutura de retorno:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
+            <i class="fas fa-sync-alt"></i> Dados carregados DIRETAMENTE da sua planilha Google Sheets<br>
+            <strong>Estrutura:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)<br>
+            <strong>Busca EXATA:</strong> "BARRA" só retorna BARRA, não "BARRA DO GARÇAS" | "15" só retorna 15, não 115 ou 150
         </div>
     </main>
-
-    <!-- Modal para adicionar nova aba -->
-    <div id="sheetModal" class="modal">
-        <div class="modal-content">
-            <h3><i class="fas fa-plus-circle"></i> Adicionar Nova Aba</h3>
-            <p>Digite o nome da aba que deseja carregar:</p>
-            <input type="text" id="newSheetName" placeholder="Ex: Escolas_ativas, Notas_2026, etc." />
-            <div class="modal-buttons" style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button class="btn-clear" id="cancelModalBtn">Cancelar</button>
-                <button class="btn-search" id="confirmAddSheetBtn">Adicionar</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         // CONFIGURAÇÃO
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
         const TARGET_SHEET = 'Escolas_ativas';
         
-        // Mapeamento das colunas na planilha (índices base 0 para array)
-        // Estrutura: [NTE, Municipio, CodigoSEC, CodigoINEP, UnidadeEscolar]
-        // Baseado na sua planilha:
-        // Coluna B = NTE (índice 1)
-        // Coluna C = Município (índice 2)
-        // Coluna D = Código SEC (índice 3)
-        // Coluna F = Código INEP (índice 5)
-        // Coluna G = Unidade Escolar (índice 6)
-        
-        // Mapeamento do tipo de busca para a coluna e índice
-        const SEARCH_MAPPING = {
-            'NTE': { coluna: 'B', indice: 1, label: 'B (NTE)' },
-            'MUNICIPIO': { coluna: 'C', indice: 2, label: 'C (Município)' },
-            'ESCOLA': { coluna: 'D', indice: 3, label: 'D (Código SEC)' },
-            'INEP': { coluna: 'F', indice: 5, label: 'F (Código INEP)' }
-        };
-        
-        let escolasData = []; // Armazena todos os dados carregados da planilha
+        let escolasData = [];
+        let isLoading = false;
 
-        // Função para carregar dados da aba Escolas_ativas do Google Sheets
-        async function loadEscolasData() {
+        const SEARCH_MAPPING = {
+            'NTE': { coluna: 'B', campo: 'nte', label: 'Coluna B (NTE) - Busca EXATA' },
+            'MUNICIPIO': { coluna: 'C', campo: 'municipio', label: 'Coluna C (Município) - Busca EXATA' },
+            'ESCOLA': { coluna: 'D', campo: 'codigoSec', label: 'Coluna D (Código SEC) - Busca EXATA' },
+            'INEP': { coluna: 'F', campo: 'codigoInep', label: 'Coluna F (Código INEP) - Busca EXATA' }
+        };
+
+        // Carregar dados REAIS da planilha (SEM MOCK)
+        async function loadRealDataFromSheets() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const container = document.getElementById('resultsTable');
+            container.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha Google Sheets...<br>
+                    <small style="font-size: 0.7rem;">Aguarde, buscando na aba "${TARGET_SHEET}"</small>
+                </div>
+            `;
+            
             try {
-                showLoading();
-                
-                // Usando Google Sheets CSV export (público)
+                // Usando Google Sheets CSV export
                 const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`;
                 
+                console.log('Carregando de:', csvUrl);
+                
                 const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error('Erro ao carregar planilha');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Erro ao carregar`);
+                }
                 
                 const csvText = await response.text();
-                const parsedData = parseCSVToEscolas(csvText);
+                console.log('CSV carregado, tamanho:', csvText.length, 'caracteres');
                 
+                const parsedData = parseCSVToEscolasReal(csvText);
                 escolasData = parsedData;
-                updateLastUpdateTime();
-                console.log(`Dados carregados: ${escolasData.length} registros`);
-                return parsedData;
+                
+                const countSpan = document.getElementById('recordCount');
+                if (countSpan) {
+                    countSpan.innerHTML = `📊 ${escolasData.length} registros carregados`;
+                }
+                
+                console.log(`✅ Dados carregados: ${escolasData.length} registros`);
+                console.log('Primeiros 3 registros:', escolasData.slice(0, 3));
+                
+                // Mostrar dados carregados para debug
+                const debugDiv = document.createElement('div');
+                debugDiv.className = 'debug-info';
+                debugDiv.innerHTML = `<i class="fas fa-bug"></i> DEBUG: ${escolasData.length} registros carregados da planilha. Exemplo: ${escolasData[0] ? `NTE="${escolasData[0].nte}", Município="${escolasData[0].municipio}"` : 'Nenhum dado'}`;
+                
+                const existingDebug = document.querySelector('.debug-info');
+                if (existingDebug) existingDebug.remove();
+                document.querySelector('.results-panel').insertBefore(debugDiv, document.getElementById('resultsTable'));
+                
+                // Resetar busca
+                document.getElementById('resultCount').textContent = '0 registros';
+                document.getElementById('resultsTable').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search" style="font-size: 3rem;"></i>
+                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: "BARRA" só retorna BARRA | "15" só retorna 15</p>
+                    </div>
+                `;
+                
+                return escolasData;
                 
             } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                // Dados de exemplo para demonstração
-                escolasData = getMockEscolasData();
-                return escolasData;
+                console.error('Erro detalhado:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                        <p>Erro ao carregar dados da planilha</p>
+                        <p style="font-size: 0.8rem;">${error.message}</p>
+                        <p style="font-size: 0.7rem; margin-top: 0.5rem;">Verifique se a planilha está pública ou compartilhada</p>
+                    </div>
+                `;
+                escolasData = [];
+                return [];
+            } finally {
+                isLoading = false;
             }
         }
 
-        // Parse CSV para estrutura de escolas
-        function parseCSVToEscolas(csvText) {
+        // Parse CSV para estrutura de escolas (SEM MOCK, dados reais)
+        function parseCSVToEscolasReal(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
+            if (lines.length < 2) {
+                console.warn('CSV com poucas linhas:', lines.length);
+                return [];
+            }
             
             const escolas = [];
             
             // Pula cabeçalho (linha 1)
             for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
+                const line = lines[i];
+                if (!line.trim()) continue;
+                
+                const values = parseCSVLine(line);
                 
                 // Mapeia baseado nas colunas:
                 // B(1): NTE, C(2): Município, D(3): Código SEC, F(5): Código INEP, G(6): Unidade Escolar
                 if (values.length >= 7) {
                     const escola = {
-                        nte: values[1] ? values[1].replace(/^"|"$/g, '').trim() : '',
-                        municipio: values[2] ? values[2].replace(/^"|"$/g, '').trim() : '',
-                        codigoSec: values[3] ? values[3].replace(/^"|"$/g, '').trim() : '',
-                        codigoInep: values[5] ? values[5].replace(/^"|"$/g, '').trim() : '',
-                        unidadeEscolar: values[6] ? values[6].replace(/^"|"$/g, '').trim() : ''
+                        nte: cleanValue(values[1]),
+                        municipio: cleanValue(values[2]),
+                        codigoSec: cleanValue(values[3]),
+                        codigoInep: cleanValue(values[5]),
+                        unidadeEscolar: cleanValue(values[6])
                     };
                     
-                    // Só adiciona se tiver pelo menos um dado relevante
-                    if (escola.unidadeEscolar || escola.nte || escola.municipio) {
+                    // Só adiciona se tiver pelo menos NTE ou Município ou Unidade Escolar
+                    if (escola.nte || escola.municipio || escola.unidadeEscolar) {
                         escolas.push(escola);
                     }
                 }
@@ -584,7 +608,11 @@
             return escolas;
         }
 
-        // Parse de linha CSV respeitando aspas
+        function cleanValue(value) {
+            if (!value) return '';
+            return value.replace(/^"|"$/g, '').trim();
+        }
+
         function parseCSVLine(line) {
             const result = [];
             let current = '';
@@ -607,58 +635,31 @@
             return result;
         }
 
-        // Dados mockados para demonstração (simulando sua planilha)
-        function getMockEscolasData() {
-            return [
-                { nte: 'NTE 01', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
-                { nte: 'NTE 01', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
-                { nte: 'NTE 02', municipio: 'BARRA DO GARÇAS', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
-                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
-                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
-                { nte: 'NTE 15', municipio: 'CAMPINAS', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
-                { nte: 'NTE 03', municipio: 'BARRA MANSA', codigoSec: 'SEC203', codigoInep: '355203', unidadeEscolar: 'EE Barra Mansa' },
-                { nte: 'NTE 08', municipio: 'SÃO PAULO', codigoSec: 'SEC015', codigoInep: '355015', unidadeEscolar: 'EMEF Santo Antônio' },
-            ];
-        }
-
-        // Função de pesquisa baseada no tipo selecionado
-        function searchEscolas(searchType, searchValue) {
+        // BUSCA EXATA - ignora maiúsculas/minúsculas mas compara exatamente
+        function searchEscolasExact(searchType, searchValue) {
             if (!searchValue || searchValue.trim() === '') {
                 return [];
             }
             
-            const value = searchValue.trim().toLowerCase();
+            const valueNormalized = searchValue.trim().toLowerCase();
             const mapping = SEARCH_MAPPING[searchType];
             
-            if (!mapping) return [];
+            if (!mapping || !escolasData.length) return [];
             
             const results = escolasData.filter(escola => {
-                let campo = '';
+                const campo = escola[mapping.campo] || '';
+                const campoNormalized = campo.toLowerCase();
                 
-                switch(searchType) {
-                    case 'NTE':
-                        campo = escola.nte.toLowerCase();
-                        break;
-                    case 'MUNICIPIO':
-                        campo = escola.municipio.toLowerCase();
-                        break;
-                    case 'ESCOLA':
-                        campo = escola.codigoSec.toLowerCase();
-                        break;
-                    case 'INEP':
-                        campo = escola.codigoInep.toLowerCase();
-                        break;
-                    default:
-                        return false;
-                }
-                
-                return campo.includes(value);
+                // BUSCA EXATA: compara se são iguais, não se contém
+                return campoNormalized === valueNormalized;
             });
+            
+            console.log(`Busca EXATA: "${searchValue}" em ${mapping.campo} -> encontrou ${results.length} resultados`);
+            console.log('Valores encontrados:', results.map(r => r[mapping.campo]));
             
             return results;
         }
 
-        // Renderizar tabela de resultados
         function renderResults(results, searchType, searchValue) {
             const container = document.getElementById('resultsTable');
             const countSpan = document.getElementById('resultCount');
@@ -669,8 +670,9 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Nenhum resultado encontrado para "${searchValue}" na coluna ${SEARCH_MAPPING[searchType]?.coluna || '?'}</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Verifique se o valor digitado está correto.</p>
+                        <p>Nenhum resultado encontrado para <strong>"${searchValue}"</strong></p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: o valor digitado deve corresponder exatamente ao valor na planilha.</p>
+                        <p style="font-size: 0.7rem;">Exemplo: Se buscar "BARRA", só retorna registros com Município = "BARRA" (não "BARRA DO GARÇAS")</p>
                     </div>
                 `;
                 return;
@@ -712,42 +714,14 @@
             container.innerHTML = html;
         }
 
-        function showLoading() {
-            const container = document.getElementById('resultsTable');
-            container.innerHTML = `
-                <div class="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...
-                </div>
-            `;
-        }
-
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const formatted = now.toLocaleString('pt-BR');
-            const footer = document.querySelector('.footer-note');
-            if (footer) {
-                const oldSpan = footer.querySelector('.time-span');
-                if (oldSpan) oldSpan.remove();
-                const newSpan = document.createElement('span');
-                newSpan.className = 'time-span';
-                newSpan.style.display = 'block';
-                newSpan.style.marginTop = '0.5rem';
-                newSpan.style.fontSize = '0.7rem';
-                newSpan.innerHTML = `<i class="fas fa-clock"></i> Última atualização: ${formatted}`;
-                footer.appendChild(newSpan);
-            }
-        }
-
-        // Atualizar informação da coluna de busca
         function updateSearchInfo(searchType) {
             const mapping = SEARCH_MAPPING[searchType];
             const label = document.getElementById('searchColumnLabel');
             if (label && mapping) {
-                label.innerHTML = `${mapping.coluna} (${mapping.label.split(' ')[0]})`;
+                label.innerHTML = mapping.label;
             }
         }
 
-        // Controle de abas
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.style.display = 'none';
@@ -764,18 +738,15 @@
 
         // Inicialização
         async function init() {
-            // Carregar dados das escolas
-            await loadEscolasData();
+            // Carregar dados reais da planilha
+            await loadRealDataFromSheets();
             
-            // Atualizar info inicial
             updateSearchInfo('MUNICIPIO');
             
-            // Evento de mudança do tipo de busca
             document.getElementById('searchType').addEventListener('change', (e) => {
                 updateSearchInfo(e.target.value);
             });
             
-            // Evento de pesquisa
             document.getElementById('searchBtn').addEventListener('click', () => {
                 const searchType = document.getElementById('searchType').value;
                 const searchValue = document.getElementById('searchValue').value;
@@ -785,11 +756,10 @@
                     return;
                 }
                 
-                const results = searchEscolas(searchType, searchValue);
+                const results = searchEscolasExact(searchType, searchValue);
                 renderResults(results, searchType, searchValue);
             });
             
-            // Evento de limpar
             document.getElementById('clearBtn').addEventListener('click', () => {
                 document.getElementById('searchValue').value = '';
                 document.getElementById('resultCount').textContent = '0 registros';
@@ -797,46 +767,29 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exemplo: Município = "BARRA" ou NTE = "15"</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: "BARRA" só retorna BARRA | "15" só retorna 15</p>
                     </div>
                 `;
             });
             
-            // Enter para pesquisar
+            document.getElementById('refreshDataBtn').addEventListener('click', async () => {
+                await loadRealDataFromSheets();
+                alert(`Dados recarregados! ${escolasData.length} registros carregados.`);
+            });
+            
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     document.getElementById('searchBtn').click();
                 }
             });
             
-            // Abas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     switchTab(btn.dataset.tab);
                 });
             });
             
-            document.getElementById('sheetIdDisplay').innerText = SPREADSHEET_ID;
             document.getElementById('currentSheetName').innerText = TARGET_SHEET;
-            
-            // Modal
-            const modal = document.getElementById('sheetModal');
-            document.getElementById('addSheetBtn').onclick = () => {
-                modal.style.display = 'flex';
-            };
-            document.getElementById('cancelModalBtn').onclick = () => {
-                modal.style.display = 'none';
-            };
-            document.getElementById('confirmAddSheetBtn').onclick = () => {
-                const newSheet = document.getElementById('newSheetName').value;
-                if (newSheet) {
-                    alert(`Nova aba "${newSheet}" será carregada.\nFuncionalidade em desenvolvimento.`);
-                    modal.style.display = 'none';
-                }
-            };
-            window.onclick = (e) => {
-                if (e.target === modal) modal.style.display = 'none';
-            };
         }
         
         init();
