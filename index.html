@@ -7,18 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #eef2f8;
-            color: #1a2b4c;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #eef2f8; color: #1a2b4c; }
         .app-header {
             background: linear-gradient(135deg, #0a2647, #123456);
             color: white;
@@ -30,47 +20,11 @@
             gap: 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-icon {
-            background: #1e4d8c;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .title h1 {
-            font-size: 1.6rem;
-            font-weight: 600;
-        }
-
-        .title span {
-            font-size: 0.8rem;
-            background: #2f80ed;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            margin-left: 8px;
-        }
-
-        .sheet-info {
-            background: rgba(255,255,255,0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: #1e4d8c; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .title h1 { font-size: 1.6rem; font-weight: 600; }
+        .title span { font-size: 0.8rem; background: #2f80ed; padding: 0.2rem 0.8rem; border-radius: 20px; margin-left: 8px; }
+        .sheet-info { background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
         .tabs-container {
             background: #103450;
             padding: 0 2rem;
@@ -79,7 +33,6 @@
             gap: 0.25rem;
             border-bottom: 1px solid #2a5570;
         }
-
         .tab-btn {
             padding: 0.8rem 1.5rem;
             background: none;
@@ -94,18 +47,8 @@
             transition: all 0.2s;
             font-size: 0.9rem;
         }
-
-        .tab-btn:hover {
-            background: #1f4b70;
-            color: white;
-        }
-
-        .tab-btn.active {
-            background: #1f4b70;
-            color: white;
-            border-bottom-color: #2f80ed;
-        }
-
+        .tab-btn:hover { background: #1f4b70; color: white; }
+        .tab-btn.active { background: #1f4b70; color: white; border-bottom-color: #2f80ed; }
         .admin-bar {
             background: white;
             padding: 0.8rem 2rem;
@@ -116,37 +59,9 @@
             gap: 1rem;
             border-bottom: 1px solid #e2e8f0;
         }
-
-        .sheet-id {
-            font-family: monospace;
-            font-size: 0.75rem;
-            color: #4a627a;
-        }
-
-        .status-badge {
-            background: #e6f4ff;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            color: #2f80ed;
-        }
-
-        .status-badge.warning {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .status-badge.error {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .main-container {
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        .sheet-id { font-family: monospace; font-size: 0.75rem; color: #4a627a; }
+        .status-badge { background: #e6f4ff; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; color: #2f80ed; }
+        .main-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
         .search-panel {
             background: white;
             border-radius: 24px;
@@ -155,7 +70,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
         }
-
         .search-header {
             display: flex;
             align-items: center;
@@ -164,202 +78,31 @@
             padding-bottom: 1rem;
             border-bottom: 2px solid #eef2f8;
         }
-
-        .search-header i {
-            font-size: 1.8rem;
-            color: #2f80ed;
-        }
-
-        .search-header h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #0a2647;
-        }
-
-        .search-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-
-        .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #5c7b9c;
-            margin-bottom: 0.4rem;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group select, .form-group input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .form-group select:focus, .form-group input:focus {
-            outline: none;
-            border-color: #2f80ed;
-            box-shadow: 0 0 0 3px rgba(47,128,237,0.1);
-        }
-
-        .btn-search {
-            background: #2f80ed;
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .btn-search:hover {
-            background: #1a68c7;
-            transform: translateY(-1px);
-        }
-
-        .btn-clear {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-            padding: 0.8rem 1.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-clear:hover {
-            background: #e2e8f0;
-        }
-
-        .results-panel {
-            background: white;
-            border-radius: 24px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .results-header h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1e4d8c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .badge-count {
-            background: #e6f4ff;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #2f80ed;
-            font-weight: 600;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 16px;
-            border: 1px solid #eef2f8;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 700px;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #1e4d8c;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        td {
-            padding: 0.9rem 1rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        tr:hover td {
-            background-color: #fafcff;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #94a3b8;
-        }
-
-        .empty-state i {
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: #2f80ed;
-        }
-
-        .footer-note {
-            margin-top: 2rem;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #6c86a3;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .instruction-box {
-            background: #e6f4ff;
-            border: 1px solid #2f80ed;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-        }
-
-        .instruction-box a {
-            color: #2f80ed;
-            text-decoration: none;
-        }
-
-        .instruction-box a:hover {
-            text-decoration: underline;
-        }
+        .search-header i { font-size: 1.8rem; color: #2f80ed; }
+        .search-header h3 { font-size: 1.2rem; font-weight: 600; color: #0a2647; }
+        .search-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #5c7b9c; margin-bottom: 0.4rem; letter-spacing: 0.5px; }
+        .form-group select, .form-group input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-family: inherit; font-size: 0.9rem; transition: all 0.2s; }
+        .form-group select:focus, .form-group input:focus { outline: none; border-color: #2f80ed; box-shadow: 0 0 0 3px rgba(47,128,237,0.1); }
+        .btn-search { background: #2f80ed; color: white; border: none; padding: 0.8rem 2rem; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: all 0.2s; }
+        .btn-search:hover { background: #1a68c7; transform: translateY(-1px); }
+        .btn-clear { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-clear:hover { background: #e2e8f0; }
+        .results-panel { background: white; border-radius: 24px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem; }
+        .results-header h4 { font-size: 1rem; font-weight: 600; color: #1e4d8c; display: flex; align-items: center; gap: 8px; }
+        .badge-count { background: #e6f4ff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; color: #2f80ed; font-weight: 600; }
+        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #eef2f8; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px; }
+        th { background: #f8fafc; padding: 1rem; text-align: left; font-weight: 600; color: #1e4d8c; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.9rem 1rem; border-bottom: 1px solid #f1f5f9; }
+        tr:hover td { background-color: #fafcff; }
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        .empty-state i { margin-bottom: 1rem; opacity: 0.5; }
+        .loading { text-align: center; padding: 3rem; color: #2f80ed; }
+        .footer-note { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #6c86a3; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        .search-info { background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -372,21 +115,15 @@
         </div>
         <div class="sheet-info">
             <i class="fab fa-google"></i>
-            <span>Google Sheets</span>
+            <span>Google Sheets API</span>
             <i class="fas fa-check-circle" style="color: #4ade80; font-size: 0.8rem;"></i>
         </div>
     </header>
 
     <div class="tabs-container">
-        <button class="tab-btn active" data-tab="consulta">
-            <i class="fas fa-search"></i> Consulta Escolas
-        </button>
-        <button class="tab-btn" data-tab="notas">
-            <i class="fas fa-file-alt"></i> Notas Técnicas
-        </button>
-        <button class="tab-btn" data-tab="relatorios">
-            <i class="fas fa-chart-bar"></i> Relatórios
-        </button>
+        <button class="tab-btn active" data-tab="consulta"><i class="fas fa-search"></i> Consulta Escolas</button>
+        <button class="tab-btn" data-tab="notas"><i class="fas fa-file-alt"></i> Notas Técnicas</button>
+        <button class="tab-btn" data-tab="relatorios"><i class="fas fa-chart-bar"></i> Relatórios</button>
     </div>
 
     <div class="admin-bar">
@@ -396,25 +133,12 @@
             <span style="margin-left: 1rem;" id="recordCount" class="status-badge"></span>
         </div>
         <button class="btn-clear" id="refreshDataBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
-            <i class="fas fa-sync-alt"></i> Recarregar Dados
+            <i class="fas fa-sync-alt"></i> Carregar Dados
         </button>
     </div>
 
     <main class="main-container">
         <div id="consultaTab" class="tab-content">
-            <div class="instruction-box" id="instructionBox">
-                <i class="fas fa-info-circle"></i> 
-                <strong>Para carregar dados da sua planilha:</strong>
-                <ol style="margin-top: 8px; margin-left: 20px;">
-                    <li>Abra sua planilha do Google Sheets</li>
-                    <li>Clique em <strong>"Arquivo" → "Compartilhar" → "Publicar na web"</strong></li>
-                    <li>Selecione a aba <strong>"Escolas_ativas"</strong> e formato <strong>"Página da web"</strong></li>
-                    <li>Clique em <strong>"Publicar"</strong> e confirme</li>
-                    <li>Depois clique em <strong>"Recarregar Dados"</strong> abaixo</li>
-                </ol>
-                <a href="https://support.google.com/docs/answer/183965?hl=pt-BR" target="_blank" style="font-size: 0.75rem;">🔗 Como publicar uma planilha no Google Sheets</a>
-            </div>
-            
             <div class="search-panel">
                 <div class="search-header">
                     <i class="fas fa-filter"></i>
@@ -427,7 +151,7 @@
                             <option value="NTE">📌 NTE</option>
                             <option value="MUNICIPIO" selected>🏙️ Município</option>
                             <option value="ESCOLA">🏫 Escola (Código SEC)</option>
-                            <option value="ESTADO">🇧🇷 Estado (todos os registros)</option>
+                            <option value="ESTADO">🇧🇷 Estado</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -441,7 +165,7 @@
                         <i class="fas fa-eraser"></i> Limpar
                     </button>
                 </div>
-                <div class="search-info" style="background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8rem;">
+                <div class="search-info">
                     <i class="fas fa-info-circle"></i> 
                     <span id="searchInfoText">Busca EXATA em Município (Coluna C)</span>
                 </div>
@@ -454,9 +178,8 @@
                 </div>
                 <div id="resultsTable">
                     <div class="empty-state">
-                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem;"></i>
-                        <p>Clique em <strong>"Recarregar Dados"</strong> para carregar sua planilha</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Após publicar sua planilha, os dados serão carregados automaticamente</p>
+                        <i class="fas fa-cloud-download-alt" style="font-size: 3rem;"></i>
+                        <p>Clique em <strong>"Carregar Dados"</strong> para buscar sua planilha</p>
                     </div>
                 </div>
             </div>
@@ -464,48 +187,39 @@
 
         <div id="notasTab" class="tab-content" style="display: none;">
             <div class="results-panel">
-                <div class="empty-state">
-                    <i class="fas fa-file-alt" style="font-size: 3rem;"></i>
-                    <p>Área de Notas Técnicas - Em desenvolvimento</p>
-                </div>
+                <div class="empty-state"><i class="fas fa-file-alt" style="font-size: 3rem;"></i><p>Área de Notas Técnicas - Em desenvolvimento</p></div>
             </div>
         </div>
 
         <div id="relatoriosTab" class="tab-content" style="display: none;">
             <div class="results-panel">
-                <div class="empty-state">
-                    <i class="fas fa-chart-line" style="font-size: 3rem;"></i>
-                    <p>Área de Relatórios - Em desenvolvimento</p>
-                </div>
+                <div class="empty-state"><i class="fas fa-chart-line" style="font-size: 3rem;"></i><p>Área de Relatórios - Em desenvolvimento</p></div>
             </div>
         </div>
 
         <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Para carregar dados: Publique sua planilha (Arquivo → Compartilhar → Publicar na web)<br>
-            <strong>Estrutura de retorno:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)<br>
-            <strong>Busca EXATA:</strong> "BARRA" só retorna BARRA | "15" só retorna 15 | Estado: retorna TODOS os registros
+            <i class="fas fa-sync-alt"></i> Dados carregados via Google Sheets API<br>
+            <strong>Estrutura:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
         </div>
     </main>
 
     <script>
         // CONFIGURAÇÃO
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
-        const TARGET_SHEET = 'Escolas_ativas';
+        const SHEET_NAME = 'Escolas_ativas';
         
         let escolasData = [];
         let isLoading = false;
-        let publishedUrl = null;
 
-        // Mapeamento dos tipos de busca
         const SEARCH_MAPPING = {
-            'NTE': { coluna: 'B', campo: 'nte', label: 'NTE (Coluna B) - Busca EXATA' },
-            'MUNICIPIO': { coluna: 'C', campo: 'municipio', label: 'Município (Coluna C) - Busca EXATA' },
-            'ESCOLA': { coluna: 'D', campo: 'codigoSec', label: 'Código SEC (Coluna D) - Busca EXATA' },
-            'ESTADO': { coluna: 'TODAS', campo: 'todos', label: 'TODOS os registros - Retorna planilha completa' }
+            'NTE': { campo: 'nte', label: 'NTE - Busca EXATA' },
+            'MUNICIPIO': { campo: 'municipio', label: 'Município - Busca EXATA' },
+            'ESCOLA': { campo: 'codigoSec', label: 'Código SEC - Busca EXATA' },
+            'ESTADO': { campo: 'todos', label: 'TODOS os registros' }
         };
 
-        // Tenta carregar dados via URL publicada
-        async function loadDataFromPublishedSheet() {
+        // Função para carregar dados usando o proxy do Google Sheets (JSONP alternativo)
+        async function loadSheetData() {
             if (isLoading) return;
             isLoading = true;
             
@@ -514,95 +228,123 @@
             
             container.innerHTML = `
                 <div class="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Tentando carregar dados da planilha...<br>
-                    <small style="font-size: 0.7rem;">Verificando se a planilha está publicada</small>
+                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...<br>
+                    <small style="font-size: 0.7rem;">Aguarde, buscando na aba "${SHEET_NAME}"</small>
                 </div>
             `;
             
-            // Tentar diferentes formatos de URL publicada
-            const urlsToTry = [
-                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`,
-                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`,
-                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&sheet=${encodeURIComponent(TARGET_SHEET)}`
-            ];
-            
-            for (const url of urlsToTry) {
-                try {
-                    console.log('Tentando URL:', url);
-                    const response = await fetch(url, { mode: 'cors' });
-                    
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        if (csvText && csvText.length > 100) {
-                            const parsedData = parseCSVToEscolas(csvText);
-                            if (parsedData.length > 0) {
-                                escolasData = parsedData;
-                                publishedUrl = url;
-                                countSpan.innerHTML = `✅ ${escolasData.length} registros`;
-                                countSpan.className = 'status-badge';
-                                
-                                // Esconder instruções
-                                const instBox = document.getElementById('instructionBox');
-                                if (instBox) instBox.style.display = 'none';
-                                
-                                container.innerHTML = `
-                                    <div class="empty-state">
-                                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i>
-                                        <p>✅ Dados carregados com sucesso!</p>
-                                        <p style="font-size: 0.8rem;">${escolasData.length} registros encontrados na aba "${TARGET_SHEET}"</p>
-                                        <p style="font-size: 0.7rem;">Agora você pode pesquisar pelos tipos: NTE, Município, Escola ou Estado</p>
-                                    </div>
-                                `;
-                                
-                                console.log('✅ Dados carregados:', escolasData.length, 'registros');
-                                console.log('Primeiros 3:', escolasData.slice(0, 3));
-                                return true;
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.log('Falha na URL:', url, error.message);
+            try {
+                // Usando o formato de exportação CSV do Google Sheets (funciona com planilhas públicas OU com permissão)
+                // Para planilhas privadas, o usuário precisa estar logado na conta Google
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+                
+                console.log('Carregando:', url);
+                
+                const response = await fetch(url, {
+                    credentials: 'include', // Tenta usar credenciais se estiver logado
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
+                
+                const csvText = await response.text();
+                console.log('CSV recebido, tamanho:', csvText.length);
+                
+                if (csvText.length < 100) {
+                    throw new Error('Dados insuficientes');
+                }
+                
+                const parsedData = parseCSVToEscolas(csvText);
+                
+                if (parsedData.length === 0) {
+                    throw new Error('Nenhum dado encontrado');
+                }
+                
+                escolasData = parsedData;
+                countSpan.innerHTML = `✅ ${escolasData.length} registros`;
+                countSpan.style.background = '#d1fae5';
+                countSpan.style.color = '#065f46';
+                
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i>
+                        <p>✅ Dados carregados com sucesso!</p>
+                        <p style="font-size: 0.8rem;">${escolasData.length} escolas encontradas na aba "${SHEET_NAME}"</p>
+                        <p style="font-size: 0.7rem;">Exemplos de NTE: ${[...new Set(escolasData.slice(0, 10).map(e => e.nte).filter(v => v))].slice(0, 5).join(', ')}</p>
+                        <p style="font-size: 0.7rem;">Exemplos de Municípios: ${[...new Set(escolasData.slice(0, 10).map(e => e.municipio).filter(v => v))].slice(0, 5).join(', ')}</p>
+                    </div>
+                `;
+                
+                console.log('✅ Dados carregados:', escolasData.length);
+                return true;
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                
+                // Se falhar, tentar método alternativo com JSON
+                try {
+                    const jsonUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+                    const jsonResponse = await fetch(jsonUrl, { credentials: 'include' });
+                    const jsonText = await jsonResponse.text();
+                    
+                    // Parse do JSONP
+                    const jsonData = JSON.parse(jsonText.substring(47, jsonText.length - 2));
+                    const parsedData = parseGoogleJSON(jsonData);
+                    
+                    if (parsedData.length > 0) {
+                        escolasData = parsedData;
+                        countSpan.innerHTML = `✅ ${escolasData.length} registros`;
+                        container.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i><p>✅ Dados carregados! ${escolasData.length} registros</p></div>`;
+                        return true;
+                    }
+                } catch(e2) {
+                    console.error('Método alternativo falhou:', e2);
+                }
+                
+                countSpan.innerHTML = `⚠️ Erro`;
+                countSpan.style.background = '#fee2e2';
+                countSpan.style.color = '#dc2626';
+                
+                // Dados de exemplo para demonstração (para você testar a busca)
+                escolasData = getExampleData();
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                        <p>⚠️ Não foi possível carregar sua planilha</p>
+                        <p style="font-size: 0.8rem;">Verifique se você está logado no Google e tem acesso à planilha</p>
+                        <p style="font-size: 0.8rem;">Clique aqui para abrir: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Abrir Planilha</a></p>
+                        <p style="font-size: 0.7rem; margin-top: 0.5rem;">Usando dados de exemplo para demonstração. Após abrir a planilha, clique em "Carregar Dados" novamente.</p>
+                    </div>
+                `;
+                return false;
+            } finally {
+                isLoading = false;
             }
-            
-            // Se chegou aqui, não conseguiu carregar
-            countSpan.innerHTML = `⚠️ Não publicado`;
-            countSpan.className = 'status-badge warning';
-            
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
-                    <p>⚠️ Não foi possível carregar os dados da planilha</p>
-                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Siga as instruções abaixo para publicar sua planilha:</p>
-                    <ol style="text-align: left; max-width: 400px; margin: 1rem auto;">
-                        <li>Abra sua planilha: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Clique aqui</a></li>
-                        <li>Clique em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
-                        <li>Selecione a aba <strong>"${TARGET_SHEET}"</strong></li>
-                        <li>Formato: <strong>Página da web</strong> ou <strong>CSV</strong></li>
-                        <li>Clique em <strong>Publicar</strong> e depois em <strong>Recarregar Dados</strong></li>
-                    </ol>
-                    <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank" class="btn-clear" style="display: inline-flex; margin-top: 1rem;">
-                        <i class="fas fa-external-link-alt"></i> Abrir Planilha
-                    </a>
-                </div>
-            `;
-            
-            // Dados de exemplo para demonstração (apenas para testar a busca)
-            escolasData = getExampleData();
-            console.log('Usando dados de exemplo para demonstração:', escolasData.length, 'registros');
-            
-            return false;
         }
 
-        function getExampleData() {
-            return [
-                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
-                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
-                { nte: '08', municipio: 'SÃO PAULO', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
-                { nte: '12', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
-                { nte: '03', municipio: 'RIBEIRÃO PRETO', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
-                { nte: '01', municipio: 'GUARULHOS', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
-            ];
+        function parseGoogleJSON(jsonData) {
+            const escolas = [];
+            if (!jsonData.table || !jsonData.table.rows) return [];
+            
+            const headers = jsonData.table.cols.map(col => col.label);
+            
+            for (const row of jsonData.table.rows) {
+                if (!row.c) continue;
+                const values = row.c.map(cell => cell ? cell.v : '');
+                
+                if (values.length >= 7) {
+                    escolas.push({
+                        nte: values[1] || '',
+                        municipio: values[2] || '',
+                        codigoSec: values[3] || '',
+                        codigoInep: values[5] || '',
+                        unidadeEscolar: values[6] || ''
+                    });
+                }
+            }
+            return escolas;
         }
 
         function parseCSVToEscolas(csvText) {
@@ -647,7 +389,6 @@
             
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
-                
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ',' && !inQuotes) {
@@ -658,31 +399,32 @@
                 }
             }
             result.push(current);
-            
             return result;
         }
 
+        function getExampleData() {
+            return [
+                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
+                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
+                { nte: '08', municipio: 'SÃO PAULO', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
+                { nte: '12', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
+                { nte: '03', municipio: 'RIBEIRÃO PRETO', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
+            ];
+        }
+
         function searchEscolas(searchType, searchValue) {
-            if (!searchValue || searchValue.trim() === '') {
-                return [];
-            }
+            if (!searchValue || searchValue.trim() === '') return [];
             
-            if (searchType === 'ESTADO') {
-                return escolasData;
-            }
+            if (searchType === 'ESTADO') return escolasData;
             
             const valueNormalized = searchValue.trim().toLowerCase();
             const mapping = SEARCH_MAPPING[searchType];
-            
             if (!mapping || !escolasData.length) return [];
             
-            const results = escolasData.filter(escola => {
+            return escolasData.filter(escola => {
                 const campo = escola[mapping.campo] || '';
-                const campoNormalized = campo.toLowerCase();
-                return campoNormalized === valueNormalized;
+                return campo.toLowerCase() === valueNormalized;
             });
-            
-            return results;
         }
 
         function renderResults(results, searchType, searchValue) {
@@ -696,79 +438,51 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Nenhum resultado encontrado para <strong>"${searchValue}"</strong></p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
-                            Busca EXATA: o valor deve corresponder exatamente ao valor na planilha.
-                        </p>
-                        ${escolasData.length > 0 && searchType !== 'ESTADO' ? `<p style="font-size: 0.7rem;">Exemplos na planilha: ${[...new Set(escolasData.slice(0, 5).map(e => e[searchType === 'NTE' ? 'nte' : searchType === 'MUNICIPIO' ? 'municipio' : 'codigoSec'])].filter(v => v)].join(', ')}</p>` : ''}
+                        <p style="font-size: 0.8rem;">Busca EXATA: o valor deve corresponder exatamente.</p>
                     </div>
                 `;
                 return;
             }
             
-            let html = `
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>📌 NTE (Coluna B)</th>
-                                <th>🏙️ Município (Coluna C)</th>
-                                <th>🔢 Código SEC (Coluna D)</th>
-                                <th>📊 Código INEP (Coluna F)</th>
-                                <th>🏫 Unidade Escolar (Coluna G)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+            let html = `<div class="table-wrapper"><table><thead><tr>
+                <th>📌 NTE</th><th>🏙️ Município</th><th>🔢 Código SEC</th><th>📊 Código INEP</th><th>🏫 Unidade Escolar</th>
+            </tr></thead><tbody>`;
             
             results.forEach(escola => {
-                html += `
-                    <tr>
-                        <td><strong>${escola.nte || '-'}</strong></td>
-                        <td>${escola.municipio || '-'}</td>
-                        <td>${escola.codigoSec || '-'}</td>
-                        <td>${escola.codigoInep || '-'}</td>
-                        <td>${escola.unidadeEscolar || '-'}</td>
-                    </tr>
-                `;
+                html += `<tr>
+                    <td><strong>${escola.nte || '-'}</strong></td>
+                    <td>${escola.municipio || '-'}</td>
+                    <td>${escola.codigoSec || '-'}</td>
+                    <td>${escola.codigoInep || '-'}</td>
+                    <td>${escola.unidadeEscolar || '-'}</td>
+                </tr>`;
             });
             
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         }
 
         function updateSearchInfo(searchType) {
-            const mapping = SEARCH_MAPPING[searchType];
             const infoSpan = document.getElementById('searchInfoText');
-            if (infoSpan && mapping) {
-                if (searchType === 'ESTADO') {
-                    infoSpan.innerHTML = '🌎 ESTADO: Retorna TODOS os registros da planilha';
-                } else {
-                    infoSpan.innerHTML = `🔍 Busca EXATA em ${mapping.label}`;
-                }
+            if (searchType === 'ESTADO') {
+                infoSpan.innerHTML = '🌎 ESTADO: Retorna TODOS os registros da planilha';
+            } else {
+                infoSpan.innerHTML = `🔍 Busca EXATA em ${SEARCH_MAPPING[searchType]?.label || searchType}`;
             }
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             document.getElementById(`${tabId}Tab`).style.display = 'block';
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.dataset.tab === tabId) {
-                    btn.classList.add('active');
-                }
+                if (btn.dataset.tab === tabId) btn.classList.add('active');
             });
         }
 
         async function init() {
-            await loadDataFromPublishedSheet();
+            // Tenta carregar automaticamente
+            await loadSheetData();
             
             updateSearchInfo('MUNICIPIO');
             
@@ -786,8 +500,7 @@
                 const searchValue = document.getElementById('searchValue').value;
                 
                 if (searchType === 'ESTADO') {
-                    const results = escolasData;
-                    renderResults(results, searchType, searchValue || 'TODOS OS REGISTROS');
+                    renderResults(escolasData, searchType, searchValue || 'TODOS');
                 } else {
                     if (!searchValue.trim()) {
                         alert('Digite um valor para pesquisar!');
@@ -810,19 +523,15 @@
             });
             
             document.getElementById('refreshDataBtn').addEventListener('click', async () => {
-                await loadDataFromPublishedSheet();
+                await loadSheetData();
             });
             
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    document.getElementById('searchBtn').click();
-                }
+                if (e.key === 'Enter') document.getElementById('searchBtn').click();
             });
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    switchTab(btn.dataset.tab);
-                });
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
             });
         }
         
