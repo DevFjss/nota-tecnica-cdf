@@ -3,436 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nota Técnica · CDF - Sistema de Consulta Escolar</title>
+    <title>Nota Técnica · CDF - Consulta Escolar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #eef2f8; color: #1a2b4c; }
-        .app-header {
+        body {
+            font-family: system-ui, 'Segoe UI', 'Inter', sans-serif;
+            background: #f0f4f9;
+            color: #1a2b4c;
+        }
+        .header {
             background: linear-gradient(135deg, #0a2647, #123456);
             color: white;
-            padding: 1.2rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .logo-area { display: flex; align-items: center; gap: 1rem; }
-        .logo-icon { background: #1e4d8c; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .title h1 { font-size: 1.6rem; font-weight: 600; }
-        .title span { font-size: 0.8rem; background: #2f80ed; padding: 0.2rem 0.8rem; border-radius: 20px; margin-left: 8px; }
-        .sheet-info { background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
-        .tabs-container {
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: #1e4d8c; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .logo h1 { font-size: 1.4rem; font-weight: 600; }
+        .logo span { background: #2f80ed; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.7rem; margin-left: 8px; }
+        .status { background: rgba(255,255,255,0.1); padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.8rem; }
+        .tabs {
             background: #103450;
             padding: 0 2rem;
             display: flex;
-            flex-wrap: wrap;
             gap: 0.25rem;
-            border-bottom: 1px solid #2a5570;
         }
-        .tab-btn {
-            padding: 0.8rem 1.5rem;
+        .tab {
+            padding: 0.7rem 1.5rem;
             background: none;
             border: none;
             color: #b8d0e8;
-            font-weight: 500;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 500;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            font-size: 0.9rem;
         }
-        .tab-btn:hover { background: #1f4b70; color: white; }
-        .tab-btn.active { background: #1f4b70; color: white; border-bottom-color: #2f80ed; }
-        .admin-bar {
-            background: white;
-            padding: 0.8rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+        .tab.active {
+            background: #1f4b70;
+            color: white;
+            border-bottom-color: #2f80ed;
         }
-        .sheet-id { font-family: monospace; font-size: 0.75rem; color: #4a627a; }
-        .status-badge { background: #e6f4ff; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; color: #2f80ed; }
-        .main-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-        .search-panel {
+        .main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+        .search-card {
             background: white;
             border-radius: 24px;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
         }
-        .search-header {
+        .search-form {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #eef2f8;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
         }
-        .search-header i { font-size: 1.8rem; color: #2f80ed; }
-        .search-header h3 { font-size: 1.2rem; font-weight: 600; color: #0a2647; }
-        .search-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
-        .form-group { flex: 1; min-width: 200px; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #5c7b9c; margin-bottom: 0.4rem; letter-spacing: 0.5px; }
-        .form-group select, .form-group input { width: 100%; padding: 0.8rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-family: inherit; font-size: 0.9rem; transition: all 0.2s; }
-        .form-group select:focus, .form-group input:focus { outline: none; border-color: #2f80ed; box-shadow: 0 0 0 3px rgba(47,128,237,0.1); }
-        .btn-search { background: #2f80ed; color: white; border: none; padding: 0.8rem 2rem; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: all 0.2s; }
-        .btn-search:hover { background: #1a68c7; transform: translateY(-1px); }
-        .btn-clear { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .btn-clear:hover { background: #e2e8f0; }
-        .results-panel { background: white; border-radius: 24px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem; }
-        .results-header h4 { font-size: 1rem; font-weight: 600; color: #1e4d8c; display: flex; align-items: center; gap: 8px; }
-        .badge-count { background: #e6f4ff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; color: #2f80ed; font-weight: 600; }
-        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #eef2f8; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px; }
-        th { background: #f8fafc; padding: 1rem; text-align: left; font-weight: 600; color: #1e4d8c; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 0.9rem 1rem; border-bottom: 1px solid #f1f5f9; }
-        tr:hover td { background-color: #fafcff; }
-        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
-        .empty-state i { margin-bottom: 1rem; opacity: 0.5; }
-        .loading { text-align: center; padding: 3rem; color: #2f80ed; }
-        .footer-note { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #6c86a3; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
-        .search-info { background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8rem; }
-        .config-box {
-            background: #e6f4ff;
-            border: 1px solid #2f80ed;
+        .form-group { flex: 1; min-width: 180px; }
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #5c7b9c;
+            margin-bottom: 0.3rem;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #cbd5e1;
             border-radius: 12px;
-            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: #2f80ed; color: white; }
+        .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .results-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eef2f8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            text-align: left;
+            padding: 0.8rem;
+            background: #f8fafc;
+            color: #1e4d8c;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        tr:hover td { background: #fafcff; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #2f80ed;
+        }
+        .badge {
+            background: #e6f4ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6c86a3;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .info-bar {
+            background: #e6f4ff;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
-    <header class="app-header">
-        <div class="logo-area">
+    <div class="header">
+        <div class="logo">
             <div class="logo-icon"><i class="fas fa-school"></i></div>
-            <div class="title">
-                <h1>Nota Técnica <span>CDF</span></h1>
-            </div>
+            <h1>Nota Técnica <span>CDF</span></h1>
         </div>
-        <div class="sheet-info">
-            <i class="fab fa-google"></i>
-            <span>Google Sheets API</span>
-            <i class="fas fa-check-circle" style="color: #4ade80; font-size: 0.8rem;"></i>
+        <div class="status">
+            <i class="fab fa-google"></i> Google Sheets
         </div>
-    </header>
-
-    <div class="tabs-container">
-        <button class="tab-btn active" data-tab="consulta"><i class="fas fa-search"></i> Consulta Escolas</button>
-        <button class="tab-btn" data-tab="notas"><i class="fas fa-file-alt"></i> Notas Técnicas</button>
-        <button class="tab-btn" data-tab="relatorios"><i class="fas fa-chart-bar"></i> Relatórios</button>
     </div>
 
-    <div class="admin-bar">
-        <div class="sheet-id">
-            <i class="fas fa-database"></i> Planilha ID: <strong>1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
-            <span style="margin-left: 1rem;">📄 Aba: <strong>Escolas_ativas</strong></span>
-            <span style="margin-left: 1rem;" id="recordCount" class="status-badge"></span>
-        </div>
-        <button class="btn-clear" id="refreshDataBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
-            <i class="fas fa-sync-alt"></i> Carregar Dados
-        </button>
+    <div class="tabs">
+        <button class="tab active" data-tab="consulta"><i class="fas fa-search"></i> Consulta Escolas</button>
+        <button class="tab" data-tab="notas"><i class="fas fa-file-alt"></i> Notas Técnicas</button>
+        <button class="tab" data-tab="relatorios"><i class="fas fa-chart-bar"></i> Relatórios</button>
     </div>
 
-    <main class="main-container">
-        <div id="consultaTab" class="tab-content">
-            <div class="config-box" id="configBox">
-                <i class="fas fa-cog"></i> 
-                <strong>Configure a URL do seu Google Apps Script:</strong><br>
-                <input type="text" id="scriptUrl" placeholder="Cole aqui a URL do seu Apps Script" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; border-radius: 8px; border: 1px solid #cbd5e1;">
-                <button id="saveUrlBtn" class="btn-clear" style="padding: 0.3rem 1rem;">Salvar URL</button>
-                <span id="urlStatus" style="margin-left: 0.5rem; font-size: 0.7rem;"></span>
+    <div class="main">
+        <div id="consultaTab">
+            <div class="info-bar">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Para funcionar:</strong> Sua planilha precisa estar publicada em <strong>Arquivo → Compartilhar → Publicar na web</strong>
+                <a href="https://docs.google.com/spreadsheets/d/1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k" target="_blank" style="margin-left: 1rem;">📊 Abrir Planilha</a>
             </div>
             
-            <div class="search-panel">
-                <div class="search-header">
-                    <i class="fas fa-filter"></i>
-                    <h3>Filtrar Escolas por:</h3>
-                </div>
+            <div class="search-card">
                 <div class="search-form">
                     <div class="form-group">
-                        <label><i class="fas fa-tag"></i> TIPO DE BUSCA</label>
+                        <label>TIPO DE BUSCA</label>
                         <select id="searchType">
                             <option value="NTE">📌 NTE</option>
                             <option value="MUNICIPIO" selected>🏙️ Município</option>
-                            <option value="ESCOLA">🏫 Escola (Código SEC)</option>
-                            <option value="ESTADO">🇧🇷 Estado</option>
+                            <option value="ESCOLA">🏫 Código SEC</option>
+                            <option value="INEP">📊 Código INEP</option>
+                            <option value="ESTADO">🇧🇷 Estado (todos)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR</label>
-                        <input type="text" id="searchValue" placeholder="Digite o valor para busca..." autocomplete="off">
+                        <label>VALOR PARA PESQUISAR</label>
+                        <input type="text" id="searchValue" placeholder="Digite o valor exato..." autocomplete="off">
                     </div>
-                    <button class="btn-search" id="searchBtn">
-                        <i class="fas fa-search"></i> Pesquisar
-                    </button>
-                    <button class="btn-clear" id="clearBtn">
-                        <i class="fas fa-eraser"></i> Limpar
-                    </button>
-                </div>
-                <div class="search-info">
-                    <i class="fas fa-info-circle"></i> 
-                    <span id="searchInfoText">Busca EXATA em Município</span>
+                    <button class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> Pesquisar</button>
+                    <button class="btn-secondary" id="clearBtn"><i class="fas fa-eraser"></i> Limpar</button>
                 </div>
             </div>
 
-            <div class="results-panel">
+            <div class="results-card">
                 <div class="results-header">
-                    <h4><i class="fas fa-table-list"></i> Resultados da Consulta</h4>
-                    <span class="badge-count" id="resultCount">0 registros</span>
+                    <h4><i class="fas fa-table-list"></i> Resultados</h4>
+                    <span class="badge" id="resultCount">0 registros</span>
                 </div>
                 <div id="resultsTable">
                     <div class="empty-state">
                         <i class="fas fa-cloud-download-alt" style="font-size: 3rem;"></i>
-                        <p>1. Configure a URL do Google Apps Script acima</p>
-                        <p style="font-size: 0.8rem;">2. Depois clique em <strong>"Carregar Dados"</strong></p>
+                        <p>Clique em <strong>"Carregar Dados"</strong> abaixo para buscar sua planilha</p>
+                        <button id="loadDataBtn" class="btn-primary" style="margin-top: 1rem;"><i class="fas fa-download"></i> Carregar Dados</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="notasTab" class="tab-content" style="display: none;">
-            <div class="results-panel">
-                <div class="empty-state"><i class="fas fa-file-alt" style="font-size: 3rem;"></i><p>Área de Notas Técnicas - Em desenvolvimento</p></div>
-            </div>
+        <div id="notasTab" style="display: none;">
+            <div class="results-card"><div class="empty-state"><i class="fas fa-file-alt"></i><p>Notas Técnicas - Em desenvolvimento</p></div></div>
+        </div>
+        <div id="relatoriosTab" style="display: none;">
+            <div class="results-card"><div class="empty-state"><i class="fas fa-chart-line"></i><p>Relatórios - Em desenvolvimento</p></div></div>
         </div>
 
-        <div id="relatoriosTab" class="tab-content" style="display: none;">
-            <div class="results-panel">
-                <div class="empty-state"><i class="fas fa-chart-line" style="font-size: 3rem;"></i><p>Área de Relatórios - Em desenvolvimento</p></div>
-            </div>
+        <div class="footer">
+            <i class="fas fa-database"></i> Dados da aba "Escolas_ativas"<br>
+            NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
         </div>
-
-        <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Dados carregados via Google Apps Script da sua planilha<br>
-            <strong>Estrutura:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)
-        </div>
-    </main>
+    </div>
 
     <script>
+        const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
+        const SHEET_NAME = 'Escolas_ativas';
+        
         let escolasData = [];
-        let isLoading = false;
-        let scriptUrl = localStorage.getItem('scriptUrl') || '';
 
-        const SEARCH_MAPPING = {
-            'NTE': { campo: 'nte', label: 'NTE - Busca EXATA' },
-            'MUNICIPIO': { campo: 'municipio', label: 'Município - Busca EXATA' },
-            'ESCOLA': { campo: 'codigoSec', label: 'Código SEC - Busca EXATA' },
-            'ESTADO': { campo: 'todos', label: 'TODOS os registros' }
-        };
-
-        // Carregar dados do Google Apps Script
-        async function loadSheetData() {
-            if (isLoading) return;
-            
-            if (!scriptUrl) {
-                alert('Por favor, configure a URL do Google Apps Script no campo acima!');
-                return;
-            }
-            
-            isLoading = true;
+        // Carregar dados da planilha publicada
+        async function carregarDados() {
             const container = document.getElementById('resultsTable');
-            const countSpan = document.getElementById('recordCount');
-            
             container.innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...</div>`;
             
             try {
-                const response = await fetch(scriptUrl);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                // URL do Google Sheets como CSV (funciona com planilha publicada)
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
                 
-                const data = await response.json();
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Erro ao carregar');
                 
-                if (!Array.isArray(data) || data.length === 0) {
+                const csvText = await response.text();
+                const dados = parseCSV(csvText);
+                
+                if (dados.length === 0) {
                     throw new Error('Nenhum dado encontrado');
                 }
                 
-                escolasData = data;
-                countSpan.innerHTML = `✅ ${escolasData.length} registros`;
-                countSpan.style.background = '#d1fae5';
-                countSpan.style.color = '#065f46';
+                escolasData = dados;
                 
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i>
                         <p>✅ Dados carregados com sucesso!</p>
-                        <p style="font-size: 0.8rem;">${escolasData.length} escolas encontradas na aba "Escolas_ativas"</p>
-                        <p style="font-size: 0.7rem;">Exemplos de Municípios: ${[...new Set(escolasData.slice(0, 10).map(e => e.municipio).filter(v => v))].slice(0, 5).join(', ')}</p>
+                        <p style="font-size: 0.85rem;">${escolasData.length} escolas encontradas</p>
+                        <p style="font-size: 0.7rem; margin-top: 0.5rem;">Exemplos: ${[...new Set(escolasData.slice(0, 5).map(e => e.municipio).filter(v => v))].slice(0, 3).join(', ')}</p>
                     </div>
                 `;
                 
-                console.log('✅ Dados carregados:', escolasData.length);
-                console.log('Primeiros 3 registros:', escolasData.slice(0, 3));
+                document.getElementById('resultCount').innerHTML = `${escolasData.length} registros carregados`;
                 
             } catch (error) {
                 console.error('Erro:', error);
-                countSpan.innerHTML = `⚠️ Erro`;
-                countSpan.style.background = '#fee2e2';
-                countSpan.style.color = '#dc2626';
-                
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
-                        <p>Erro ao carregar dados</p>
-                        <p style="font-size: 0.8rem;">${error.message}</p>
-                        <p style="font-size: 0.8rem;">Verifique se a URL do Apps Script está correta e publicada</p>
-                        <p style="font-size: 0.7rem;">URL atual: ${scriptUrl}</p>
+                        <p>❌ Não foi possível carregar os dados</p>
+                        <p style="font-size: 0.8rem;">Você precisa publicar sua planilha:</p>
+                        <ol style="text-align: left; max-width: 400px; margin: 1rem auto;">
+                            <li>Abra sua planilha</li>
+                            <li>Clique em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
+                            <li>Selecione a aba <strong>"${SHEET_NAME}"</strong></li>
+                            <li>Clique em <strong>Publicar</strong></li>
+                            <li>Depois clique em <strong>"Carregar Dados"</strong> novamente</li>
+                        </ol>
+                        <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank" class="btn-secondary" style="display: inline-block; margin-top: 0.5rem;">
+                            <i class="fas fa-external-link-alt"></i> Abrir Planilha
+                        </a>
                     </div>
                 `;
-            } finally {
-                isLoading = false;
             }
         }
 
-        function searchEscolas(searchType, searchValue) {
-            if (!searchValue || searchValue.trim() === '') return [];
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(l => l.trim());
+            if (lines.length < 2) return [];
             
-            if (searchType === 'ESTADO') return escolasData;
-            
-            const valueNormalized = searchValue.trim().toLowerCase();
-            const mapping = SEARCH_MAPPING[searchType];
-            if (!mapping || !escolasData.length) return [];
-            
-            return escolasData.filter(escola => {
-                const campo = escola[mapping.campo] || '';
-                return campo.toLowerCase() === valueNormalized;
-            });
+            const dados = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length >= 7) {
+                    dados.push({
+                        nte: values[1] ? values[1].replace(/^"|"$/g, '').trim() : '',
+                        municipio: values[2] ? values[2].replace(/^"|"$/g, '').trim() : '',
+                        codigoSec: values[3] ? values[3].replace(/^"|"$/g, '').trim() : '',
+                        codigoInep: values[5] ? values[5].replace(/^"|"$/g, '').trim() : '',
+                        unidadeEscolar: values[6] ? values[6].replace(/^"|"$/g, '').trim() : ''
+                    });
+                }
+            }
+            return dados;
         }
 
-        function renderResults(results, searchType, searchValue) {
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else current += char;
+            }
+            result.push(current);
+            return result;
+        }
+
+        function pesquisar() {
+            const tipo = document.getElementById('searchType').value;
+            const valor = document.getElementById('searchValue').value.trim();
+            
+            if (escolasData.length === 0) {
+                alert('Primeiro clique em "Carregar Dados" para carregar a planilha');
+                return;
+            }
+            
+            if (tipo === 'ESTADO') {
+                mostrarResultados(escolasData, 'TODOS OS REGISTROS');
+                return;
+            }
+            
+            if (!valor) {
+                alert('Digite um valor para pesquisar');
+                return;
+            }
+            
+            let resultados = [];
+            const valorLower = valor.toLowerCase();
+            
+            if (tipo === 'NTE') {
+                resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
+            } else if (tipo === 'MUNICIPIO') {
+                resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
+            } else if (tipo === 'ESCOLA') {
+                resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
+            } else if (tipo === 'INEP') {
+                resultados = escolasData.filter(e => e.codigoInep.toLowerCase() === valorLower);
+            }
+            
+            mostrarResultados(resultados, valor);
+        }
+        
+        function mostrarResultados(resultados, valorBuscado) {
             const container = document.getElementById('resultsTable');
             const countSpan = document.getElementById('resultCount');
             
-            countSpan.textContent = `${results.length} registro${results.length !== 1 ? 's' : ''}`;
+            countSpan.innerHTML = `${resultados.length} registro${resultados.length !== 1 ? 's' : ''}`;
             
-            if (results.length === 0) {
+            if (resultados.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Nenhum resultado encontrado para <strong>"${searchValue}"</strong></p>
-                        <p style="font-size: 0.8rem;">Busca EXATA: o valor deve corresponder exatamente.</p>
+                        <p>Nenhum resultado encontrado para <strong>"${valorBuscado}"</strong></p>
+                        <p style="font-size: 0.8rem;">Busca EXATA: o valor deve corresponder exatamente</p>
                     </div>
                 `;
                 return;
             }
             
-            let html = `<div class="table-wrapper"> <table> <thead> <tr>
+            let html = `<div style="overflow-x: auto;"><table><thead><tr>
                 <th>📌 NTE</th><th>🏙️ Município</th><th>🔢 Código SEC</th><th>📊 Código INEP</th><th>🏫 Unidade Escolar</th>
-            </tr> </thead> <tbody>`;
+            </tr></thead><tbody>`;
             
-            results.forEach(escola => {
+            resultados.forEach(e => {
                 html += `<tr>
-                    <td><strong>${escola.nte || '-'}</strong></td>
-                    <td>${escola.municipio || '-'}</td>
-                    <td>${escola.codigoSec || '-'}</td>
-                    <td>${escola.codigoInep || '-'}</td>
-                    <td>${escola.unidadeEscolar || '-'}</td>
+                    <td><strong>${e.nte || '-'}</strong></td>
+                    <td>${e.municipio || '-'}</td>
+                    <td>${e.codigoSec || '-'}</td>
+                    <td>${e.codigoInep || '-'}</td>
+                    <td>${e.unidadeEscolar || '-'}</td>
                 </tr>`;
             });
             
-            html += `</tbody> </table> </div>`;
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         }
 
-        function updateSearchInfo(searchType) {
-            const infoSpan = document.getElementById('searchInfoText');
-            if (searchType === 'ESTADO') {
-                infoSpan.innerHTML = '🌎 ESTADO: Retorna TODOS os registros da planilha';
-            } else {
-                infoSpan.innerHTML = `🔍 Busca EXATA em ${SEARCH_MAPPING[searchType]?.label || searchType}`;
-            }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            document.getElementById(`${tabId}Tab`).style.display = 'block';
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.tab === tabId) btn.classList.add('active');
-            });
-        }
-
-        // Inicialização
-        function init() {
-            const urlInput = document.getElementById('scriptUrl');
-            const urlStatus = document.getElementById('urlStatus');
-            
-            if (scriptUrl) {
-                urlInput.value = scriptUrl;
-                urlStatus.innerHTML = '✅ URL salva';
-                urlStatus.style.color = '#10b981';
-            }
-            
-            document.getElementById('saveUrlBtn').addEventListener('click', () => {
-                const newUrl = urlInput.value.trim();
-                if (newUrl) {
-                    scriptUrl = newUrl;
-                    localStorage.setItem('scriptUrl', newUrl);
-                    urlStatus.innerHTML = '✅ URL salva! Clique em "Carregar Dados"';
-                    urlStatus.style.color = '#10b981';
-                } else {
-                    alert('Digite a URL do seu Google Apps Script');
-                }
-            });
-            
-            document.getElementById('refreshDataBtn').addEventListener('click', () => {
-                if (!scriptUrl) {
-                    alert('Configure a URL primeiro!');
-                    return;
-                }
-                loadSheetData();
-            });
-            
-            document.getElementById('searchBtn').addEventListener('click', () => {
-                const searchType = document.getElementById('searchType').value;
-                const searchValue = document.getElementById('searchValue').value;
-                
-                if (searchType === 'ESTADO') {
-                    renderResults(escolasData, searchType, searchValue || 'TODOS');
-                } else {
-                    if (!searchValue.trim()) {
-                        alert('Digite um valor para pesquisar!');
-                        return;
-                    }
-                    const results = searchEscolas(searchType, searchValue);
-                    renderResults(results, searchType, searchValue);
-                }
-            });
-            
-            document.getElementById('clearBtn').addEventListener('click', () => {
-                document.getElementById('searchValue').value = '';
-                document.getElementById('resultCount').textContent = '0 registros';
-                document.getElementById('resultsTable').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('searchValue').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') document.getElementById('searchBtn').click();
-            });
-            
-            document.getElementById('searchType').addEventListener('change', (e) => updateSearchInfo(e.target.value));
-            
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-            });
-            
-            updateSearchInfo('MUNICIPIO');
-        }
+        // Eventos
+        document.getElementById('loadDataBtn').onclick = () => carregarDados();
+        document.getElementById('searchBtn').onclick = () => pesquisar();
+        document.getElementById('clearBtn').onclick = () => {
+            document.getElementById('searchValue').value = '';
+            document.getElementById('resultCount').innerHTML = `${escolasData.length} registros carregados`;
+            document.getElementById('resultsTable').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search" style="font-size: 3rem;"></i>
+                    <p>Digite um valor e clique em Pesquisar</p>
+                </div>
+            `;
+        };
+        document.getElementById('searchValue').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') pesquisar();
+        });
         
-        init();
+        // Abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('consultaTab').style.display = 'none';
+                document.getElementById('notasTab').style.display = 'none';
+                document.getElementById('relatoriosTab').style.display = 'none';
+                document.getElementById(`${tab.dataset.tab}Tab`).style.display = 'block';
+            };
+        });
     </script>
 </body>
 </html>
