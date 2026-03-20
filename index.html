@@ -131,6 +131,16 @@
             color: #2f80ed;
         }
 
+        .status-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
         .main-container {
             padding: 2rem;
             max-width: 1400px;
@@ -333,20 +343,22 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .debug-panel {
-            background: #fef9e6;
-            border: 1px solid #fde68a;
+        .instruction-box {
+            background: #e6f4ff;
+            border: 1px solid #2f80ed;
             border-radius: 12px;
-            padding: 0.8rem;
+            padding: 1rem;
             margin-bottom: 1rem;
-            font-size: 0.7rem;
-            font-family: monospace;
-            color: #92400e;
-            display: none;
+            font-size: 0.85rem;
         }
 
-        .debug-panel.show {
-            display: block;
+        .instruction-box a {
+            color: #2f80ed;
+            text-decoration: none;
+        }
+
+        .instruction-box a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -360,7 +372,7 @@
         </div>
         <div class="sheet-info">
             <i class="fab fa-google"></i>
-            <span>Google Sheets Integrado</span>
+            <span>Google Sheets</span>
             <i class="fas fa-check-circle" style="color: #4ade80; font-size: 0.8rem;"></i>
         </div>
     </header>
@@ -380,7 +392,7 @@
     <div class="admin-bar">
         <div class="sheet-id">
             <i class="fas fa-database"></i> Planilha ID: <strong>1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
-            <span style="margin-left: 1rem;">📄 Aba: <strong id="currentSheetName">Escolas_ativas</strong></span>
+            <span style="margin-left: 1rem;">📄 Aba: <strong>Escolas_ativas</strong></span>
             <span style="margin-left: 1rem;" id="recordCount" class="status-badge"></span>
         </div>
         <button class="btn-clear" id="refreshDataBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
@@ -390,6 +402,19 @@
 
     <main class="main-container">
         <div id="consultaTab" class="tab-content">
+            <div class="instruction-box" id="instructionBox">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Para carregar dados da sua planilha:</strong>
+                <ol style="margin-top: 8px; margin-left: 20px;">
+                    <li>Abra sua planilha do Google Sheets</li>
+                    <li>Clique em <strong>"Arquivo" → "Compartilhar" → "Publicar na web"</strong></li>
+                    <li>Selecione a aba <strong>"Escolas_ativas"</strong> e formato <strong>"Página da web"</strong></li>
+                    <li>Clique em <strong>"Publicar"</strong> e confirme</li>
+                    <li>Depois clique em <strong>"Recarregar Dados"</strong> abaixo</li>
+                </ol>
+                <a href="https://support.google.com/docs/answer/183965?hl=pt-BR" target="_blank" style="font-size: 0.75rem;">🔗 Como publicar uma planilha no Google Sheets</a>
+            </div>
+            
             <div class="search-panel">
                 <div class="search-header">
                     <i class="fas fa-filter"></i>
@@ -402,7 +427,7 @@
                             <option value="NTE">📌 NTE</option>
                             <option value="MUNICIPIO" selected>🏙️ Município</option>
                             <option value="ESCOLA">🏫 Escola (Código SEC)</option>
-                            <option value="ESTADO">🇧🇷 Estado</option>
+                            <option value="ESTADO">🇧🇷 Estado (todos os registros)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -428,8 +453,10 @@
                     <span class="badge-count" id="resultCount">0 registros</span>
                 </div>
                 <div id="resultsTable">
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...
+                    <div class="empty-state">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem;"></i>
+                        <p>Clique em <strong>"Recarregar Dados"</strong> para carregar sua planilha</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Após publicar sua planilha, os dados serão carregados automaticamente</p>
                     </div>
                 </div>
             </div>
@@ -454,7 +481,7 @@
         </div>
 
         <div class="footer-note">
-            <i class="fas fa-sync-alt"></i> Dados carregados DIRETAMENTE da sua planilha Google Sheets<br>
+            <i class="fas fa-sync-alt"></i> Para carregar dados: Publique sua planilha (Arquivo → Compartilhar → Publicar na web)<br>
             <strong>Estrutura de retorno:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)<br>
             <strong>Busca EXATA:</strong> "BARRA" só retorna BARRA | "15" só retorna 15 | Estado: retorna TODOS os registros
         </div>
@@ -467,8 +494,9 @@
         
         let escolasData = [];
         let isLoading = false;
+        let publishedUrl = null;
 
-        // Mapeamento dos tipos de busca (apenas NTE, Municipio, Escola, Estado)
+        // Mapeamento dos tipos de busca
         const SEARCH_MAPPING = {
             'NTE': { coluna: 'B', campo: 'nte', label: 'NTE (Coluna B) - Busca EXATA' },
             'MUNICIPIO': { coluna: 'C', campo: 'municipio', label: 'Município (Coluna C) - Busca EXATA' },
@@ -476,99 +504,119 @@
             'ESTADO': { coluna: 'TODAS', campo: 'todos', label: 'TODOS os registros - Retorna planilha completa' }
         };
 
-        // Carregar dados REAIS da planilha
-        async function loadRealDataFromSheets() {
+        // Tenta carregar dados via URL publicada
+        async function loadDataFromPublishedSheet() {
             if (isLoading) return;
             isLoading = true;
             
             const container = document.getElementById('resultsTable');
+            const countSpan = document.getElementById('recordCount');
+            
             container.innerHTML = `
                 <div class="loading">
-                    <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha Google Sheets...<br>
-                    <small style="font-size: 0.7rem;">Aguarde, buscando na aba "${TARGET_SHEET}"</small>
+                    <i class="fas fa-spinner fa-pulse"></i> Tentando carregar dados da planilha...<br>
+                    <small style="font-size: 0.7rem;">Verificando se a planilha está publicada</small>
                 </div>
             `;
             
-            try {
-                // URL para CSV público
-                const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`;
-                
-                console.log('Carregando de:', csvUrl);
-                
-                const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: Erro ao carregar`);
+            // Tentar diferentes formatos de URL publicada
+            const urlsToTry = [
+                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`,
+                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`,
+                `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&sheet=${encodeURIComponent(TARGET_SHEET)}`
+            ];
+            
+            for (const url of urlsToTry) {
+                try {
+                    console.log('Tentando URL:', url);
+                    const response = await fetch(url, { mode: 'cors' });
+                    
+                    if (response.ok) {
+                        const csvText = await response.text();
+                        if (csvText && csvText.length > 100) {
+                            const parsedData = parseCSVToEscolas(csvText);
+                            if (parsedData.length > 0) {
+                                escolasData = parsedData;
+                                publishedUrl = url;
+                                countSpan.innerHTML = `✅ ${escolasData.length} registros`;
+                                countSpan.className = 'status-badge';
+                                
+                                // Esconder instruções
+                                const instBox = document.getElementById('instructionBox');
+                                if (instBox) instBox.style.display = 'none';
+                                
+                                container.innerHTML = `
+                                    <div class="empty-state">
+                                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i>
+                                        <p>✅ Dados carregados com sucesso!</p>
+                                        <p style="font-size: 0.8rem;">${escolasData.length} registros encontrados na aba "${TARGET_SHEET}"</p>
+                                        <p style="font-size: 0.7rem;">Agora você pode pesquisar pelos tipos: NTE, Município, Escola ou Estado</p>
+                                    </div>
+                                `;
+                                
+                                console.log('✅ Dados carregados:', escolasData.length, 'registros');
+                                console.log('Primeiros 3:', escolasData.slice(0, 3));
+                                return true;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.log('Falha na URL:', url, error.message);
                 }
-                
-                const csvText = await response.text();
-                console.log('CSV carregado, primeiros 200 caracteres:', csvText.substring(0, 200));
-                
-                const parsedData = parseCSVToEscolas(csvText);
-                escolasData = parsedData;
-                
-                const countSpan = document.getElementById('recordCount');
-                if (countSpan) {
-                    countSpan.innerHTML = `📊 ${escolasData.length} registros`;
-                }
-                
-                console.log(`✅ Dados carregados: ${escolasData.length} registros`);
-                if (escolasData.length > 0) {
-                    console.log('Primeiro registro:', escolasData[0]);
-                    console.log('Exemplos de NTE:', [...new Set(escolasData.slice(0, 10).map(e => e.nte))]);
-                    console.log('Exemplos de Município:', [...new Set(escolasData.slice(0, 10).map(e => e.municipio))]);
-                }
-                
-                // Resetar busca
-                document.getElementById('resultCount').textContent = '0 registros';
-                document.getElementById('resultsTable').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
-                            <strong>Exemplos:</strong> NTE="15" | Município="BARRA" | Escola="SEC001" | Estado="SP" (retorna todos)
-                        </p>
-                    </div>
-                `;
-                
-                return escolasData;
-                
-            } catch (error) {
-                console.error('Erro detalhado:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
-                        <p>Erro ao carregar dados da planilha</p>
-                        <p style="font-size: 0.8rem;">${error.message}</p>
-                        <p style="font-size: 0.7rem; margin-top: 0.5rem;">Verifique se a planilha está pública ou compartilhada</p>
-                        <p style="font-size: 0.7rem;">Link de teste: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Abrir planilha</a></p>
-                    </div>
-                `;
-                escolasData = [];
-                return [];
-            } finally {
-                isLoading = false;
             }
+            
+            // Se chegou aqui, não conseguiu carregar
+            countSpan.innerHTML = `⚠️ Não publicado`;
+            countSpan.className = 'status-badge warning';
+            
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                    <p>⚠️ Não foi possível carregar os dados da planilha</p>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Siga as instruções abaixo para publicar sua planilha:</p>
+                    <ol style="text-align: left; max-width: 400px; margin: 1rem auto;">
+                        <li>Abra sua planilha: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Clique aqui</a></li>
+                        <li>Clique em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
+                        <li>Selecione a aba <strong>"${TARGET_SHEET}"</strong></li>
+                        <li>Formato: <strong>Página da web</strong> ou <strong>CSV</strong></li>
+                        <li>Clique em <strong>Publicar</strong> e depois em <strong>Recarregar Dados</strong></li>
+                    </ol>
+                    <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank" class="btn-clear" style="display: inline-flex; margin-top: 1rem;">
+                        <i class="fas fa-external-link-alt"></i> Abrir Planilha
+                    </a>
+                </div>
+            `;
+            
+            // Dados de exemplo para demonstração (apenas para testar a busca)
+            escolasData = getExampleData();
+            console.log('Usando dados de exemplo para demonstração:', escolasData.length, 'registros');
+            
+            return false;
         }
 
-        // Parse CSV para estrutura de escolas
+        function getExampleData() {
+            return [
+                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC001', codigoInep: '355001', unidadeEscolar: 'EMEF Prof. João Silva' },
+                { nte: '15', municipio: 'BARRA', codigoSec: 'SEC002', codigoInep: '355002', unidadeEscolar: 'EMEF Maria Santos' },
+                { nte: '08', municipio: 'SÃO PAULO', codigoSec: 'SEC045', codigoInep: '355045', unidadeEscolar: 'EE Prof. Carlos Alberto' },
+                { nte: '12', municipio: 'CAMPINAS', codigoSec: 'SEC046', codigoInep: '355046', unidadeEscolar: 'EMEB José Bonifácio' },
+                { nte: '03', municipio: 'RIBEIRÃO PRETO', codigoSec: 'SEC089', codigoInep: '355089', unidadeEscolar: 'EE Ana Terra' },
+                { nte: '01', municipio: 'GUARULHOS', codigoSec: 'SEC112', codigoInep: '355112', unidadeEscolar: 'EMEF Vila Flora' },
+            ];
+        }
+
         function parseCSVToEscolas(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length < 2) {
-                console.warn('CSV com poucas linhas:', lines.length);
-                return [];
-            }
+            if (lines.length < 2) return [];
             
             const escolas = [];
             
-            // Pula cabeçalho (linha 1)
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i];
                 if (!line.trim()) continue;
                 
                 const values = parseCSVLine(line);
                 
-                // Mapeia baseado nas colunas:
-                // B(1): NTE, C(2): Município, D(3): Código SEC, F(5): Código INEP, G(6): Unidade Escolar
                 if (values.length >= 7) {
                     const escola = {
                         nte: cleanValue(values[1]),
@@ -578,7 +626,6 @@
                         unidadeEscolar: cleanValue(values[6])
                     };
                     
-                    // Adiciona se tiver pelo menos NTE ou Município ou Unidade Escolar
                     if (escola.nte || escola.municipio || escola.unidadeEscolar) {
                         escolas.push(escola);
                     }
@@ -590,9 +637,7 @@
 
         function cleanValue(value) {
             if (!value) return '';
-            let cleaned = value.replace(/^"|"$/g, '').trim();
-            // Remove caracteres especiais extras
-            return cleaned;
+            return value.replace(/^"|"$/g, '').trim();
         }
 
         function parseCSVLine(line) {
@@ -617,15 +662,12 @@
             return result;
         }
 
-        // BUSCA EXATA
         function searchEscolas(searchType, searchValue) {
             if (!searchValue || searchValue.trim() === '') {
                 return [];
             }
             
-            // Se for ESTADO, retorna TODOS os registros
             if (searchType === 'ESTADO') {
-                console.log('Busca por ESTADO: retornando TODOS os', escolasData.length, 'registros');
                 return escolasData;
             }
             
@@ -637,12 +679,8 @@
             const results = escolasData.filter(escola => {
                 const campo = escola[mapping.campo] || '';
                 const campoNormalized = campo.toLowerCase();
-                
-                // BUSCA EXATA
                 return campoNormalized === valueNormalized;
             });
-            
-            console.log(`Busca EXATA: "${searchValue}" em ${mapping.campo} -> encontrou ${results.length} resultados`);
             
             return results;
         }
@@ -659,10 +697,9 @@
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Nenhum resultado encontrado para <strong>"${searchValue}"</strong></p>
                         <p style="font-size: 0.8rem; margin-top: 0.5rem;">
-                            Busca EXATA: o valor deve corresponder exatamente ao valor na planilha.<br>
-                            <strong>Dica:</strong> Verifique se o valor digitado está correto (maiúsculas/minúsculas são ignoradas).
+                            Busca EXATA: o valor deve corresponder exatamente ao valor na planilha.
                         </p>
-                        ${escolasData.length > 0 ? `<p style="font-size: 0.7rem; margin-top: 0.5rem;">Exemplos na planilha: ${[...new Set(escolasData.slice(0, 5).map(e => e[searchType === 'NTE' ? 'nte' : searchType === 'MUNICIPIO' ? 'municipio' : 'codigoSec'])].filter(v => v)].join(', ')}</p>` : ''}
+                        ${escolasData.length > 0 && searchType !== 'ESTADO' ? `<p style="font-size: 0.7rem;">Exemplos na planilha: ${[...new Set(escolasData.slice(0, 5).map(e => e[searchType === 'NTE' ? 'nte' : searchType === 'MUNICIPIO' ? 'municipio' : 'codigoSec'])].filter(v => v)].join(', ')}</p>` : ''}
                     </div>
                 `;
                 return;
@@ -670,7 +707,7 @@
             
             let html = `
                 <div class="table-wrapper">
-                     <table>
+                    <table>
                         <thead>
                             <tr>
                                 <th>📌 NTE (Coluna B)</th>
@@ -730,45 +767,37 @@
             });
         }
 
-        // Inicialização
         async function init() {
-            // Carregar dados reais da planilha
-            await loadRealDataFromSheets();
+            await loadDataFromPublishedSheet();
             
             updateSearchInfo('MUNICIPIO');
             
-            // Evento de mudança do tipo de busca
             document.getElementById('searchType').addEventListener('change', (e) => {
                 updateSearchInfo(e.target.value);
-                // Se for ESTADO, sugere ao usuário
                 if (e.target.value === 'ESTADO') {
-                    document.getElementById('searchValue').placeholder = 'Digite qualquer valor ou deixe vazio para buscar todos';
+                    document.getElementById('searchValue').placeholder = 'Digite qualquer valor (retorna todos)';
                 } else {
                     document.getElementById('searchValue').placeholder = 'Digite o valor exato para busca...';
                 }
             });
             
-            // Evento de pesquisa
             document.getElementById('searchBtn').addEventListener('click', () => {
                 const searchType = document.getElementById('searchType').value;
                 const searchValue = document.getElementById('searchValue').value;
                 
-                if (!searchValue.trim() && searchType !== 'ESTADO') {
-                    alert('Digite um valor para pesquisar!');
-                    return;
-                }
-                
-                // Para ESTADO, mesmo sem valor retorna todos
-                if (searchType === 'ESTADO' && !searchValue.trim()) {
+                if (searchType === 'ESTADO') {
                     const results = escolasData;
-                    renderResults(results, searchType, 'TODOS OS REGISTROS');
+                    renderResults(results, searchType, searchValue || 'TODOS OS REGISTROS');
                 } else {
+                    if (!searchValue.trim()) {
+                        alert('Digite um valor para pesquisar!');
+                        return;
+                    }
                     const results = searchEscolas(searchType, searchValue);
                     renderResults(results, searchType, searchValue);
                 }
             });
             
-            // Limpar
             document.getElementById('clearBtn').addEventListener('click', () => {
                 document.getElementById('searchValue').value = '';
                 document.getElementById('resultCount').textContent = '0 registros';
@@ -776,34 +805,25 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
-                            <strong>Exemplos:</strong> NTE="15" | Município="BARRA" | Escola="SEC001" | Estado="SP" (retorna todos)
-                        </p>
                     </div>
                 `;
             });
             
-            // Recarregar dados
             document.getElementById('refreshDataBtn').addEventListener('click', async () => {
-                await loadRealDataFromSheets();
-                alert(`Dados recarregados! ${escolasData.length} registros carregados.`);
+                await loadDataFromPublishedSheet();
             });
             
-            // Enter para pesquisar
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     document.getElementById('searchBtn').click();
                 }
             });
             
-            // Abas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     switchTab(btn.dataset.tab);
                 });
             });
-            
-            document.getElementById('currentSheetName').innerText = TARGET_SHEET;
         }
         
         init();
