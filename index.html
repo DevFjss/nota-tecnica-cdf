@@ -123,16 +123,12 @@
             color: #4a627a;
         }
 
-        .debug-info {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 0.5rem 1rem;
+        .status-badge {
+            background: #e6f4ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
             font-size: 0.7rem;
-            font-family: monospace;
-            color: #92400e;
-            margin-top: 0.5rem;
-            border-radius: 8px;
-            word-break: break-all;
+            color: #2f80ed;
         }
 
         .main-container {
@@ -337,35 +333,20 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .modal {
+        .debug-panel {
+            background: #fef9e6;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: #92400e;
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 450px;
-            width: 90%;
-        }
-
-        .search-info {
-            background: #f8fafc;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            color: #475569;
-            display: inline-block;
+        .debug-panel.show {
+            display: block;
         }
     </style>
 </head>
@@ -400,7 +381,7 @@
         <div class="sheet-id">
             <i class="fas fa-database"></i> Planilha ID: <strong>1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k</strong>
             <span style="margin-left: 1rem;">📄 Aba: <strong id="currentSheetName">Escolas_ativas</strong></span>
-            <span style="margin-left: 1rem;" id="recordCount"></span>
+            <span style="margin-left: 1rem;" id="recordCount" class="status-badge"></span>
         </div>
         <button class="btn-clear" id="refreshDataBtn" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
             <i class="fas fa-sync-alt"></i> Recarregar Dados
@@ -418,15 +399,15 @@
                     <div class="form-group">
                         <label><i class="fas fa-tag"></i> TIPO DE BUSCA</label>
                         <select id="searchType">
-                            <option value="NTE">📌 NTE (Coluna B)</option>
-                            <option value="MUNICIPIO" selected>🏙️ Município (Coluna C)</option>
-                            <option value="ESCOLA">🏫 Código SEC (Coluna D)</option>
-                            <option value="INEP">📊 Código INEP (Coluna F)</option>
+                            <option value="NTE">📌 NTE</option>
+                            <option value="MUNICIPIO" selected>🏙️ Município</option>
+                            <option value="ESCOLA">🏫 Escola (Código SEC)</option>
+                            <option value="ESTADO">🇧🇷 Estado</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR (BUSCA EXATA)</label>
-                        <input type="text" id="searchValue" placeholder="Digite o valor exato para busca..." autocomplete="off">
+                        <label><i class="fas fa-keyboard"></i> VALOR PARA PESQUISAR</label>
+                        <input type="text" id="searchValue" placeholder="Digite o valor para busca..." autocomplete="off">
                     </div>
                     <button class="btn-search" id="searchBtn">
                         <i class="fas fa-search"></i> Pesquisar
@@ -435,8 +416,9 @@
                         <i class="fas fa-eraser"></i> Limpar
                     </button>
                 </div>
-                <div class="search-info">
-                    <i class="fas fa-info-circle"></i> Busca EXATA em: <strong id="searchColumnLabel">Coluna C (Município)</strong> - Ignora maiúsculas/minúsculas
+                <div class="search-info" style="background: #f8fafc; padding: 0.5rem 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8rem;">
+                    <i class="fas fa-info-circle"></i> 
+                    <span id="searchInfoText">Busca EXATA em Município (Coluna C)</span>
                 </div>
             </div>
 
@@ -446,9 +428,8 @@
                     <span class="badge-count" id="resultCount">0 registros</span>
                 </div>
                 <div id="resultsTable">
-                    <div class="empty-state">
-                        <i class="fas fa-search" style="font-size: 3rem;"></i>
-                        <p>Carregando dados da planilha...</p>
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-pulse"></i> Carregando dados da planilha...
                     </div>
                 </div>
             </div>
@@ -474,8 +455,8 @@
 
         <div class="footer-note">
             <i class="fas fa-sync-alt"></i> Dados carregados DIRETAMENTE da sua planilha Google Sheets<br>
-            <strong>Estrutura:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)<br>
-            <strong>Busca EXATA:</strong> "BARRA" só retorna BARRA, não "BARRA DO GARÇAS" | "15" só retorna 15, não 115 ou 150
+            <strong>Estrutura de retorno:</strong> NTE (Coluna B) | Município (Coluna C) | Código SEC (Coluna D) | Código INEP (Coluna F) | Unidade Escolar (Coluna G)<br>
+            <strong>Busca EXATA:</strong> "BARRA" só retorna BARRA | "15" só retorna 15 | Estado: retorna TODOS os registros
         </div>
     </main>
 
@@ -487,14 +468,15 @@
         let escolasData = [];
         let isLoading = false;
 
+        // Mapeamento dos tipos de busca (apenas NTE, Municipio, Escola, Estado)
         const SEARCH_MAPPING = {
-            'NTE': { coluna: 'B', campo: 'nte', label: 'Coluna B (NTE) - Busca EXATA' },
-            'MUNICIPIO': { coluna: 'C', campo: 'municipio', label: 'Coluna C (Município) - Busca EXATA' },
-            'ESCOLA': { coluna: 'D', campo: 'codigoSec', label: 'Coluna D (Código SEC) - Busca EXATA' },
-            'INEP': { coluna: 'F', campo: 'codigoInep', label: 'Coluna F (Código INEP) - Busca EXATA' }
+            'NTE': { coluna: 'B', campo: 'nte', label: 'NTE (Coluna B) - Busca EXATA' },
+            'MUNICIPIO': { coluna: 'C', campo: 'municipio', label: 'Município (Coluna C) - Busca EXATA' },
+            'ESCOLA': { coluna: 'D', campo: 'codigoSec', label: 'Código SEC (Coluna D) - Busca EXATA' },
+            'ESTADO': { coluna: 'TODAS', campo: 'todos', label: 'TODOS os registros - Retorna planilha completa' }
         };
 
-        // Carregar dados REAIS da planilha (SEM MOCK)
+        // Carregar dados REAIS da planilha
         async function loadRealDataFromSheets() {
             if (isLoading) return;
             isLoading = true;
@@ -508,7 +490,7 @@
             `;
             
             try {
-                // Usando Google Sheets CSV export
+                // URL para CSV público
                 const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(TARGET_SHEET)}`;
                 
                 console.log('Carregando de:', csvUrl);
@@ -519,27 +501,22 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV carregado, tamanho:', csvText.length, 'caracteres');
+                console.log('CSV carregado, primeiros 200 caracteres:', csvText.substring(0, 200));
                 
-                const parsedData = parseCSVToEscolasReal(csvText);
+                const parsedData = parseCSVToEscolas(csvText);
                 escolasData = parsedData;
                 
                 const countSpan = document.getElementById('recordCount');
                 if (countSpan) {
-                    countSpan.innerHTML = `📊 ${escolasData.length} registros carregados`;
+                    countSpan.innerHTML = `📊 ${escolasData.length} registros`;
                 }
                 
                 console.log(`✅ Dados carregados: ${escolasData.length} registros`);
-                console.log('Primeiros 3 registros:', escolasData.slice(0, 3));
-                
-                // Mostrar dados carregados para debug
-                const debugDiv = document.createElement('div');
-                debugDiv.className = 'debug-info';
-                debugDiv.innerHTML = `<i class="fas fa-bug"></i> DEBUG: ${escolasData.length} registros carregados da planilha. Exemplo: ${escolasData[0] ? `NTE="${escolasData[0].nte}", Município="${escolasData[0].municipio}"` : 'Nenhum dado'}`;
-                
-                const existingDebug = document.querySelector('.debug-info');
-                if (existingDebug) existingDebug.remove();
-                document.querySelector('.results-panel').insertBefore(debugDiv, document.getElementById('resultsTable'));
+                if (escolasData.length > 0) {
+                    console.log('Primeiro registro:', escolasData[0]);
+                    console.log('Exemplos de NTE:', [...new Set(escolasData.slice(0, 10).map(e => e.nte))]);
+                    console.log('Exemplos de Município:', [...new Set(escolasData.slice(0, 10).map(e => e.municipio))]);
+                }
                 
                 // Resetar busca
                 document.getElementById('resultCount').textContent = '0 registros';
@@ -547,7 +524,9 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: "BARRA" só retorna BARRA | "15" só retorna 15</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+                            <strong>Exemplos:</strong> NTE="15" | Município="BARRA" | Escola="SEC001" | Estado="SP" (retorna todos)
+                        </p>
                     </div>
                 `;
                 
@@ -561,6 +540,7 @@
                         <p>Erro ao carregar dados da planilha</p>
                         <p style="font-size: 0.8rem;">${error.message}</p>
                         <p style="font-size: 0.7rem; margin-top: 0.5rem;">Verifique se a planilha está pública ou compartilhada</p>
+                        <p style="font-size: 0.7rem;">Link de teste: <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}" target="_blank">Abrir planilha</a></p>
                     </div>
                 `;
                 escolasData = [];
@@ -570,8 +550,8 @@
             }
         }
 
-        // Parse CSV para estrutura de escolas (SEM MOCK, dados reais)
-        function parseCSVToEscolasReal(csvText) {
+        // Parse CSV para estrutura de escolas
+        function parseCSVToEscolas(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim());
             if (lines.length < 2) {
                 console.warn('CSV com poucas linhas:', lines.length);
@@ -598,7 +578,7 @@
                         unidadeEscolar: cleanValue(values[6])
                     };
                     
-                    // Só adiciona se tiver pelo menos NTE ou Município ou Unidade Escolar
+                    // Adiciona se tiver pelo menos NTE ou Município ou Unidade Escolar
                     if (escola.nte || escola.municipio || escola.unidadeEscolar) {
                         escolas.push(escola);
                     }
@@ -610,7 +590,9 @@
 
         function cleanValue(value) {
             if (!value) return '';
-            return value.replace(/^"|"$/g, '').trim();
+            let cleaned = value.replace(/^"|"$/g, '').trim();
+            // Remove caracteres especiais extras
+            return cleaned;
         }
 
         function parseCSVLine(line) {
@@ -635,10 +617,16 @@
             return result;
         }
 
-        // BUSCA EXATA - ignora maiúsculas/minúsculas mas compara exatamente
-        function searchEscolasExact(searchType, searchValue) {
+        // BUSCA EXATA
+        function searchEscolas(searchType, searchValue) {
             if (!searchValue || searchValue.trim() === '') {
                 return [];
+            }
+            
+            // Se for ESTADO, retorna TODOS os registros
+            if (searchType === 'ESTADO') {
+                console.log('Busca por ESTADO: retornando TODOS os', escolasData.length, 'registros');
+                return escolasData;
             }
             
             const valueNormalized = searchValue.trim().toLowerCase();
@@ -650,12 +638,11 @@
                 const campo = escola[mapping.campo] || '';
                 const campoNormalized = campo.toLowerCase();
                 
-                // BUSCA EXATA: compara se são iguais, não se contém
+                // BUSCA EXATA
                 return campoNormalized === valueNormalized;
             });
             
             console.log(`Busca EXATA: "${searchValue}" em ${mapping.campo} -> encontrou ${results.length} resultados`);
-            console.log('Valores encontrados:', results.map(r => r[mapping.campo]));
             
             return results;
         }
@@ -671,8 +658,11 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Nenhum resultado encontrado para <strong>"${searchValue}"</strong></p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: o valor digitado deve corresponder exatamente ao valor na planilha.</p>
-                        <p style="font-size: 0.7rem;">Exemplo: Se buscar "BARRA", só retorna registros com Município = "BARRA" (não "BARRA DO GARÇAS")</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+                            Busca EXATA: o valor deve corresponder exatamente ao valor na planilha.<br>
+                            <strong>Dica:</strong> Verifique se o valor digitado está correto (maiúsculas/minúsculas são ignoradas).
+                        </p>
+                        ${escolasData.length > 0 ? `<p style="font-size: 0.7rem; margin-top: 0.5rem;">Exemplos na planilha: ${[...new Set(escolasData.slice(0, 5).map(e => e[searchType === 'NTE' ? 'nte' : searchType === 'MUNICIPIO' ? 'municipio' : 'codigoSec'])].filter(v => v)].join(', ')}</p>` : ''}
                     </div>
                 `;
                 return;
@@ -680,7 +670,7 @@
             
             let html = `
                 <div class="table-wrapper">
-                    <table>
+                     <table>
                         <thead>
                             <tr>
                                 <th>📌 NTE (Coluna B)</th>
@@ -716,9 +706,13 @@
 
         function updateSearchInfo(searchType) {
             const mapping = SEARCH_MAPPING[searchType];
-            const label = document.getElementById('searchColumnLabel');
-            if (label && mapping) {
-                label.innerHTML = mapping.label;
+            const infoSpan = document.getElementById('searchInfoText');
+            if (infoSpan && mapping) {
+                if (searchType === 'ESTADO') {
+                    infoSpan.innerHTML = '🌎 ESTADO: Retorna TODOS os registros da planilha';
+                } else {
+                    infoSpan.innerHTML = `🔍 Busca EXATA em ${mapping.label}`;
+                }
             }
         }
 
@@ -743,23 +737,38 @@
             
             updateSearchInfo('MUNICIPIO');
             
+            // Evento de mudança do tipo de busca
             document.getElementById('searchType').addEventListener('change', (e) => {
                 updateSearchInfo(e.target.value);
+                // Se for ESTADO, sugere ao usuário
+                if (e.target.value === 'ESTADO') {
+                    document.getElementById('searchValue').placeholder = 'Digite qualquer valor ou deixe vazio para buscar todos';
+                } else {
+                    document.getElementById('searchValue').placeholder = 'Digite o valor exato para busca...';
+                }
             });
             
+            // Evento de pesquisa
             document.getElementById('searchBtn').addEventListener('click', () => {
                 const searchType = document.getElementById('searchType').value;
                 const searchValue = document.getElementById('searchValue').value;
                 
-                if (!searchValue.trim()) {
+                if (!searchValue.trim() && searchType !== 'ESTADO') {
                     alert('Digite um valor para pesquisar!');
                     return;
                 }
                 
-                const results = searchEscolasExact(searchType, searchValue);
-                renderResults(results, searchType, searchValue);
+                // Para ESTADO, mesmo sem valor retorna todos
+                if (searchType === 'ESTADO' && !searchValue.trim()) {
+                    const results = escolasData;
+                    renderResults(results, searchType, 'TODOS OS REGISTROS');
+                } else {
+                    const results = searchEscolas(searchType, searchValue);
+                    renderResults(results, searchType, searchValue);
+                }
             });
             
+            // Limpar
             document.getElementById('clearBtn').addEventListener('click', () => {
                 document.getElementById('searchValue').value = '';
                 document.getElementById('resultCount').textContent = '0 registros';
@@ -767,22 +776,27 @@
                     <div class="empty-state">
                         <i class="fas fa-search" style="font-size: 3rem;"></i>
                         <p>Selecione um tipo de busca e digite um valor para pesquisar</p>
-                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Busca EXATA: "BARRA" só retorna BARRA | "15" só retorna 15</p>
+                        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+                            <strong>Exemplos:</strong> NTE="15" | Município="BARRA" | Escola="SEC001" | Estado="SP" (retorna todos)
+                        </p>
                     </div>
                 `;
             });
             
+            // Recarregar dados
             document.getElementById('refreshDataBtn').addEventListener('click', async () => {
                 await loadRealDataFromSheets();
                 alert(`Dados recarregados! ${escolasData.length} registros carregados.`);
             });
             
+            // Enter para pesquisar
             document.getElementById('searchValue').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     document.getElementById('searchBtn').click();
                 }
             });
             
+            // Abas
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     switchTab(btn.dataset.tab);
