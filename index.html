@@ -195,23 +195,14 @@
             color: white;
         }
 
-        .btn-warning:hover {
-            background: #d97706;
-        }
-
         .btn-danger {
             background: #ef4444;
             color: white;
         }
 
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
         .table-wrapper {
             overflow-x: auto;
             margin-top: 1rem;
-            cursor: col-resize;
         }
 
         table {
@@ -235,21 +226,6 @@
             font-weight: 600;
             font-size: 0.7rem;
             position: relative;
-        }
-
-        th.resizable {
-            position: relative;
-        }
-
-        th.resizable::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 5px;
-            cursor: col-resize;
-            background: transparent;
         }
 
         td:first-child, td:nth-child(2), td:nth-child(5) {
@@ -315,11 +291,6 @@
             font-weight: 500;
             text-align: right;
             padding-right: 0.8rem;
-        }
-
-        .sub-header {
-            font-size: 0.65rem;
-            font-weight: normal;
         }
     </style>
 </head>
@@ -439,24 +410,46 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DAS ABAS (PRÉ-DEFINIDA)
+        // ==================== CONFIGURAÇÃO DAS ABAS E COLUNAS ====================
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
         const SHEET_NAME = 'Escolas_ativas';
         
-        // FAED Manutenção - Coluna C = código, Coluna E = valor
+        // CONFIGURAÇÃO FAED MANUTENÇÃO
+        // Para cada ano: nome da aba, coluna do código, coluna do valor
         const FAED_CONFIG = {
-            2023: 'BBPag2023',
-            2024: 'BBPag2024',
-            2025: 'BBPag2025',
-            2026: 'BBPag2026'
+            2023: { sheetName: 'BBPag2023', codigoCol: 'C', valorCol: 'E' },
+            2024: { sheetName: 'BBPag2023', codigoCol: 'C', valorCol: 'E' },  // enquanto não tem, usa 2023
+            2025: { sheetName: 'BBPag2023', codigoCol: 'C', valorCol: 'E' },  // enquanto não tem, usa 2023
+            2026: { sheetName: 'BBPag2023', codigoCol: 'C', valorCol: 'E' }   // enquanto não tem, usa 2023
         };
         
-        // Repasse Alimentação - Coluna C = código, Coluna E = valor
+        // CONFIGURAÇÃO REPASSE ALIMENTAÇÃO
+        // Para cada ano: nome da aba, coluna do código, coluna do valor FEDERAL, coluna do valor ESTADUAL
         const ALIMENTACAO_CONFIG = {
-            2023: { federal: 'Alimentacao2023_Federal', estadual: 'Alimentacao2023_Estadual' },
-            2024: { federal: 'Alimentacao2024_Federal', estadual: 'Alimentacao2024_Estadual' },
-            2025: { federal: 'Alimentacao2025_Federal', estadual: 'Alimentacao2025_Estadual' },
-            2026: { federal: 'Alimentacao2026_Federal', estadual: 'Alimentacao2026_Estadual' }
+            2023: { 
+                sheetName: 'Dados2023', 
+                codigoCol: 'C', 
+                federalCol: 'F',   // Coluna F = Federal
+                estadualCol: 'H'   // Coluna H = Estadual
+            },
+            2024: { 
+                sheetName: 'Dados2023',   // enquanto não tem, usa 2023
+                codigoCol: 'C', 
+                federalCol: 'F', 
+                estadualCol: 'H' 
+            },
+            2025: { 
+                sheetName: 'Dados2023',   // enquanto não tem, usa 2023
+                codigoCol: 'C', 
+                federalCol: 'F', 
+                estadualCol: 'H' 
+            },
+            2026: { 
+                sheetName: 'Dados2023',   // enquanto não tem, usa 2023
+                codigoCol: 'C', 
+                federalCol: 'F', 
+                estadualCol: 'H' 
+            }
         };
         
         let escolasData = [];
@@ -469,14 +462,13 @@
             2026: { federal: {}, estadual: {} }
         };
         
-        // ==================== FUNÇÕES DE FORMATAÇÃO ====================
-        
-        function formatarMoedaBR(valor) {
+        // ==================== FUNÇÃO DE FORMATAÇÃO ====================
+        function formatarValorBR(valor) {
             if (valor === undefined || valor === null || isNaN(valor)) return '0,00';
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // ==================== CARREGAR DADOS ====================
+        // ==================== FUNÇÕES DE CARREGAMENTO ====================
         
         async function carregarDadosPlanilha() {
             const container = document.getElementById('resultsTable');
@@ -503,27 +495,88 @@
             }
         }
         
+        // Função genérica para carregar valores de uma aba com colunas personalizadas
+        async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+                const response = await fetch(url);
+                if (!response.ok) return {};
+                
+                const csvText = await response.text();
+                const dados = parseCSVGeneric(csvText);
+                const mapa = {};
+                
+                // Converter letra da coluna para índice (A=0, B=1, C=2, etc.)
+                const codigoIndex = colunaParaIndice(codigoCol);
+                const valorIndex = colunaParaIndice(valorCol);
+                
+                for (const linha of dados) {
+                    if (linha.length > Math.max(codigoIndex, valorIndex)) {
+                        const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
+                        const valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
+                        const valor = parseFloat(valorRaw.replace(/\./g, '').replace(',', '.')) || 0;
+                        if (codigo && valor) mapa[codigo] = valor;
+                    }
+                }
+                return mapa;
+            } catch(e) {
+                console.error(`Erro ao carregar ${sheetName}:`, e);
+                return {};
+            }
+        }
+        
+        // Função para carregar valores da alimentação (Federal e Estadual em colunas diferentes)
+        async function carregarValoresAlimentacaoAba(sheetName, codigoCol, federalCol, estadualCol) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+                const response = await fetch(url);
+                if (!response.ok) return { federal: {}, estadual: {} };
+                
+                const csvText = await response.text();
+                const dados = parseCSVGeneric(csvText);
+                const mapaFederal = {};
+                const mapaEstadual = {};
+                
+                const codigoIndex = colunaParaIndice(codigoCol);
+                const federalIndex = colunaParaIndice(federalCol);
+                const estadualIndex = colunaParaIndice(estadualCol);
+                
+                for (const linha of dados) {
+                    if (linha.length > Math.max(codigoIndex, federalIndex, estadualIndex)) {
+                        const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
+                        const federalRaw = (linha[federalIndex] || '').replace(/^"|"$/g, '').trim();
+                        const estadualRaw = (linha[estadualIndex] || '').replace(/^"|"$/g, '').trim();
+                        const federal = parseFloat(federalRaw.replace(/\./g, '').replace(',', '.')) || 0;
+                        const estadual = parseFloat(estadualRaw.replace(/\./g, '').replace(',', '.')) || 0;
+                        if (codigo) {
+                            if (federal) mapaFederal[codigo] = federal;
+                            if (estadual) mapaEstadual[codigo] = estadual;
+                        }
+                    }
+                }
+                return { federal: mapaFederal, estadual: mapaEstadual };
+            } catch(e) {
+                console.error(`Erro ao carregar alimentação ${sheetName}:`, e);
+                return { federal: {}, estadual: {} };
+            }
+        }
+        
+        function colunaParaIndice(coluna) {
+            const letras = coluna.toUpperCase();
+            let resultado = 0;
+            for (let i = 0; i < letras.length; i++) {
+                resultado = resultado * 26 + (letras.charCodeAt(i) - 64);
+            }
+            return resultado - 1; // índice 0-based
+        }
+        
         async function carregarValoresFAED() {
             let carregados = 0;
             for (const ano of [2023, 2024, 2025, 2026]) {
-                try {
-                    const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(FAED_CONFIG[ano])}`;
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        const dados = parseCSVGeneric(csvText);
-                        const mapa = {};
-                        for (const linha of dados) {
-                            if (linha.length > 4) {
-                                const codigo = (linha[2] || '').replace(/^"|"$/g, '').trim();
-                                const valor = parseFloat((linha[4] || '').replace(/^"|"$/g, '').replace(/\./g, '').replace(',', '.')) || 0;
-                                if (codigo && valor) mapa[codigo] = valor;
-                            }
-                        }
-                        valoresFAED[ano] = mapa;
-                        carregados++;
-                    }
-                } catch(e) { console.error(`FAED ${ano}:`, e); }
+                const config = FAED_CONFIG[ano];
+                const mapa = await carregarValoresDaAba(config.sheetName, config.codigoCol, config.valorCol);
+                valoresFAED[ano] = mapa;
+                if (Object.keys(mapa).length > 0) carregados++;
             }
             return carregados;
         }
@@ -531,26 +584,16 @@
         async function carregarValoresAlimentacao() {
             let carregados = 0;
             for (const ano of [2023, 2024, 2025, 2026]) {
-                for (const tipo of ['federal', 'estadual']) {
-                    try {
-                        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(ALIMENTACAO_CONFIG[ano][tipo])}`;
-                        const response = await fetch(url);
-                        if (response.ok) {
-                            const csvText = await response.text();
-                            const dados = parseCSVGeneric(csvText);
-                            const mapa = {};
-                            for (const linha of dados) {
-                                if (linha.length > 4) {
-                                    const codigo = (linha[2] || '').replace(/^"|"$/g, '').trim();
-                                    const valor = parseFloat((linha[4] || '').replace(/^"|"$/g, '').replace(/\./g, '').replace(',', '.')) || 0;
-                                    if (codigo && valor) mapa[codigo] = valor;
-                                }
-                            }
-                            valoresAlimentacao[ano][tipo] = mapa;
-                            carregados++;
-                        }
-                    } catch(e) { console.error(`Alimentação ${ano} ${tipo}:`, e); }
-                }
+                const config = ALIMENTACAO_CONFIG[ano];
+                const { federal, estadual } = await carregarValoresAlimentacaoAba(
+                    config.sheetName, 
+                    config.codigoCol, 
+                    config.federalCol, 
+                    config.estadualCol
+                );
+                valoresAlimentacao[ano].federal = federal;
+                valoresAlimentacao[ano].estadual = estadual;
+                if (Object.keys(federal).length > 0 || Object.keys(estadual).length > 0) carregados++;
             }
             return carregados;
         }
@@ -633,7 +676,7 @@
             let html = `<div class="table-wrapper"><table><thead><tr>
                 <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
                 <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
-            </tr></thead><tbody>`;
+             </tr></thead><tbody>`;
             
             resultados.forEach(escola => {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
@@ -644,7 +687,7 @@
                     <td>${escola.codigoSec || '-'}</td>
                     <td>${escola.codigoInep || '-'}</td>
                     <td style="text-align:left">${escola.unidadeEscolar || '-'}</td>
-                </tr>`;
+                 </tr>`;
             });
             
             html += `</tbody></table></div>`;
@@ -717,122 +760,70 @@
                 return;
             }
             
-            let html = `<div class="table-wrapper" id="resizableTable"><table id="mainTable"><thead>`;
+            let html = `<div class="table-wrapper"><table id="mainTable"><thead>`;
             
-            // Linha 1: FAED Manutenção e Alimentação
             html += `<tr>
-                <th rowspan="2" class="resizable">NTE</th>
-                <th rowspan="2" class="resizable">Município</th>
-                <th rowspan="2" class="resizable">Código SEC</th>
-                <th rowspan="2" class="resizable">Código INEP</th>
-                <th rowspan="2" class="resizable">Unidade Escolar</th>
-                <th colspan="4" class="faed-header resizable">FAED Manutenção</th>
-                <th colspan="8" class="alimentacao-header resizable">Repasse Alimentação</th>
-            </tr>`;
+                <th rowspan="2">NTE</th>
+                <th rowspan="2">Município</th>
+                <th rowspan="2">Código SEC</th>
+                <th rowspan="2">Código INEP</th>
+                <th rowspan="2">Unidade Escolar</th>
+                <th colspan="4" class="faed-header">FAED Manutenção</th>
+                <th colspan="8" class="alimentacao-header">Repasse Alimentação</th>
+             </tr>`;
             
-            // Linha 2: anos e subcategorias
             html += `<tr>`;
             for (let ano of [2023, 2024, 2025, 2026]) {
-                html += `<th class="faed-header resizable">${ano}</th>`;
+                html += `<th class="faed-header">${ano}</th>`;
             }
             for (let ano of [2023, 2024, 2025, 2026]) {
-                html += `<th class="alimentacao-header resizable">Federal ${ano}</th>`;
-                html += `<th class="alimentacao-header resizable">Estadual ${ano}</th>`;
+                html += `<th class="alimentacao-header">Federal ${ano}</th>`;
+                html += `<th class="alimentacao-header">Estadual ${ano}</th>`;
             }
             html += `</tr></thead><tbody>`;
             
-            // Dados das escolas
             for (const escola of escolasSelecionadas) {
                 html += `<tr>`;
-                html += `<td class="resizable">${escola.nte || '-'}</td>`;
-                html += `<td class="resizable">${escola.municipio || '-'}</td>`;
-                html += `<td class="resizable">${escola.codigoSec || '-'}</td>`;
-                html += `<td class="resizable">${escola.codigoInep || '-'}</td>`;
-                html += `<td class="resizable" style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
+                html += `<td>${escola.nte || '-'}</td>`;
+                html += `<td>${escola.municipio || '-'}</td>`;
+                html += `<td>${escola.codigoSec || '-'}</td>`;
+                html += `<td>${escola.codigoInep || '-'}</td>`;
+                html += `<td style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
                 
                 // FAED
                 for (let ano of [2023, 2024, 2025, 2026]) {
                     const valor = valoresFAED[ano][escola.codigoSec] || 0;
-                    html += `<td class="valor-monetario resizable">${formatarMoedaBR(valor)}</td>`;
+                    html += `<td class="valor-monetario">${formatarValorBR(valor)}</td>`;
                 }
                 
                 // Alimentação
                 for (let ano of [2023, 2024, 2025, 2026]) {
                     const federal = valoresAlimentacao[ano].federal[escola.codigoSec] || 0;
                     const estadual = valoresAlimentacao[ano].estadual[escola.codigoSec] || 0;
-                    html += `<td class="valor-monetario resizable">${formatarMoedaBR(federal)}</td>`;
-                    html += `<td class="valor-monetario resizable">${formatarMoedaBR(estadual)}</td>`;
+                    html += `<td class="valor-monetario">${formatarValorBR(federal)}</td>`;
+                    html += `<td class="valor-monetario">${formatarValorBR(estadual)}</td>`;
                 }
                 html += `</tr>`;
             }
             
-            // Linha de totais
+            // Totais
             html += `<tr style="background:#f1f5f9; font-weight:bold;">`;
-            html += `<td colspan="5" class="resizable">TOTAIS</td>`;
+            html += `<td colspan="5">TOTAIS</td>`;
             for (let ano of [2023, 2024, 2025, 2026]) {
                 let totalFAED = escolasSelecionadas.reduce((sum, e) => sum + (valoresFAED[ano][e.codigoSec] || 0), 0);
-                html += `<td class="valor-monetario resizable">${formatarMoedaBR(totalFAED)}</td>`;
+                html += `<td class="valor-monetario">${formatarValorBR(totalFAED)}</td>`;
             }
             for (let ano of [2023, 2024, 2025, 2026]) {
                 let totalFederal = escolasSelecionadas.reduce((sum, e) => sum + (valoresAlimentacao[ano].federal[e.codigoSec] || 0), 0);
                 let totalEstadual = escolasSelecionadas.reduce((sum, e) => sum + (valoresAlimentacao[ano].estadual[e.codigoSec] || 0), 0);
-                html += `<td class="valor-monetario resizable">${formatarMoedaBR(totalFederal)}</td>`;
-                html += `<td class="valor-monetario resizable">${formatarMoedaBR(totalEstadual)}</td>`;
+                html += `<td class="valor-monetario">${formatarValorBR(totalFederal)}</td>`;
+                html += `<td class="valor-monetario">${formatarValorBR(totalEstadual)}</td>`;
             }
             html += `</tr>`;
             
             html += `</tbody></table></div>`;
             container.innerHTML = html;
-            
-            // Ativar redimensionamento de colunas
-            ativarRedimensionamentoColunas();
-            
             renderRelatorioTabela();
-        }
-        
-        function ativarRedimensionamentoColunas() {
-            const table = document.getElementById('mainTable');
-            if (!table) return;
-            
-            const cols = table.querySelectorAll('th.resizable, td.resizable');
-            let startX, startWidth, currentCol;
-            
-            const handleMouseMove = (e) => {
-                if (!currentCol) return;
-                const delta = e.clientX - startX;
-                const newWidth = startWidth + delta;
-                if (newWidth > 50) {
-                    currentCol.style.width = newWidth + 'px';
-                    currentCol.style.minWidth = newWidth + 'px';
-                }
-            };
-            
-            const handleMouseUp = () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-                currentCol = null;
-            };
-            
-            table.querySelectorAll('th').forEach((th, index) => {
-                th.style.position = 'relative';
-                const resizer = document.createElement('div');
-                resizer.style.position = 'absolute';
-                resizer.style.right = '0';
-                resizer.style.top = '0';
-                resizer.style.height = '100%';
-                resizer.style.width = '5px';
-                resizer.style.cursor = 'col-resize';
-                resizer.style.background = 'transparent';
-                resizer.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    startX = e.clientX;
-                    currentCol = th;
-                    startWidth = th.offsetWidth;
-                    document.addEventListener('mousemove', handleMouseMove);
-                    document.addEventListener('mouseup', handleMouseUp);
-                });
-                th.appendChild(resizer);
-            });
         }
         
         function renderRelatorioTabela() {
@@ -841,47 +832,7 @@
                 container.innerHTML = `<div class="empty-state"><p>Nenhum dado para gerar relatório</p></div>`;
                 return;
             }
-            const gerarContent = document.getElementById('gerarTabela').innerHTML;
-            container.innerHTML = gerarContent;
-            ativarRedimensionamentoColunasRelatorio();
-        }
-        
-        function ativarRedimensionamentoColunasRelatorio() {
-            const container = document.getElementById('relatorioTabela');
-            const table = container.querySelector('table');
-            if (!table) return;
-            
-            table.querySelectorAll('th').forEach((th, index) => {
-                th.style.position = 'relative';
-                const resizer = document.createElement('div');
-                resizer.style.position = 'absolute';
-                resizer.style.right = '0';
-                resizer.style.top = '0';
-                resizer.style.height = '100%';
-                resizer.style.width = '5px';
-                resizer.style.cursor = 'col-resize';
-                let startX, startWidth;
-                resizer.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    startX = e.clientX;
-                    startWidth = th.offsetWidth;
-                    const onMouseMove = (me) => {
-                        const delta = me.clientX - startX;
-                        const newWidth = startWidth + delta;
-                        if (newWidth > 50) {
-                            th.style.width = newWidth + 'px';
-                            th.style.minWidth = newWidth + 'px';
-                        }
-                    };
-                    const onMouseUp = () => {
-                        document.removeEventListener('mousemove', onMouseMove);
-                        document.removeEventListener('mouseup', onMouseUp);
-                    };
-                    document.addEventListener('mousemove', onMouseMove);
-                    document.addEventListener('mouseup', onMouseUp);
-                });
-                th.appendChild(resizer);
-            });
+            container.innerHTML = document.getElementById('gerarTabela').innerHTML;
         }
         
         async function buscarFAED() {
@@ -892,7 +843,7 @@
             document.getElementById('gerarTabela').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando valores FAED Manutenção...</div>`;
             const carregados = await carregarValoresFAED();
             renderGerarTabela();
-            alert(`FAED Manutenção: ${carregados} abas carregadas (2023-2026)`);
+            alert(`FAED Manutenção: ${carregados} abas carregadas`);
         }
         
         async function buscarAlimentacao() {
@@ -903,13 +854,18 @@
             document.getElementById('gerarTabela').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando valores Repasse Alimentação...</div>`;
             const carregados = await carregarValoresAlimentacao();
             renderGerarTabela();
-            alert(`Repasse Alimentação: ${carregados} abas carregadas (Federal/Estadual 2023-2026)`);
+            alert(`Repasse Alimentação: ${carregados} abas carregadas`);
         }
         
         function limparTudo() {
             escolasSelecionadas = [];
             valoresFAED = { 2023: {}, 2024: {}, 2025: {}, 2026: {} };
-            valoresAlimentacao = { 2023: { federal: {}, estadual: {} }, 2024: { federal: {}, estadual: {} }, 2025: { federal: {}, estadual: {} }, 2026: { federal: {}, estadual: {} } };
+            valoresAlimentacao = {
+                2023: { federal: {}, estadual: {} },
+                2024: { federal: {}, estadual: {} },
+                2025: { federal: {}, estadual: {} },
+                2026: { federal: {}, estadual: {} }
+            };
             
             document.getElementById('gerarTabela').innerHTML = `<div class="empty-state"><p>Limpo! Selecione novas escolas.</p></div>`;
             document.getElementById('relatorioTabela').innerHTML = `<div class="empty-state"><p>Limpo! Gere novos valores.</p></div>`;
