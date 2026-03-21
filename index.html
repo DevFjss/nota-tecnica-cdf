@@ -38,7 +38,6 @@
         table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 1200px; }
         th, td { padding: 0.5rem 0.3rem; border: 1px solid #d1d5db; text-align: center; vertical-align: middle; }
         th { background: #9ca3af; color: white; font-weight: 700; font-size: 0.7rem; }
-        .sub-header { background: #6b7280; font-size: 0.65rem; }
         .total-row { background: #e5e7eb; font-weight: bold; }
         .total-geral { background: #d1d5db; font-weight: bold; }
         .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
@@ -51,7 +50,6 @@
         .report-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem; }
         .info-message { background: #e6f4ff; padding: 0.5rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.8rem; }
         
-        /* Estilos para impressão/PDF */
         @media print {
             body { background: white; }
             .header, .tabs, .action-buttons, .report-actions, .card-header button, .btn, .search-form, .info-message { display: none !important; }
@@ -176,53 +174,30 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // Função para exportar Excel mantendo a formatação numérica
         function exportarParaExcel(tabelaElement, nomeArquivo) {
             if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
-            
-            // Clona a tabela para não afetar a original
             const tabelaClone = tabelaElement.cloneNode(true);
-            
-            // Converte os valores monetários para números (formato brasileiro)
             const celulas = tabelaClone.querySelectorAll('.valor-monetario');
             celulas.forEach(celula => {
-                const valorTexto = celula.innerText.trim().replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+                const valorTexto = celula.innerText.trim().replace(/\./g, '').replace(',', '.');
                 const valorNumero = parseFloat(valorTexto);
                 if (!isNaN(valorNumero)) {
                     celula.innerText = valorNumero;
                     celula.style.textAlign = 'right';
                 }
             });
-            
-            // Cria a planilha
             const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
-            
-            // Ajusta largura das colunas
             const colunas = [];
-            for (let i = 0; i < 30; i++) {
-                colunas.push({ wch: 15 });
-            }
+            for (let i = 0; i < 30; i++) colunas.push({ wch: 15 });
             ws['!cols'] = colunas;
-            
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
             XLSX.writeFile(wb, `${nomeArquivo}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
         
-        // Função para exportar PDF com orientação landscape
         async function exportarParaPDF(elemento, nomeArquivo) {
-            if (!elemento || elemento.innerHTML.includes('Nenhum dado')) {
-                alert('Nenhum dado para exportar');
-                return;
-            }
-            
-            const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3],
-                filename: `${nomeArquivo}_${new Date().toISOString().slice(0,10)}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' }
-            };
+            if (!elemento || elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; }
+            const opt = { margin: [0.3, 0.3, 0.3, 0.3], filename: `${nomeArquivo}_${new Date().toISOString().slice(0,10)}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, letterRendering: true }, jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } };
             html2pdf().set(opt).from(elemento).save();
         }
         
@@ -362,42 +337,35 @@
         function pesquisar() {
             const tipo = document.getElementById('searchType').value;
             const valor = document.getElementById('searchValue').value.trim();
-            
             if (escolasData.length === 0) { alert('Clique em "Carregar Dados" primeiro'); return; }
             if (!valor) { alert('Digite um valor'); return; }
-            
             tipoBuscaAtual = tipo;
             valorBuscaAtual = valor;
             const valorLower = valor.toLowerCase();
             let resultados = [];
-            
             if (tipo === 'NTE') resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
             else if (tipo === 'MUNICIPIO') resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
             else if (tipo === 'ESCOLA') resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
             else if (tipo === 'INEP') resultados = escolasData.filter(e => e.codigoInep.toLowerCase() === valorLower);
-            
             mostrarResultados(resultados);
         }
         
         function mostrarResultados(resultados) {
             const container = document.getElementById('resultsTable');
             document.getElementById('resultCount').innerHTML = `${resultados.length} registro${resultados.length !== 1 ? 's' : ''}`;
-            
             if (resultados.length === 0) {
                 container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado para "${document.getElementById('searchValue').value}"</p></div>`;
                 document.getElementById('exportToGerarBtn').style.display = 'none';
                 return;
             }
-            
-            let html = `<div class="table-wrapper"> 能 <thead> 值得
+            let html = `<div class="table-wrapper"> 能 <thead> 见到
                 <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
                 <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
              </thead><tbody>`;
-            
             resultados.forEach(escola => {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
                 html += `<tr class="${isSelected ? 'selected-row' : ''}">
-                    <td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}>  </td>
+                    <td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}>   </td>
                     <td><strong>${escola.nte || '-'}</strong></td>
                     <td>${escola.municipio || '-'}</td>
                     <td>${escola.codigoSec || '-'}</td>
@@ -405,11 +373,9 @@
                     <td style="text-align:left">${escola.unidadeEscolar || '-'}</td>
                  </tr>`;
             });
-            
             html += `</tbody> 能 </div>`;
             container.innerHTML = html;
             document.getElementById('exportToGerarBtn').style.display = 'block';
-            
             document.querySelectorAll('.school-checkbox').forEach(cb => {
                 cb.onchange = () => {
                     const codigo = cb.dataset.codigo;
@@ -419,7 +385,6 @@
                     atualizarLinhasSelecionadas();
                 };
             });
-            
             const selectAll = document.getElementById('selectAllCheckbox');
             if (selectAll) {
                 selectAll.onchange = () => {
@@ -459,7 +424,6 @@
             const container = document.getElementById('gerarTabela');
             document.getElementById('gerarCount').innerHTML = `${escolasSelecionadas.length} escola${escolasSelecionadas.length !== 1 ? 's' : ''}`;
             if (escolasSelecionadas.length === 0) { container.innerHTML = `<div class="empty-state"><p>Nenhuma escola selecionada</p></div>`; return; }
-            
             let html = `<div class="table-wrapper"> 能 <thead><tr style="background: #9ca3af; color: white;">
                 <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
                 <th colspan="4">FAED Manutenção</th><th colspan="8">Repasse Alimentação</th>
@@ -468,7 +432,6 @@
                 <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
                 <th>Fed23</th><th>Est23</th><th>Fed24</th><th>Est24</th><th>Fed25</th><th>Est25</th><th>Fed26</th><th>Est26</th>
              </tr></thead><tbody>`;
-            
             for (const escola of escolasSelecionadas) {
                 html += `<tr>
                     <td>${escola.nte || '-'}</td><td>${escola.municipio || '-'}</td><td>${escola.codigoSec || '-'}</td><td>${escola.codigoInep || '-'}</td>
@@ -500,7 +463,6 @@
         async function enviarParaResumo() {
             if (escolasSelecionadas.length === 0) { alert('Nenhuma escola selecionada'); return; }
             if (tipoBuscaAtual !== 'NTE' && tipoBuscaAtual !== 'MUNICIPIO') { alert('Esta função é apenas para buscas por NTE ou Município.'); return; }
-            
             const totais = calcularTotaisEscolas(escolasSelecionadas);
             const identificador = tipoBuscaAtual === 'NTE' ? `NTE ${valorBuscaAtual}` : valorBuscaAtual;
             const existe = resumoDados.find(r => r.tipo === tipoBuscaAtual && r.valor === valorBuscaAtual);
@@ -514,11 +476,9 @@
         function renderResumoConsolidado() {
             const container = document.getElementById('resumoConsolidado');
             if (resumoDados.length === 0) { container.innerHTML = `<div class="empty-state"><p>Nenhum dado no resumo.</p></div>`; return; }
-            
             let totalFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalAlimentacaoFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalAlimentacaoEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
-            
             for (const item of resumoDados) {
                 for (let ano of [2023, 2024, 2025, 2026]) {
                     totalFAED[ano] += item[`faed${ano}`];
@@ -526,33 +486,31 @@
                     totalAlimentacaoEstadual[ano] += item.alimentacao[ano].estadual;
                 }
             }
-            
             let totalGeralManutencao = totalFAED[2023] + totalFAED[2024] + totalFAED[2025] + totalFAED[2026];
             let totalGeralAlimentacao = 0;
             for (let ano of [2023, 2024, 2025, 2026]) totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano] + totalFAED[ano];
             
             let html = `<div class="table-wrapper" id="resumoTableContainer"> 能 <table id="resumoTable" style="min-width: 1200px;">`;
-            
             html += `<thead><tr style="background: #4b5563; color: white;">
                 <th rowspan="3" style="background: #374151;">REPASSE ESCOLARES</th>
                 <th colspan="4" style="background: #374151;">FAED MANUTENÇÃO</th>
                 <th colspan="8" style="background: #374151;">CARTÃO PNAE - ALIMENTAÇÃO</th>
                 <th colspan="4" style="background: #374151;">CARTÃO FAED - ALIMENTAÇÃO</th>
-              </tr>`;
+               </tr>`;
             html += `<tr style="background: #4b5563; color: white;">
                 <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
                 <th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>
                 <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
-              </tr>`;
+               </tr>`;
             html += `<tr style="background: #4b5563; color: white; font-size: 0.65rem;">
                 <th></th><th></th><th></th><th></th>
                 <th>FEDERAL</th><th>ESTADUAL</th><th>FEDERAL</th><th>ESTADUAL</th><th>FEDERAL</th><th>ESTADUAL</th><th>FEDERAL</th><th>ESTADUAL</th>
                 <th></th><th></th><th></th><th></th>
-              </tr></thead><tbody>`;
+               </tr></thead><tbody>`;
             
             for (const item of resumoDados) {
                 html += `<tr>
-                    <td style="text-align:left; font-weight:bold; background:#f9fafb;">${item.identificador}${item.tipo === 'NTE' ? ' (NTE)' : ''}  </td>
+                    <td style="text-align:left; font-weight:bold; background:#f9fafb;">${item.identificador}${item.tipo === 'NTE' ? ' (NTE)' : ''}   </td>
                     <td class="valor-monetario">${formatarValorBR(item.faed2023)}</td>
                     <td class="valor-monetario">${formatarValorBR(item.faed2024)}</td>
                     <td class="valor-monetario">${formatarValorBR(item.faed2025)}</td>
@@ -587,13 +545,12 @@
             html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
                 <td style="text-align:left; font-weight:bold;">TOTAL GERAL MANUTENÇÃO</td>
                 <td colspan="16" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>
-              </tr>`;
+               </tr>`;
             html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
                 <td style="text-align:left; font-weight:bold;">TOTAL GERAL ALIMENTAÇÃO</td>
                 <td colspan="16" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>
-              </tr>`;
-            
-            html += `</tbody></table></div>`;
+               </tr>`;
+            html += `</tbody> 能 </div>`;
             container.innerHTML = html;
         }
         
@@ -601,26 +558,10 @@
         async function buscarAlimentacao() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; } document.getElementById('gerarTabela').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando Alimentação...</div>`; await carregarValoresAlimentacao(); renderGerarTabela(); alert('Repasse Alimentação carregado!'); }
         function limparGerar() { escolasSelecionadas = []; renderGerarTabela(); }
         function limparResumo() { resumoDados = []; renderResumoConsolidado(); }
-        
-        // Exportações com formatação correta
-        function exportResumoPDF() { 
-            const elemento = document.getElementById('resumoConsolidado');
-            if (elemento && elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; }
-            exportarParaPDF(elemento, 'resumo_nota_tecnica');
-        }
-        function exportResumoExcel() { 
-            const tabela = document.querySelector('#resumoConsolidado table');
-            exportarParaExcel(tabela, 'resumo_nota_tecnica');
-        }
-        function exportGerarPDF() { 
-            const elemento = document.getElementById('gerarTabela');
-            if (elemento && elemento.innerHTML.includes('Nenhuma escola')) { alert('Nenhum dado para exportar'); return; }
-            exportarParaPDF(elemento, 'detalhado_escolas');
-        }
-        function exportGerarExcel() { 
-            const tabela = document.querySelector('#gerarTabela table');
-            exportarParaExcel(tabela, 'detalhado_escolas');
-        }
+        function exportResumoPDF() { exportarParaPDF(document.getElementById('resumoConsolidado'), 'resumo_nota_tecnica'); }
+        function exportResumoExcel() { exportarParaExcel(document.querySelector('#resumoConsolidado table'), 'resumo_nota_tecnica'); }
+        function exportGerarPDF() { exportarParaPDF(document.getElementById('gerarTabela'), 'detalhado_escolas'); }
+        function exportGerarExcel() { exportarParaExcel(document.querySelector('#gerarTabela table'), 'detalhado_escolas'); }
         
         document.getElementById('loadDataBtn').onclick = carregarDadosPlanilha;
         document.getElementById('searchBtn').onclick = pesquisar;
