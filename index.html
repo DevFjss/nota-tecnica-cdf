@@ -176,24 +176,29 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
+        // FUNÇÃO CORRIGIDA - Mantém a formatação brasileira no Excel
         function exportarParaExcel(tabelaElement, nomeArquivo) {
             if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
             const tabelaClone = tabelaElement.cloneNode(true);
             
-            // Converter valores monetários para número
+            // Manter a formatação brasileira nos valores (ex: 133.116,38)
             const celulas = tabelaClone.querySelectorAll('.valor-monetario');
             celulas.forEach(celula => {
-                let valorTexto = celula.innerText.trim().replace('R$', '').trim();
-                const valorNumero = parseFloat(valorTexto.replace(/\./g, '').replace(',', '.'));
-                if (!isNaN(valorNumero)) {
-                    celula.innerText = valorNumero;
-                }
+                const valorFormatado = celula.innerText.trim();
+                // Mantém o texto com a formatação brasileira original
+                celula.innerText = valorFormatado;
                 celula.style.textAlign = 'right';
+                // Remove qualquer formatação extra
+                celula.style.fontFamily = 'monospace';
             });
             
-            const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
+            // Criar planilha preservando o texto
+            const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: false });
+            
+            // Ajustar largura das colunas
             const colunas = [];
-            for (let i = 0; i < 20; i++) colunas.push({ wch: 15 });
+            const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
+            for (let i = 0; i < numCols; i++) colunas.push({ wch: 15 });
             ws['!cols'] = colunas;
             
             const wb = XLSX.utils.book_new();
@@ -366,10 +371,10 @@
                 return;
             }
             
-            let html = `<div class="table-wrapper"><table><thead><tr>
+            let html = `<div class="table-wrapper"> 能 <thead> 见到
                 <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
                 <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
-            </tr></thead><tbody>`;
+             </thead><tbody>`;
             
             for (const escola of resultados) {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
@@ -380,10 +385,10 @@
                     <td>${escola.codigoSec || '-'}</td>
                     <td>${escola.codigoInep || '-'}</td>
                     <td style="text-align:left">${escola.unidadeEscolar || '-'}</td>
-                </tr>`;
+                 </tr>`;
             }
             
-            html += `</tbody></table></div>`;
+            html += `</tbody> 能 </div>`;
             container.innerHTML = html;
             document.getElementById('exportToGerarBtn').style.display = 'block';
             
@@ -447,17 +452,17 @@
             document.getElementById('gerarCount').innerHTML = `${escolasSelecionadas.length} escola${escolasSelecionadas.length !== 1 ? 's' : ''}`;
             if (escolasSelecionadas.length === 0) { container.innerHTML = `<div class="empty-state"><p>Nenhuma escola selecionada</p></div>`; return; }
             
-            let html = `<div class="table-wrapper"><table><thead>
+            let html = `<div class="table-wrapper"> 能 <thead>
                 <tr style="background: #9ca3af; color: white;">
                     <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
                     <th colspan="4">FAED Manutenção</th><th colspan="8">Alimentação</th>
-                </tr>
+                 </tr>
                 <tr style="background: #6b7280; color: white;">
                     <th></th><th></th><th></th><th></th><th></th>
                     <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
                     <th>Federal<br>2023</th><th>Estadual<br>2023</th><th>Federal<br>2024</th><th>Estadual<br>2024</th>
                     <th>Federal<br>2025</th><th>Estadual<br>2025</th><th>Federal<br>2026</th><th>Estadual<br>2026</th>
-                </tr>
+                 </tr>
             </thead><tbody>`;
             
             for (const escola of escolasSelecionadas) {
@@ -466,7 +471,7 @@
                     <td>${escola.municipio || '-'}</td>
                     <td>${escola.codigoSec || '-'}</td>
                     <td>${escola.codigoInep || '-'}</td>
-                    <td style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
+                    <td style="text-align:left">${escola.unidadeEscolar || '-'}  </td>`;
                 for (let ano of [2023, 2024, 2025, 2026]) {
                     html += `<td class="valor-monetario">${formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0)}</td>`;
                 }
@@ -476,7 +481,7 @@
                 }
                 html += `</tr>`;
             }
-            html += `</tbody></table></div>`;
+            html += `</tbody> 能 </div>`;
             container.innerHTML = html;
         }
         
@@ -535,18 +540,18 @@
                             <th rowspan="2" style="background: #374151;">REPASSE ESCOLARES</th>
                             <th colspan="4" style="background: #374151;">FAED MANUTENÇÃO</th>
                             <th colspan="8" style="background: #374151;">ALIMENTAÇÃO</th>
-                        </tr>
+                         </tr>
                         <tr style="background: #4b5563; color: white;">
                             <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
                             <th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>
-                        </tr>
+                         </tr>
                         <tr style="background: #6b7280; color: white; font-size: 0.65rem;">
                             <th></th><th></th><th></th><th></th>
                             <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
                             <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
                             <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
                             <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
-                        </tr>
+                         </tr>
                     </thead>
                     <tbody>`;
             
@@ -589,7 +594,7 @@
                 <td colspan="11" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>
             </tr>`;
             
-            html += `</tbody> </table> </div>`;
+            html += `</tbody> 能 </div>`;
             container.innerHTML = html;
         }
         
