@@ -176,24 +176,25 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        function exportarParaExcel(tabelaElement, nomeArquivo) {
-            if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
-            const tabelaClone = tabelaElement.cloneNode(true);
-            const celulas = tabelaClone.querySelectorAll('.valor-monetario');
-            celulas.forEach(celula => {
-                const valorFormatado = celula.innerText.trim();
-                celula.innerText = valorFormatado;
-                celula.style.textAlign = 'right';
-            });
-            const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: false });
-            const colunas = [];
-            const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
-            for (let i = 0; i < numCols; i++) colunas.push({ wch: 15 });
-            ws['!cols'] = colunas;
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
-            XLSX.writeFile(wb, nomeArquivo + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
-        }
+           function exportarParaExcel(tabelaElement, nomeArquivo) {
+        if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
+        const tabelaClone = tabelaElement.cloneNode(true);
+        const celulas = tabelaClone.querySelectorAll('.valor-monetario');
+        celulas.forEach(celula => {
+            const valorFormatado = celula.innerText.trim();
+            // Mantém o valor com formatação brasileira original (ex: 386.048,40)
+            celula.innerText = valorFormatado;
+            celula.style.textAlign = 'right';
+        });
+        const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: false });
+        const colunas = [];
+        const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
+        for (let i = 0; i < numCols; i++) colunas.push({ wch: 15 });
+        ws['!cols'] = colunas;
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
+        XLSX.writeFile(wb, nomeArquivo + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
         
         async function exportarParaPDF(elemento, nomeArquivo) {
             if (!elemento || elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; }
