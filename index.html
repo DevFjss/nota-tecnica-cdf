@@ -181,11 +181,22 @@
         const tabelaClone = tabelaElement.cloneNode(true);
         const celulas = tabelaClone.querySelectorAll('.valor-monetario');
         celulas.forEach(celula => {
-            const valorFormatado = celula.innerText.trim();
-            // Mantém o valor com formatação brasileira original (ex: 386.048,40)
-            celula.innerText = valorFormatado;
-            celula.style.textAlign = 'right';
-        });
+    const texto = celula.innerText.trim();
+
+    // Converte "386.048,40" → 386048.40
+    const numero = parseFloat(
+        texto.replace(/\./g, '').replace(',', '.')
+    );
+
+    // Se for número válido
+    if (!isNaN(numero)) {
+        celula.innerText = numero;
+    } else {
+        celula.innerText = 0;
+    }
+
+    celula.style.textAlign = 'right';
+});
         const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: false });
         const colunas = [];
         const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
