@@ -5,69 +5,29 @@
 <title>Nota Técnica - CDF</title>
 
 <style>
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #f4f6f9;
-}
+body { font-family: Arial; margin:0; background:#f4f6f9; }
 
 header {
-  background: linear-gradient(90deg, #0d6efd, #20c997);
-  color: white;
-  padding: 15px;
-  font-size: 22px;
-  font-weight: bold;
+  background: linear-gradient(90deg,#0d6efd,#20c997);
+  color:white; padding:15px; font-size:22px;
 }
 
-.tabs {
-  display: flex;
-  background: #103450;
-}
+.tabs { display:flex; background:#103450; }
+.tab { padding:10px 20px; color:#cbd5e1; cursor:pointer; }
+.tab.active { background:#0d6efd; color:white; }
 
-.tab {
-  padding: 10px 20px;
-  cursor: pointer;
-  color: #cbd5e1;
-}
+.container { padding:15px; }
 
-.tab.active {
-  background: #0d6efd;
-  color: white;
-}
-
-.container {
-  padding: 15px;
-}
-
-input, select, button {
-  padding: 8px;
-  margin: 5px;
-}
-
-button {
-  cursor: pointer;
-}
+input,select,button { padding:8px; margin:5px; }
+button { cursor:pointer; }
 
 .table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+  width:100%; border-collapse:collapse; margin-top:10px;
 }
-
-.table th, .table td {
-  border: 1px solid #ccc;
-  padding: 6px;
-  text-align: center;
+.table th,.table td {
+  border:1px solid #ccc; padding:6px; text-align:center;
 }
-
-.table th {
-  background: #0d6efd;
-  color: white;
-}
-
-tr.selected {
-  background: #e6f4ff;
-}
+.table th { background:#0d6efd; color:white; }
 
 </style>
 </head>
@@ -77,9 +37,8 @@ tr.selected {
 <header>Nota Técnica - CDF</header>
 
 <div class="tabs">
-  <div class="tab active" onclick="trocar('consulta')">Consultar Escola</div>
-  <div class="tab" onclick="trocar('gerar')">Gerar Valor</div>
-  <div class="tab">Relatório</div>
+  <div class="tab active" onclick="trocar('consulta',event)">Consulta</div>
+  <div class="tab" onclick="trocar('gerar',event)">Gerar Valor</div>
 </div>
 
 <div class="container">
@@ -93,30 +52,31 @@ tr.selected {
     <option>INEP</option>
   </select>
 
-  <input id="busca" placeholder="Digite..." />
+  <input id="busca">
   <button onclick="pesquisar()">Buscar</button>
-  <button onclick="carregar()">Carregar Dados</button>
+  <button onclick="carregar()">Carregar</button>
 
   <table class="table">
     <thead>
       <tr>
         <th><input type="checkbox" onclick="marcarTodos(this)"></th>
-        <th>NTE</th>
-        <th>Município</th>
-        <th>Cod SEC</th>
-        <th>Cod INEP</th>
-        <th>Escola</th>
+        <th>NTE</th><th>Município</th><th>SEC</th><th>INEP</th><th>Escola</th>
       </tr>
     </thead>
     <tbody id="lista"></tbody>
   </table>
 
-  <button onclick="enviar()">Enviar para Gerar Valor</button>
+  <button onclick="enviar()">Enviar</button>
 </div>
 
 <!-- GERAR -->
 <div id="gerar" style="display:none;">
+
+  <button onclick="buscarFaed()">Faed Manutenção</button>
+  <button onclick="buscarAlimentacao()">Alimentação</button>
+
   <table class="table" id="tabelaGerar"></table>
+
 </div>
 
 </div>
@@ -125,67 +85,57 @@ tr.selected {
 
 const ID = "1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k";
 
-let dados = [];
-let selecionados = [];
+let dados=[], selecionados=[];
+let faed=[], alim=[];
 
 function url(sheet){
   return `https://docs.google.com/spreadsheets/d/${ID}/gviz/tq?tqx=out:csv&sheet=${sheet}`;
 }
 
-// carregar dados
+// carregar escolas
 async function carregar(){
   const csv = await fetch(url("Escolas_ativas")).then(r=>r.text());
-  dados = parseCSV(csv);
-  alert("Dados carregados: " + dados.length);
+  dados = parse(csv);
+  alert("Carregado: "+dados.length);
 }
 
-// parser CSV robusto
-function parseCSV(csv){
+// parser
+function parse(csv){
   return csv.split("\n").slice(1).map(l=>{
     const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
     return {
-      nte: (c[1]||"").replace(/"/g,""),
-      municipio: (c[2]||"").replace(/"/g,""),
-      codSec: (c[3]||"").replace(/"/g,""),
-      codInep: (c[5]||"").replace(/"/g,""),
-      escola: (c[6]||"").replace(/"/g,"")
+      nte:c[1], municipio:c[2],
+      codSec:c[3], codInep:c[5], escola:c[6]
     };
   });
 }
 
-// pesquisa
+// pesquisar
 function pesquisar(){
-  const tipo = document.getElementById("tipo").value;
-  const valor = document.getElementById("busca").value.toUpperCase();
+  const t = tipo.value;
+  const v = busca.value.toUpperCase();
 
-  let res = [];
+  let r=[];
 
-  if(tipo==="NTE") res = dados.filter(x=>x.nte==valor);
-  if(tipo==="MUNICIPIO") res = dados.filter(x=>x.municipio.includes(valor));
-  if(tipo==="ESCOLA") res = dados.filter(x=>x.codSec==valor);
-  if(tipo==="INEP") res = dados.filter(x=>x.codInep==valor);
+  if(t==="NTE") r=dados.filter(x=>x.nte==v);
+  if(t==="MUNICIPIO") r=dados.filter(x=>x.municipio.includes(v));
+  if(t==="ESCOLA") r=dados.filter(x=>x.codSec==v);
+  if(t==="INEP") r=dados.filter(x=>x.codInep==v);
 
-  render(res);
+  render(r);
 }
 
-// render tabela
+// render lista
 function render(lista){
-  let html = "";
-
+  let h="";
   lista.forEach(e=>{
-    html += `
-    <tr>
+    h+=`<tr>
       <td><input type="checkbox" data='${JSON.stringify(e)}'></td>
-      <td>${e.nte}</td>
-      <td>${e.municipio}</td>
-      <td>${e.codSec}</td>
-      <td>${e.codInep}</td>
-      <td>${e.escola}</td>
+      <td>${e.nte}</td><td>${e.municipio}</td>
+      <td>${e.codSec}</td><td>${e.codInep}</td><td>${e.escola}</td>
     </tr>`;
   });
-
-  document.getElementById("lista").innerHTML = html;
+  listaHTML.innerHTML=h;
 }
 
 // marcar todos
@@ -193,50 +143,76 @@ function marcarTodos(c){
   document.querySelectorAll("#lista input").forEach(x=>x.checked=c.checked);
 }
 
-// enviar seleção
+// enviar
 function enviar(){
-  selecionados = [];
-
+  selecionados=[];
   document.querySelectorAll("#lista input:checked").forEach(x=>{
-    selecionados.push(JSON.parse(x.getAttribute("data")));
+    selecionados.push(JSON.parse(x.dataset));
   });
 
   renderGerar();
   trocar("gerar");
 }
 
-// gerar tabela
+// render base
 function renderGerar(){
-  let html = `
-  <tr>
-    <th>NTE</th>
-    <th>Município</th>
-    <th>Cod SEC</th>
-    <th>Cod INEP</th>
-    <th>Escola</th>
+  let h=`<tr>
+    <th>NTE</th><th>Município</th><th>SEC</th><th>INEP</th><th>Escola</th>
+    <th>FAED</th><th>Federal</th><th>Estadual</th>
   </tr>`;
 
   selecionados.forEach(e=>{
-    html += `
-    <tr>
+    h+=`<tr>
       <td>${e.nte}</td>
       <td>${e.municipio}</td>
       <td>${e.codSec}</td>
       <td>${e.codInep}</td>
       <td>${e.escola}</td>
+      <td>${e.faed||0}</td>
+      <td>${e.fed||0}</td>
+      <td>${e.est||0}</td>
     </tr>`;
   });
 
-  document.getElementById("tabelaGerar").innerHTML = html;
+  tabelaGerar.innerHTML=h;
+}
+
+// buscar FAED
+async function buscarFaed(){
+  const csv = await fetch(url("BBPag2023")).then(r=>r.text());
+  faed = parse(csv);
+
+  selecionados.forEach(e=>{
+    const achou = faed.find(f=>f.codSec==e.codSec);
+    e.faed = achou ? achou.codInep : 0;
+  });
+
+  renderGerar();
+}
+
+// buscar alimentação
+async function buscarAlimentacao(){
+  const csv = await fetch(url("dados_2023")).then(r=>r.text());
+  alim = parse(csv);
+
+  selecionados.forEach(e=>{
+    const a = alim.find(x=>x.codSec==e.codSec);
+    if(a){
+      e.fed = a.codInep;
+      e.est = a.escola;
+    }
+  });
+
+  renderGerar();
 }
 
 // trocar aba
-function trocar(t){
-  document.getElementById("consulta").style.display = t==="consulta"?"block":"none";
-  document.getElementById("gerar").style.display = t==="gerar"?"block":"none";
+function trocar(t,ev){
+  consulta.style.display = t==="consulta"?"block":"none";
+  gerar.style.display = t==="gerar"?"block":"none";
 
-  document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));
-  event.target.classList.add("active");
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  if(ev) ev.target.classList.add("active");
 }
 
 </script>
