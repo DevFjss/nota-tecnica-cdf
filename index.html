@@ -145,7 +145,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO
+        // CONFIGURACAO
         const SPREADSHEET_ID = '1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k';
         const SHEET_NAME = 'Escolas_ativas';
         
@@ -176,31 +176,20 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // FUNÇÃO CORRIGIDA - Mantém a formatação brasileira no Excel
         function exportarParaExcel(tabelaElement, nomeArquivo) {
             if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
             const tabelaClone = tabelaElement.cloneNode(true);
-            
-            // Manter a formatação brasileira nos valores (ex: 133.116,38)
             const celulas = tabelaClone.querySelectorAll('.valor-monetario');
             celulas.forEach(celula => {
                 const valorFormatado = celula.innerText.trim();
-                // Mantém o texto com a formatação brasileira original
                 celula.innerText = valorFormatado;
                 celula.style.textAlign = 'right';
-                // Remove qualquer formatação extra
-                celula.style.fontFamily = 'monospace';
             });
-            
-            // Criar planilha preservando o texto
             const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: false });
-            
-            // Ajustar largura das colunas
             const colunas = [];
             const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
             for (let i = 0; i < numCols; i++) colunas.push({ wch: 15 });
             ws['!cols'] = colunas;
-            
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
             XLSX.writeFile(wb, `${nomeArquivo}_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -214,17 +203,17 @@
         
         async function carregarDadosPlanilha() {
             const container = document.getElementById('resultsTable');
-            container.innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>`;
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>';
             try {
                 const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Erro ao carregar');
                 const csvText = await response.text();
                 escolasData = parseCSV(csvText);
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i><p>✅ ${escolasData.length} escolas carregadas</p><p style="font-size: 0.8rem;">Digite um valor e clique em Pesquisar</p></div>`;
-                document.getElementById('resultCount').innerHTML = `${escolasData.length} registros`;
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="font-size: 3rem; color: #10b981;"></i><p>✅ ' + escolasData.length + ' escolas carregadas</p><p style="font-size: 0.8rem;">Digite um valor e clique em Pesquisar</p></div>';
+                document.getElementById('resultCount').innerHTML = escolasData.length + ' registros';
             } catch (error) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar. Publique sua planilha.</p></div>`;
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar. Publique sua planilha.</p></div>';
             }
         }
         
@@ -363,32 +352,43 @@
         
         function mostrarResultados(resultados) {
             const container = document.getElementById('resultsTable');
-            document.getElementById('resultCount').innerHTML = `${resultados.length} registro${resultados.length !== 1 ? 's' : ''}`;
+            document.getElementById('resultCount').innerHTML = resultados.length + ' registro' + (resultados.length !== 1 ? 's' : '');
             
             if (resultados.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado para "${document.getElementById('searchValue').value}"</p></div>`;
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado para "' + document.getElementById('searchValue').value + '"</p></div>';
                 document.getElementById('exportToGerarBtn').style.display = 'none';
                 return;
             }
             
-            let html = `<div class="table-wrapper"> 能 <thead> 见到
-                <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>
-                <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
-             </thead><tbody>`;
+            let html = '<div class="table-wrapper">';
+            html += '<table>';
+            html += '<thead>';
+            html += '<tr>';
+            html += '<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
+            html += '<th>NTE</th>';
+            html += '<th>Município</th>';
+            html += '<th>Código SEC</th>';
+            html += '<th>Código INEP</th>';
+            html += '<th>Unidade Escolar</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
             
             for (const escola of resultados) {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
-                html += `<tr class="${isSelected ? 'selected-row' : ''}">
-                    <td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}>   </td>
-                    <td><strong>${escola.nte || '-'}</strong></td>
-                    <td>${escola.municipio || '-'}</td>
-                    <td>${escola.codigoSec || '-'}</td>
-                    <td>${escola.codigoInep || '-'}</td>
-                    <td style="text-align:left">${escola.unidadeEscolar || '-'}</td>
-                 </tr>`;
+                html += '<tr class="' + (isSelected ? 'selected-row' : '') + '">';
+                html += '<td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="' + escola.codigoSec + '" ' + (isSelected ? 'checked' : '') + '></td>';
+                html += '<td><strong>' + (escola.nte || '-') + '</strong></td>';
+                html += '<td>' + (escola.municipio || '-') + '</td>';
+                html += '<td>' + (escola.codigoSec || '-') + '</td>';
+                html += '<td>' + (escola.codigoInep || '-') + '</td>';
+                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '</td>';
+                html += '</tr>';
             }
             
-            html += `</tbody> 能 </div>`;
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
             container.innerHTML = html;
             document.getElementById('exportToGerarBtn').style.display = 'block';
             
@@ -449,39 +449,44 @@
         
         function renderGerarTabela() {
             const container = document.getElementById('gerarTabela');
-            document.getElementById('gerarCount').innerHTML = `${escolasSelecionadas.length} escola${escolasSelecionadas.length !== 1 ? 's' : ''}`;
-            if (escolasSelecionadas.length === 0) { container.innerHTML = `<div class="empty-state"><p>Nenhuma escola selecionada</p></div>`; return; }
+            document.getElementById('gerarCount').innerHTML = escolasSelecionadas.length + ' escola' + (escolasSelecionadas.length !== 1 ? 's' : '');
+            if (escolasSelecionadas.length === 0) { container.innerHTML = '<div class="empty-state"><p>Nenhuma escola selecionada</p></div>'; return; }
             
-            let html = `<div class="table-wrapper"> 能 <thead>
-                <tr style="background: #9ca3af; color: white;">
-                    <th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>
-                    <th colspan="4">FAED Manutenção</th><th colspan="8">Alimentação</th>
-                 </tr>
-                <tr style="background: #6b7280; color: white;">
-                    <th></th><th></th><th></th><th></th><th></th>
-                    <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
-                    <th>Federal<br>2023</th><th>Estadual<br>2023</th><th>Federal<br>2024</th><th>Estadual<br>2024</th>
-                    <th>Federal<br>2025</th><th>Estadual<br>2025</th><th>Federal<br>2026</th><th>Estadual<br>2026</th>
-                 </tr>
-            </thead><tbody>`;
+            let html = '<div class="table-wrapper">';
+            html += '<table>';
+            html += '<thead>';
+            html += '<tr style="background: #9ca3af; color: white;">';
+            html += '<th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>';
+            html += '<th colspan="4">FAED Manutenção</th><th colspan="8">Alimentação</th>';
+            html += '</tr>';
+            html += '<tr style="background: #6b7280; color: white;">';
+            html += '<th></th><th></th><th></th><th></th><th></th>';
+            html += '<th>2023</th><th>2024</th><th>2025</th><th>2026</th>';
+            html += '<th>Federal 2023</th><th>Estadual 2023</th><th>Federal 2024</th><th>Estadual 2024</th>';
+            html += '<th>Federal 2025</th><th>Estadual 2025</th><th>Federal 2026</th><th>Estadual 2026</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
             
             for (const escola of escolasSelecionadas) {
-                html += `<tr>
-                    <td>${escola.nte || '-'}</td>
-                    <td>${escola.municipio || '-'}</td>
-                    <td>${escola.codigoSec || '-'}</td>
-                    <td>${escola.codigoInep || '-'}</td>
-                    <td style="text-align:left">${escola.unidadeEscolar || '-'}  </td>`;
+                html += '<tr>';
+                html += '<td>' + (escola.nte || '-') + '</td>';
+                html += '<td>' + (escola.municipio || '-') + '</td>';
+                html += '<td>' + (escola.codigoSec || '-') + '</td>';
+                html += '<td>' + (escola.codigoInep || '-') + '</td>';
+                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '</td>';
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0)}</td>`;
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0) + '</td>';
                 }
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0)}</td>`;
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0)}</td>`;
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0) + '</td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0) + '</td>';
                 }
-                html += `</tr>`;
+                html += '</tr>';
             }
-            html += `</tbody> 能 </div>`;
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
             container.innerHTML = html;
         }
         
@@ -502,18 +507,18 @@
             if (escolasSelecionadas.length === 0) { alert('Nenhuma escola selecionada'); return; }
             if (tipoBuscaAtual !== 'NTE' && tipoBuscaAtual !== 'MUNICIPIO') { alert('Esta função é apenas para buscas por NTE ou Município.'); return; }
             const totais = calcularTotaisEscolas(escolasSelecionadas);
-            const identificador = tipoBuscaAtual === 'NTE' ? `NTE ${valorBuscaAtual}` : valorBuscaAtual;
+            const identificador = tipoBuscaAtual === 'NTE' ? 'NTE ' + valorBuscaAtual : valorBuscaAtual;
             const existe = resumoDados.find(r => r.tipo === tipoBuscaAtual && r.valor === valorBuscaAtual);
             const novoItem = { tipo: tipoBuscaAtual, valor: valorBuscaAtual, identificador: identificador, faed2023: totais.faed[2023], faed2024: totais.faed[2024], faed2025: totais.faed[2025], faed2026: totais.faed[2026], alimentacao: totais.alimentacao };
             if (existe) Object.assign(existe, novoItem);
             else resumoDados.push(novoItem);
             renderResumoConsolidado();
-            alert(`Dados de ${identificador} adicionados ao resumo!`);
+            alert('Dados de ' + identificador + ' adicionados ao resumo!');
         }
         
         function renderResumoConsolidado() {
             const container = document.getElementById('resumoConsolidado');
-            if (resumoDados.length === 0) { container.innerHTML = `<div class="empty-state"><p>Nenhum dado no resumo.</p></div>`; return; }
+            if (resumoDados.length === 0) { container.innerHTML = '<div class="empty-state"><p>Nenhum dado no resumo.</p></div>'; return; }
             
             let totalFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalAlimentacaoFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
@@ -521,7 +526,7 @@
             
             for (const item of resumoDados) {
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    totalFAED[ano] += item[`faed${ano}`];
+                    totalFAED[ano] += item['faed' + ano];
                     totalAlimentacaoFederal[ano] += item.alimentacao[ano].federal;
                     totalAlimentacaoEstadual[ano] += item.alimentacao[ano].estadual;
                 }
@@ -533,73 +538,73 @@
                 totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano];
             }
             
-            let html = `<div class="table-wrapper">
-                <table style="min-width: 1000px;">
-                    <thead>
-                        <tr style="background: #374151; color: white;">
-                            <th rowspan="2" style="background: #374151;">REPASSE ESCOLARES</th>
-                            <th colspan="4" style="background: #374151;">FAED MANUTENÇÃO</th>
-                            <th colspan="8" style="background: #374151;">ALIMENTAÇÃO</th>
-                         </tr>
-                        <tr style="background: #4b5563; color: white;">
-                            <th>2023</th><th>2024</th><th>2025</th><th>2026</th>
-                            <th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>
-                         </tr>
-                        <tr style="background: #6b7280; color: white; font-size: 0.65rem;">
-                            <th></th><th></th><th></th><th></th>
-                            <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
-                            <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
-                            <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
-                            <th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>
-                         </tr>
-                    </thead>
-                    <tbody>`;
+            let html = '<div class="table-wrapper">';
+            html += '<table style="min-width: 1000px;">';
+            html += '<thead>';
+            html += '<tr style="background: #374151; color: white;">';
+            html += '<th rowspan="2" style="background: #374151;">REPASSE ESCOLARES</th>';
+            html += '<th colspan="4" style="background: #374151;">FAED MANUTENÇÃO</th>';
+            html += '<th colspan="8" style="background: #374151;">ALIMENTAÇÃO</th>';
+            html += '</tr>';
+            html += '<tr style="background: #4b5563; color: white;">';
+            html += '<th>2023</th><th>2024</th><th>2025</th><th>2026</th>';
+            html += '<th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>';
+            html += '</tr>';
+            html += '<tr style="background: #6b7280; color: white; font-size: 0.65rem;">';
+            html += '<th></th><th></th><th></th><th></th>';
+            html += '<th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>';
+            html += '<th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>';
+            html += '<th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>';
+            html += '<th>FEDERAL (PNAE)</th><th>ESTADUAL (FAED)</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
             
             for (const item of resumoDados) {
-                html += `<tr>
-                    <td style="text-align:left; font-weight:bold;">${item.identificador}${item.tipo === 'NTE' ? ' (NTE)' : ''}${item.tipo === 'MUNICIPIO' ? ' (Município)' : ''}</td>
-                    <td class="valor-monetario">${formatarValorBR(item.faed2023)}</td>
-                    <td class="valor-monetario">${formatarValorBR(item.faed2024)}</td>
-                    <td class="valor-monetario">${formatarValorBR(item.faed2025)}</td>
-                    <td class="valor-monetario">${formatarValorBR(item.faed2026)}</td>`;
+                html += '<tr>';
+                html += '<td style="text-align:left; font-weight:bold;">' + item.identificador + (item.tipo === 'NTE' ? ' (NTE)' : '') + (item.tipo === 'MUNICIPIO' ? ' (Município)' : '') + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2023) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2024) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2025) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2026) + '</td>';
                 
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}</td>`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}</td>`;
+                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].federal) + '</td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].estadual) + '</td>';
                 }
-                html += `</tr>`;
+                html += '</tr>';
             }
             
-            // Linha TOTAL
-            html += `<tr class="total-row" style="background: #e5e7eb; font-weight: bold;">
-                <td style="text-align:left; font-weight:bold;">TOTAL</td>
-                <td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2023])}</strong></td>
-                <td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2024])}</strong></td>
-                <td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2025])}</strong></td>
-                <td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2026])}</strong></td>`;
+            html += '<tr class="total-row" style="background: #e5e7eb; font-weight: bold;">';
+            html += '<td style="text-align:left; font-weight:bold;">TOTAL</td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2023]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2024]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2025]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2026]) + '</strong></td>';
             
             for (let ano of [2023, 2024, 2025, 2026]) {
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoFederal[ano])}</strong></td>`;
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoEstadual[ano])}</strong></td>`;
+                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoFederal[ano]) + '</strong></td>';
+                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoEstadual[ano]) + '</strong></td>';
             }
-            html += `</tr>`;
+            html += '</tr>';
             
-            // Totais Gerais
-            html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
-                <td style="text-align:left; font-weight:bold;">TOTAL GERAL MANUTENÇÃO</td>
-                <td colspan="11" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>
-            </tr>`;
-            html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
-                <td style="text-align:left; font-weight:bold;">TOTAL GERAL ALIMENTAÇÃO</td>
-                <td colspan="11" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>
-            </tr>`;
+            html += '<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">';
+            html += '<td style="text-align:left; font-weight:bold;">TOTAL GERAL MANUTENÇÃO</td>';
+            html += '<td colspan="11" class="valor-monetario"><strong>' + formatarValorBR(totalGeralManutencao) + '</strong></td>';
+            html += '</tr>';
+            html += '<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">';
+            html += '<td style="text-align:left; font-weight:bold;">TOTAL GERAL ALIMENTAÇÃO</td>';
+            html += '<td colspan="11" class="valor-monetario"><strong>' + formatarValorBR(totalGeralAlimentacao) + '</strong></td>';
+            html += '</tr>';
             
-            html += `</tbody> 能 </div>`;
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
             container.innerHTML = html;
         }
         
-        async function buscarFAED() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; } document.getElementById('gerarTabela').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando FAED...</div>`; await carregarValoresFAED(); renderGerarTabela(); alert('FAED Manutenção carregado!'); }
-        async function buscarAlimentacao() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; } document.getElementById('gerarTabela').innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando Alimentação...</div>`; await carregarValoresAlimentacao(); renderGerarTabela(); alert('Repasse Alimentação carregado!'); }
+        async function buscarFAED() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; } document.getElementById('gerarTabela').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando FAED...</div>'; await carregarValoresFAED(); renderGerarTabela(); alert('FAED Manutenção carregado!'); }
+        async function buscarAlimentacao() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; } document.getElementById('gerarTabela').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Buscando Alimentação...</div>'; await carregarValoresAlimentacao(); renderGerarTabela(); alert('Repasse Alimentação carregado!'); }
         function limparGerar() { escolasSelecionadas = []; renderGerarTabela(); }
         function limparResumo() { resumoDados = []; renderResumoConsolidado(); }
         function exportResumoPDF() { exportarParaPDF(document.getElementById('resumoConsolidado'), 'resumo_nota_tecnica'); }
@@ -609,7 +614,7 @@
         
         document.getElementById('loadDataBtn').onclick = carregarDadosPlanilha;
         document.getElementById('searchBtn').onclick = pesquisar;
-        document.getElementById('clearSearchBtn').onclick = () => { document.getElementById('searchValue').value = ''; document.getElementById('resultCount').innerHTML = `${escolasData.length} registros`; document.getElementById('resultsTable').innerHTML = `<div class="empty-state"><p>Digite um valor e clique em Pesquisar</p></div>`; };
+        document.getElementById('clearSearchBtn').onclick = () => { document.getElementById('searchValue').value = ''; document.getElementById('resultCount').innerHTML = escolasData.length + ' registros'; document.getElementById('resultsTable').innerHTML = '<div class="empty-state"><p>Digite um valor e clique em Pesquisar</p></div>'; };
         document.getElementById('exportToGerarBtn').onclick = exportarParaGerar;
         document.getElementById('buscarFaedBtn').onclick = buscarFAED;
         document.getElementById('buscarAlimentacaoBtn').onclick = buscarAlimentacao;
@@ -629,7 +634,7 @@
                 document.getElementById('consultaTab').style.display = 'none';
                 document.getElementById('gerarTab').style.display = 'none';
                 document.getElementById('relatorioTab').style.display = 'none';
-                document.getElementById(`${tab.dataset.tab}Tab`).style.display = 'block';
+                document.getElementById(tab.dataset.tab + 'Tab').style.display = 'block';
                 if (tab.dataset.tab === 'relatorio') renderResumoConsolidado();
             };
         });
