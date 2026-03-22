@@ -219,26 +219,40 @@
         }
         
         async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
-            try {
-                const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
-                const response = await fetch(url);
-                if (!response.ok) return {};
-                const csvText = await response.text();
-                const dados = parseCSVGeneric(csvText);
-                const mapa = {};
-                const codigoIndex = colunaParaIndice(codigoCol);
-                const valorIndex = colunaParaIndice(valorCol);
-                for (const linha of dados) {
-                    if (linha.length > Math.max(codigoIndex, valorIndex)) {
-                        const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
-                        const valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
-                        const valor = parseFloat(valorRaw.replace(/\./g, '').replace(',', '.')) || 0;
-                        if (codigo && valor) mapa[codigo] = valor;
-                    }
+    try {
+        const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
+        const response = await fetch(url);
+        if (!response.ok) return {};
+        const csvText = await response.text();
+        const dados = parseCSVGeneric(csvText);
+        const mapa = {};
+        const codigoIndex = colunaParaIndice(codigoCol);
+        const valorIndex = colunaParaIndice(valorCol);
+        for (const linha of dados) {
+            if (linha.length > Math.max(codigoIndex, valorIndex)) {
+                const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
+                const valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
+                
+                let valor;
+                // Se o valor já tem vírgula e ponto (formato brasileiro: 229.927,48)
+                if (valorRaw.includes('.') && valorRaw.includes(',')) {
+                    valor = parseFloat(valorRaw.replace(/\./g, '').replace(',', '.')) || 0;
+                } 
+                // Se o valor tem vírgula mas não ponto (ex: 229,92748 - erro)
+                else if (valorRaw.includes(',') && !valorRaw.includes('.')) {
+                    valor = parseFloat(valorRaw.replace(',', '.')) || 0;
+                } 
+                // Formato americano padrão
+                else {
+                    valor = parseFloat(valorRaw) || 0;
                 }
-                return mapa;
-            } catch(e) { return {}; }
+                
+                if (codigo && valor) mapa[codigo] = valor;
+            }
         }
+        return mapa;
+    } catch(e) { return {}; }
+}
         
         async function carregarValoresAlimentacaoAba(sheetName, codigoCol, federalCol, estadualCol) {
             try {
