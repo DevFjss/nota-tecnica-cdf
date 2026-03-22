@@ -246,28 +246,11 @@
                 
                 valorRaw = valorRaw.replace(/\s/g, '');
                 
-                let valor;
-                // Se tem vírgula
-                if (valorRaw.includes(',')) {
-                    const partes = valorRaw.split(',');
-                    const decimais = partes[1].length;
-                    
-                    // Se tem mais de 2 casas decimais, a vírgula é na verdade separador de milhar (formato europeu)
-                    // Ex: 569,65244 -> significa 569.652,44
-                    if (decimais > 2) {
-                        // Remove a vírgula (separador de milhar)
-                        const semVirgula = valorRaw.replace(',', '');
-                        // Adiciona ponto decimal nos últimos 2 dígitos
-                        const inteiro = semVirgula.slice(0, -2);
-                        const decimal = semVirgula.slice(-2);
-                        valor = parseFloat(inteiro + '.' + decimal) || 0;
-                    } else {
-                        // Caso normal: 569,44
-                        valor = parseFloat(valorRaw.replace(',', '.')) || 0;
-                    }
-                } else {
-                    valor = parseFloat(valorRaw) || 0;
-                }
+               const valor = parseFloat(
+    valorRaw
+        .replace(/\./g, '')   // remove milhar
+        .replace(',', '.')    // decimal padrão JS
+) || 0;
                 
                 if (codigo && valor) mapa[codigo] = valor;
             }
