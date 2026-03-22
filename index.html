@@ -218,7 +218,7 @@
             }
         }
         
-        async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
+       async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
     try {
         const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
         const response = await fetch(url);
@@ -231,18 +231,31 @@
         for (const linha of dados) {
             if (linha.length > Math.max(codigoIndex, valorIndex)) {
                 const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
-                const valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
+                let valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
+                
+                // REMOVE QUALQUER ESPAÇO EM BRANCO
+                valorRaw = valorRaw.replace(/\s/g, '');
                 
                 let valor;
-                // Se o valor já tem vírgula e ponto (formato brasileiro: 229.927,48)
+                // CASO 1: Formato brasileiro com ponto de milhar e vírgula decimal (ex: 591.811,48)
                 if (valorRaw.includes('.') && valorRaw.includes(',')) {
                     valor = parseFloat(valorRaw.replace(/\./g, '').replace(',', '.')) || 0;
                 } 
-                // Se o valor tem vírgula mas não ponto (ex: 229,92748 - erro)
-                else if (valorRaw.includes(',') && !valorRaw.includes('.')) {
-                    valor = parseFloat(valorRaw.replace(',', '.')) || 0;
+                // CASO 2: Formato com vírgula decimal e sem ponto de milhar (ex: 591,81148)
+                else if (valorRaw.includes(',')) {
+                    // Conta quantos dígitos depois da vírgula
+                    const partes = valorRaw.split(',');
+                    const decimais = partes[1].length;
+                    // Se tem mais de 2 casas decimais, é porque o ponto de milhar está faltando
+                    if (decimais > 2) {
+                        // Remove a vírgula e trata como número inteiro
+                        valor = parseFloat(valorRaw.replace(',', '')) || 0;
+                    } else {
+                        // Caso normal com 2 casas decimais
+                        valor = parseFloat(valorRaw.replace(',', '.')) || 0;
+                    }
                 } 
-                // Formato americano padrão
+                // CASO 3: Formato americano padrão (ex: 591811.48)
                 else {
                     valor = parseFloat(valorRaw) || 0;
                 }
