@@ -176,22 +176,85 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
+        // Função para aplicar estilos inline baseados nas classes da tabela
+        function aplicarEstilosInline(tabelaClone) {
+            // Cores mapeadas
+            const cores = {
+                'th': '#9ca3af',                     // cabeçalho padrão
+                'th[style*="background: #374151"]': '#374151', // cabeçalho grupos (FAED, etc)
+                'th[style*="background: #4b5563"]': '#4b5563',
+                'th[style*="background: #6b7280"]': '#6b7280',
+                '.total-row': '#e5e7eb',
+                '.total-geral': '#d1d5db',
+                'tr.total-row': '#e5e7eb',
+                'tr.total-geral': '#d1d5db'
+            };
+            
+            // Aplicar em todas as células <th>
+            const ths = tabelaClone.querySelectorAll('th');
+            ths.forEach(th => {
+                let bg = '#9ca3af';
+                if (th.innerText.includes('FAED') || th.innerText.includes('CARTÃO') || th.innerText.includes('REPASSE')) {
+                    bg = '#374151';
+                } else if (th.innerText.includes('2023') || th.innerText.includes('2024') || th.innerText.includes('2025') || th.innerText.includes('2026')) {
+                    bg = '#4b5563';
+                } else if (th.innerText.includes('FEDERAL') || th.innerText.includes('ESTADUAL')) {
+                    bg = '#6b7280';
+                }
+                th.style.backgroundColor = bg;
+                th.style.color = 'white';
+                th.style.fontWeight = 'bold';
+            });
+            
+            // Linhas totais
+            const totalRows = tabelaClone.querySelectorAll('tr.total-row, tr.total-geral');
+            totalRows.forEach(row => {
+                const isGeral = row.classList.contains('total-geral');
+                row.style.backgroundColor = isGeral ? '#d1d5db' : '#e5e7eb';
+                row.style.fontWeight = 'bold';
+                // Aplicar também nas células
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.style.backgroundColor = isGeral ? '#d1d5db' : '#e5e7eb';
+                });
+            });
+            
+            // Garantir que as células de valor monetário fiquem alinhadas à direita
+            const monetarios = tabelaClone.querySelectorAll('.valor-monetario');
+            monetarios.forEach(cell => {
+                cell.style.textAlign = 'right';
+                cell.style.paddingRight = '0.8rem';
+            });
+        }
+        
         function exportarParaExcel(tabelaElement, nomeArquivo) {
             if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
             const tabelaClone = tabelaElement.cloneNode(true);
+            
+            // Aplicar estilos inline para preservar as cores
+            aplicarEstilosInline(tabelaClone);
+            
+            // Converter valores monetários para número (sem R$)
             const celulas = tabelaClone.querySelectorAll('.valor-monetario');
             celulas.forEach(celula => {
-                const valorTexto = celula.innerText.trim().replace(/\./g, '').replace(',', '.');
-                const valorNumero = parseFloat(valorTexto);
+                let valorTexto = celula.innerText.trim();
+                // Remove possíveis R$ e espaços
+                valorTexto = valorTexto.replace('R$', '').trim();
+                // Substitui ponto de milhar e vírgula decimal
+                const valorNumero = parseFloat(valorTexto.replace(/\./g, '').replace(',', '.'));
                 if (!isNaN(valorNumero)) {
                     celula.innerText = valorNumero;
-                    celula.style.textAlign = 'right';
                 }
             });
+            
+            // Converter a tabela para planilha
             const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
+            // Ajustar largura das colunas
             const colunas = [];
-            for (let i = 0; i < 30; i++) colunas.push({ wch: 15 });
+            const numCols = tabelaClone.querySelector('tr')?.cells.length || 20;
+            for (let i = 0; i < numCols; i++) colunas.push({ wch: 15 });
             ws['!cols'] = colunas;
+            
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
             XLSX.writeFile(wb, `${nomeArquivo}_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -379,7 +442,7 @@
             for (const escola of resultados) {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
                 html += `<tr class="${isSelected ? 'selected-row' : ''}">
-                    <td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}></td>
+                    <td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}>  </td>
                     <td><strong>${escola.nte || '-'}</strong></td>
                     <td>${escola.municipio || '-'}</td>
                     <td>${escola.codigoSec || '-'}</td>
@@ -482,7 +545,7 @@
                 }
                 html += `</tr>`;
             }
-            html += `</tbody>}</div>`;
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         }
         
@@ -532,7 +595,7 @@
             let totalGeralAlimentacao = 0;
             for (let ano of [2023, 2024, 2025, 2026]) totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano] + totalFAED[ano];
             
-            let html = `<div class="table-wrapper"> 能
+            let html = `<div class="table-wrapper">
                 <table style="min-width: 1200px;">
                     <thead>
                         <tr style="background: #4b5563; color: white;">
@@ -591,13 +654,13 @@
             html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
                 <td style="text-align:left; font-weight:bold;">TOTAL GERAL MANUTENÇÃO</td>
                 <td colspan="16" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>
-                </tr>`;
+            </tr>`;
             html += `<tr class="total-geral" style="background: #d1d5db; font-weight: bold;">
                 <td style="text-align:left; font-weight:bold;">TOTAL GERAL ALIMENTAÇÃO</td>
                 <td colspan="16" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>
-                </tr>`;
+            </tr>`;
             
-            html += `</tbody> 能</div>`;
+            html += `</tbody></table></div>`;
             container.innerHTML = html;
         }
         
