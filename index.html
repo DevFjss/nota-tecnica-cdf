@@ -233,30 +233,28 @@
                 const codigo = (linha[codigoIndex] || '').replace(/^"|"$/g, '').trim();
                 let valorRaw = (linha[valorIndex] || '').replace(/^"|"$/g, '').trim();
                 
-                // REMOVE QUALQUER ESPAÇO EM BRANCO
                 valorRaw = valorRaw.replace(/\s/g, '');
                 
                 let valor;
-                // CASO 1: Formato brasileiro com ponto de milhar e vírgula decimal (ex: 591.811,48)
-                if (valorRaw.includes('.') && valorRaw.includes(',')) {
-                    valor = parseFloat(valorRaw.replace(/\./g, '').replace(',', '.')) || 0;
-                } 
-                // CASO 2: Formato com vírgula decimal e sem ponto de milhar (ex: 591,81148)
-                else if (valorRaw.includes(',')) {
-                    // Conta quantos dígitos depois da vírgula
+                // Se tem vírgula
+                if (valorRaw.includes(',')) {
                     const partes = valorRaw.split(',');
                     const decimais = partes[1].length;
-                    // Se tem mais de 2 casas decimais, é porque o ponto de milhar está faltando
+                    
+                    // Se tem mais de 2 casas decimais, a vírgula é na verdade separador de milhar (formato europeu)
+                    // Ex: 569,65244 -> significa 569.652,44
                     if (decimais > 2) {
-                        // Remove a vírgula e trata como número inteiro
-                        valor = parseFloat(valorRaw.replace(',', '')) || 0;
+                        // Remove a vírgula (separador de milhar)
+                        const semVirgula = valorRaw.replace(',', '');
+                        // Adiciona ponto decimal nos últimos 2 dígitos
+                        const inteiro = semVirgula.slice(0, -2);
+                        const decimal = semVirgula.slice(-2);
+                        valor = parseFloat(inteiro + '.' + decimal) || 0;
                     } else {
-                        // Caso normal com 2 casas decimais
+                        // Caso normal: 569,44
                         valor = parseFloat(valorRaw.replace(',', '.')) || 0;
                     }
-                } 
-                // CASO 3: Formato americano padrão (ex: 591811.48)
-                else {
+                } else {
                     valor = parseFloat(valorRaw) || 0;
                 }
                 
