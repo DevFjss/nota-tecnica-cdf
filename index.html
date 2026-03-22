@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Nota-Tecnica - CDF</title>
+<title>Nota Técnica - CDF</title>
 
 <style>
 body {
@@ -21,15 +21,13 @@ header {
 
 .tabs {
   display: flex;
-  gap: 10px;
-  padding: 10px;
+  background: #103450;
 }
 
 .tab {
   padding: 10px 20px;
-  background: #ddd;
   cursor: pointer;
-  border-radius: 6px;
+  color: #cbd5e1;
 }
 
 .tab.active {
@@ -59,17 +57,28 @@ button {
 .table th, .table td {
   border: 1px solid #ccc;
   padding: 6px;
+  text-align: center;
 }
+
+.table th {
+  background: #0d6efd;
+  color: white;
+}
+
+tr.selected {
+  background: #e6f4ff;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>Nota-Tecnica - CDF</header>
+<header>Nota Técnica - CDF</header>
 
 <div class="tabs">
   <div class="tab active" onclick="trocar('consulta')">Consultar Escola</div>
-  <div class="tab" onclick="trocar('valor')">Gerar Valor</div>
+  <div class="tab" onclick="trocar('gerar')">Gerar Valor</div>
   <div class="tab">Relatório</div>
 </div>
 
@@ -77,15 +86,16 @@ button {
 
 <!-- CONSULTA -->
 <div id="consulta">
-  <select id="campo">
+  <select id="tipo">
     <option>NTE</option>
     <option>MUNICIPIO</option>
     <option>ESCOLA</option>
-    <option>ESTADO</option>
+    <option>INEP</option>
   </select>
 
-  <input id="valorBusca" placeholder="Digite..." />
-  <button onclick="buscar()">Buscar</button>
+  <input id="busca" placeholder="Digite..." />
+  <button onclick="pesquisar()">Buscar</button>
+  <button onclick="carregar()">Carregar Dados</button>
 
   <table class="table">
     <thead>
@@ -101,141 +111,132 @@ button {
     <tbody id="lista"></tbody>
   </table>
 
-  <button onclick="enviar()">Enviar</button>
+  <button onclick="enviar()">Enviar para Gerar Valor</button>
 </div>
 
-<!-- GERAR VALOR -->
-<div id="valor" style="display:none;">
-  <button onclick="faed()">Faed Manutenção</button>
-  <button onclick="alimentacao()">Alimentação</button>
-
-  <table class="table" id="resultado"></table>
+<!-- GERAR -->
+<div id="gerar" style="display:none;">
+  <table class="table" id="tabelaGerar"></table>
 </div>
 
 </div>
 
 <script>
 
-// 🔗 COLE AQUI OS LINKS CSV
-const URL_ESCOLAS = "https://docs.google.com/spreadsheets/d/1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k/edit?gid=1659443361#gid=1659443361";
-const URL_FAED = "https://docs.google.com/spreadsheets/d/1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k/edit?gid=1116498996#gid=1116498996";
-const URL_ALIM = "https://docs.google.com/spreadsheets/d/1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k/edit?gid=0#gid=0";
+const ID = "1bxT0HKmzmwBCohuwRUCexV_scB828Mjmr8aGt0ulY1k";
 
-let escolas = [];
+let dados = [];
 let selecionados = [];
-let faedData = [];
-let alimData = [];
 
-function csvJSON(csv) {
-  const linhas = csv.split("\n");
-  return linhas.map(l => l.split(","));
+function url(sheet){
+  return `https://docs.google.com/spreadsheets/d/${ID}/gviz/tq?tqx=out:csv&sheet=${sheet}`;
 }
 
-// carregar tudo ao abrir
-window.onload = async () => {
-  escolas = await fetch(URL_ESCOLAS).then(r => r.text()).then(csvJSON);
-  faedData = await fetch(URL_FAED).then(r => r.text()).then(csvJSON);
-  alimData = await fetch(URL_ALIM).then(r => r.text()).then(csvJSON);
-};
-
-function trocar(t) {
-  document.getElementById("consulta").style.display = t === "consulta" ? "block" : "none";
-  document.getElementById("valor").style.display = t === "valor" ? "block" : "none";
+// carregar dados
+async function carregar(){
+  const csv = await fetch(url("Escolas_ativas")).then(r=>r.text());
+  dados = parseCSV(csv);
+  alert("Dados carregados: " + dados.length);
 }
 
-function buscar() {
-  const campo = document.getElementById("campo").value;
-  const valor = document.getElementById("valorBusca").value.toUpperCase();
+// parser CSV robusto
+function parseCSV(csv){
+  return csv.split("\n").slice(1).map(l=>{
+    const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
+    return {
+      nte: (c[1]||"").replace(/"/g,""),
+      municipio: (c[2]||"").replace(/"/g,""),
+      codSec: (c[3]||"").replace(/"/g,""),
+      codInep: (c[5]||"").replace(/"/g,""),
+      escola: (c[6]||"").replace(/"/g,"")
+    };
+  });
+}
+
+// pesquisa
+function pesquisar(){
+  const tipo = document.getElementById("tipo").value;
+  const valor = document.getElementById("busca").value.toUpperCase();
+
+  let res = [];
+
+  if(tipo==="NTE") res = dados.filter(x=>x.nte==valor);
+  if(tipo==="MUNICIPIO") res = dados.filter(x=>x.municipio.includes(valor));
+  if(tipo==="ESCOLA") res = dados.filter(x=>x.codSec==valor);
+  if(tipo==="INEP") res = dados.filter(x=>x.codInep==valor);
+
+  render(res);
+}
+
+// render tabela
+function render(lista){
   let html = "";
 
-  escolas.forEach((l, i) => {
-    if (i === 0) return;
-
-    let ok = false;
-
-    if (campo === "NTE" && l[1] == valor) ok = true;
-    if (campo === "MUNICIPIO" && l[2].includes(valor)) ok = true;
-    if (campo === "ESCOLA" && l[6].includes(valor)) ok = true;
-    if (campo === "ESTADO") ok = true;
-
-    if (ok) {
-      const obj = {
-        nte: l[1],
-        municipio: l[2],
-        codSec: l[3],
-        codInep: l[5],
-        escola: l[6]
-      };
-
-      html += `
-      <tr>
-        <td><input type="checkbox" data='${JSON.stringify(obj)}'></td>
-        <td>${obj.nte}</td>
-        <td>${obj.municipio}</td>
-        <td>${obj.codSec}</td>
-        <td>${obj.codInep}</td>
-        <td>${obj.escola}</td>
-      </tr>`;
-    }
+  lista.forEach(e=>{
+    html += `
+    <tr>
+      <td><input type="checkbox" data='${JSON.stringify(e)}'></td>
+      <td>${e.nte}</td>
+      <td>${e.municipio}</td>
+      <td>${e.codSec}</td>
+      <td>${e.codInep}</td>
+      <td>${e.escola}</td>
+    </tr>`;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function marcarTodos(c) {
-  document.querySelectorAll("#lista input").forEach(x => x.checked = c.checked);
+// marcar todos
+function marcarTodos(c){
+  document.querySelectorAll("#lista input").forEach(x=>x.checked=c.checked);
 }
 
-function enviar() {
+// enviar seleção
+function enviar(){
   selecionados = [];
-  document.querySelectorAll("#lista input:checked").forEach(x => {
+
+  document.querySelectorAll("#lista input:checked").forEach(x=>{
     selecionados.push(JSON.parse(x.getAttribute("data")));
   });
+
+  renderGerar();
+  trocar("gerar");
 }
 
-function faed() {
-  let html = "<tr><th>NTE</th><th>Município</th><th>Valor</th></tr>";
+// gerar tabela
+function renderGerar(){
+  let html = `
+  <tr>
+    <th>NTE</th>
+    <th>Município</th>
+    <th>Cod SEC</th>
+    <th>Cod INEP</th>
+    <th>Escola</th>
+  </tr>`;
 
-  selecionados.forEach(e => {
-    let valor = 0;
-
-    faedData.forEach(l => {
-      if (l[2] == e.codSec) valor = l[4];
-    });
-
-    html += `<tr>
+  selecionados.forEach(e=>{
+    html += `
+    <tr>
       <td>${e.nte}</td>
       <td>${e.municipio}</td>
-      <td>${valor}</td>
+      <td>${e.codSec}</td>
+      <td>${e.codInep}</td>
+      <td>${e.escola}</td>
     </tr>`;
   });
 
-  document.getElementById("resultado").innerHTML = html;
+  document.getElementById("tabelaGerar").innerHTML = html;
 }
 
-function alimentacao() {
-  let html = "<tr><th>NTE</th><th>Município</th><th>Federal</th><th>Estadual</th></tr>";
+// trocar aba
+function trocar(t){
+  document.getElementById("consulta").style.display = t==="consulta"?"block":"none";
+  document.getElementById("gerar").style.display = t==="gerar"?"block":"none";
 
-  selecionados.forEach(e => {
-    let federal = 0, estadual = 0;
-
-    alimData.forEach(l => {
-      if (l[2] == e.codSec) {
-        federal = l[3];
-        estadual = l[4];
-      }
-    });
-
-    html += `<tr>
-      <td>${e.nte}</td>
-      <td>${e.municipio}</td>
-      <td>${federal}</td>
-      <td>${estadual}</td>
-    </tr>`;
-  });
-
-  document.getElementById("resultado").innerHTML = html;
+  document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));
+  event.target.classList.add("active");
 }
 
 </script>
