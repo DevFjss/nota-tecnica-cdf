@@ -632,8 +632,19 @@
             
             // Linha 2: Anos
             html += '<tr style="background: #4b5563; color: white;">';
-            html += '<th>2023</th><th>2024</th><th>2025</th><th>2026</th>';
-            html += '<th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>';
+            
+            // FAED (4 colunas)
+            html += '<th>2023</th>';
+            html += '<th>2024</th>';
+            html += '<th>2025</th>';
+            html += '<th>2026</th>';
+            
+            // ALIMENTAÇÃO (cada ano ocupa 2 colunas)
+            html += '<th colspan="2">2023</th>';
+            html += '<th colspan="2">2024</th>';
+            html += '<th colspan="2">2025</th>';
+            html += '<th colspan="2">2026</th>';
+            
             html += '</tr>';
             
             // Linha 3: Federal/Estadual
