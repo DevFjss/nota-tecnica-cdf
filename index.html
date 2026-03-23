@@ -729,27 +729,7 @@
         
         document.getElementById('loadDataBtn').onclick = carregarDadosPlanilha;
         document.getElementById('searchBtn').onclick = pesquisar;
-        document.getElementById('clearSearchBtn').onclick = () => {
-
-        // 🔴 ZERA MEMÓRIA
-        escolasSelecionadas = [];
-        valoresFAED = { 2023: {}, 2024: {}, 2025: {}, 2026: {} };
-        valoresAlimentacao = {
-            2023: { federal: {}, estadual: {} },
-            2024: { federal: {}, estadual: {} },
-            2025: { federal: {}, estadual: {} },
-            2026: { federal: {}, estadual: {} }
-        };
-        resumoDados = [];
-        tipoBuscaAtual = '';
-        valorBuscaAtual = '';
-    
-        // 🔴 LIMPA CAMPO
-        document.getElementById('searchValue').value = '';
-    
-        // 🔴 REFRESH REAL
-        location.reload();
-    };
+        document.getElementById('clearSearchBtn').onclick = () => { document.getElementById('searchValue').value = ''; document.getElementById('resultCount').innerHTML = escolasData.length + ' registros'; document.getElementById('resultsTable').innerHTML = '<div class="empty-state"><p>Digite um valor e clique em Pesquisar</p></div>'; };
         document.getElementById('exportToGerarBtn').onclick = exportarParaGerar;
         document.getElementById('buscarFaedBtn').onclick = buscarFAED;
         document.getElementById('buscarAlimentacaoBtn').onclick = buscarAlimentacao;
