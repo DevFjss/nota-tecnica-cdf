@@ -366,7 +366,9 @@
             if (tipo === 'NTE') resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
             else if (tipo === 'MUNICIPIO') resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
             else if (tipo === 'ESCOLA') resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
-            else if (tipo === 'ESTADO') resultados = escolasData.filter(e => e.codigoInep.toLowerCase() === valorLower);
+            else if (tipo === 'ESTADO') {
+            resultados = escolasData;
+         }
             mostrarResultados(resultados);
         }
         
