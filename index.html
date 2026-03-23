@@ -354,23 +354,44 @@
             return result;
         }
         
-        function pesquisar() {
-            const tipo = document.getElementById('searchType').value;
-            const valor = document.getElementById('searchValue').value.trim();
-            if (escolasData.length === 0) { alert('Clique em "Carregar Dados" primeiro'); return; }
-            if (!valor) { alert('Digite um valor'); return; }
-            tipoBuscaAtual = tipo;
-            valorBuscaAtual = valor;
-            const valorLower = valor.toLowerCase();
-            let resultados = [];
-            if (tipo === 'NTE') resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
-            else if (tipo === 'MUNICIPIO') resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
-            else if (tipo === 'ESCOLA') resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
-            else if (tipo === 'ESTADO') {
-            resultados = escolasData;
-         }
-            mostrarResultados(resultados);
+           function pesquisar() {
+        const tipo = document.getElementById('searchType').value;
+        const valor = document.getElementById('searchValue').value.trim();
+    
+        if (escolasData.length === 0) {
+            alert('Clique em "Carregar Dados" primeiro');
+            return;
         }
+    
+        tipoBuscaAtual = tipo;
+        valorBuscaAtual = valor;
+    
+        let resultados = [];
+    
+        if (tipo === 'ESTADO') {
+            // 🔥 traz toda a base
+            resultados = escolasData;
+        } else {
+
+        if (!valor) {
+            alert('Digite um valor');
+            return;
+        }
+
+        const valorLower = valor.toLowerCase();
+
+        if (tipo === 'NTE')
+            resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
+
+        else if (tipo === 'MUNICIPIO')
+            resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
+
+        else if (tipo === 'ESCOLA')
+            resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
+    }
+
+    mostrarResultados(resultados);
+}
         
         function mostrarResultados(resultados) {
             const container = document.getElementById('resultsTable');
