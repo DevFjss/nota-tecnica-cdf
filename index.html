@@ -89,7 +89,7 @@
                             <option value="NTE">NTE</option>
                             <option value="MUNICIPIO" selected>Município</option>
                             <option value="ESCOLA">Código SEC</option>
-                            <option value="INEP">Código INEP</option>
+                            <option value="ESTADO">Estado</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -366,7 +366,7 @@
             if (tipo === 'NTE') resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
             else if (tipo === 'MUNICIPIO') resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
             else if (tipo === 'ESCOLA') resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
-            else if (tipo === 'INEP') resultados = escolasData.filter(e => e.codigoInep.toLowerCase() === valorLower);
+            else if (tipo === 'ESTADO') resultados = escolasData.filter(e => e.codigoInep.toLowerCase() === valorLower);
             mostrarResultados(resultados);
         }
         
