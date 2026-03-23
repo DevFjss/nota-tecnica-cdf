@@ -547,17 +547,54 @@
         }
         
         async function enviarParaResumo() {
-            if (escolasSelecionadas.length === 0) { alert('Nenhuma escola selecionada'); return; }
-            if (tipoBuscaAtual !== 'NTE' && tipoBuscaAtual !== 'MUNICIPIO') { alert('Esta função é apenas para buscas por NTE ou Município.'); return; }
-            const totais = calcularTotaisEscolas(escolasSelecionadas);
-            const identificador = tipoBuscaAtual === 'NTE' ? 'NTE ' + valorBuscaAtual : valorBuscaAtual;
-            const existe = resumoDados.find(r => r.tipo === tipoBuscaAtual && r.valor === valorBuscaAtual);
-            const novoItem = { tipo: tipoBuscaAtual, valor: valorBuscaAtual, identificador: identificador, faed2023: totais.faed[2023], faed2024: totais.faed[2024], faed2025: totais.faed[2025], faed2026: totais.faed[2026], alimentacao: totais.alimentacao };
-            if (existe) Object.assign(existe, novoItem);
-            else resumoDados.push(novoItem);
-            renderResumoConsolidado();
-            alert('Dados de ' + identificador + ' adicionados ao resumo!');
-        }
+    if (escolasSelecionadas.length === 0 && tipoBuscaAtual !== 'ESTADO') { 
+        alert('Nenhuma escola selecionada'); 
+        return; 
+    }
+
+    // 🔥 Agora permite ESTADO também
+    if (tipoBuscaAtual !== 'NTE' && tipoBuscaAtual !== 'MUNICIPIO' && tipoBuscaAtual !== 'ESTADO') { 
+        alert('Função permitida apenas para NTE, Município ou Estado.'); 
+        return; 
+    }
+
+    // 🔥 Se for ESTADO, usa TODA a base
+    const listaCalculo = (tipoBuscaAtual === 'ESTADO') 
+        ? escolasData 
+        : escolasSelecionadas;
+
+    const totais = calcularTotaisEscolas(listaCalculo);
+
+    // 🔥 Identificador correto
+    let identificador = '';
+    if (tipoBuscaAtual === 'NTE') {
+        identificador = 'NTE ' + valorBuscaAtual;
+    } else if (tipoBuscaAtual === 'MUNICIPIO') {
+        identificador = valorBuscaAtual;
+    } else if (tipoBuscaAtual === 'ESTADO') {
+        identificador = 'ESTADO - BASE COMPLETA';
+    }
+
+    const existe = resumoDados.find(r => r.tipo === tipoBuscaAtual && r.valor === valorBuscaAtual);
+
+    const novoItem = {
+        tipo: tipoBuscaAtual,
+        valor: valorBuscaAtual,
+        identificador: identificador,
+        faed2023: totais.faed[2023],
+        faed2024: totais.faed[2024],
+        faed2025: totais.faed[2025],
+        faed2026: totais.faed[2026],
+        alimentacao: totais.alimentacao
+    };
+
+    if (existe) Object.assign(existe, novoItem);
+    else resumoDados.push(novoItem);
+
+    renderResumoConsolidado();
+
+    alert('Dados de ' + identificador + ' adicionados ao resumo!');
+}
         
         function renderResumoConsolidado() {
             const container = document.getElementById('resumoConsolidado');
