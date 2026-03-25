@@ -263,7 +263,7 @@
     } catch(e) { return {}; }
 }
         
-        async function carregarValoresAlimentacao(sheetName, codigoCol, federalCol, estadualCol) {
+        async function carregarValoresAlimentacaoAba(sheetName, codigoCol, federalCol, estadualCol) {
             try {
                 const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
                 const response = await fetch(url);
@@ -306,14 +306,47 @@
             }
         }
         
-        async function carregarValoresAlimentacao() {
-            for (const ano of [2023, 2024, 2025, 2026]) {
-                const config = ALIMENTACAO_CONFIG[ano];
-                const { federal, estadual } = await carregarValoresAlimentacao(config.sheetName, config.codigoCol, config.federalCol, config.estadualCol);
-                valoresAlimentacao[ano].federal = federal;
-                valoresAlimentacao[ano].estadual = estadual;
-            }
+       async function carregarValoresAlimentacao() {
+
+    for (const ano of [2023, 2024, 2025, 2026]) {
+
+        const config = ALIMENTACAO_CONFIG[ano];
+
+        // 🔹 CASO NORMAL (2023–2025)
+        if (config.federalCol) {
+
+            const { federal, estadual } =
+                await carregarValoresAlimentacaoAba(
+                    config.sheetName,
+                    config.codigoCol,
+                    config.federalCol,
+                    config.estadualCol
+                );
+
+            valoresAlimentacao[ano].federal = federal;
+            valoresAlimentacao[ano].estadual = estadual;
         }
+
+        // 🔥 CASO 2026 (abas separadas)
+        else {
+
+            const federal = await carregarValoresDaAba(
+                config.federal.sheetName,
+                config.federal.codigoCol,
+                config.federal.valorCol
+            );
+
+            const estadual = await carregarValoresDaAba(
+                config.estadual.sheetName,
+                config.estadual.codigoCol,
+                config.estadual.valorCol
+            );
+
+            valoresAlimentacao[ano].federal = federal;
+            valoresAlimentacao[ano].estadual = estadual;
+        }
+    }
+}
         
         function parseCSV(csvText) {
             const lines = csvText.split('\n').filter(l => l.trim());
