@@ -263,7 +263,7 @@
     } catch(e) { return {}; }
 }
         
-        async function carregarValoresAlimentacaoAba(sheetName, codigoCol, federalCol, estadualCol) {
+        async function carregarValoresAlimentacao(sheetName, codigoCol, federalCol, estadualCol) {
             try {
                 const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
                 const response = await fetch(url);
@@ -309,7 +309,7 @@
         async function carregarValoresAlimentacao() {
             for (const ano of [2023, 2024, 2025, 2026]) {
                 const config = ALIMENTACAO_CONFIG[ano];
-                const { federal, estadual } = await carregarValoresAlimentacaoAba(config.sheetName, config.codigoCol, config.federalCol, config.estadualCol);
+                const { federal, estadual } = await carregarValoresAlimentacao(config.sheetName, config.codigoCol, config.federalCol, config.estadualCol);
                 valoresAlimentacao[ano].federal = federal;
                 valoresAlimentacao[ano].estadual = estadual;
             }
