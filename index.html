@@ -312,8 +312,10 @@
 
         const config = ALIMENTACAO_CONFIG[ano];
 
-        // 🔹 CASO NORMAL (2023–2025)
-        if (config.federalCol) {
+        if (!config) continue;
+
+        // 🔹 PADRÃO (2023–2025)
+        if (config.federalCol && config.estadualCol) {
 
             const { federal, estadual } =
                 await carregarValoresAlimentacaoAba(
@@ -327,8 +329,8 @@
             valoresAlimentacao[ano].estadual = estadual;
         }
 
-        // 🔥 CASO 2026 (abas separadas)
-        else {
+        // 🔥 2026 (estrutura nova)
+        else if (config.federal && config.estadual) {
 
             const federal = await carregarValoresDaAba(
                 config.federal.sheetName,
@@ -344,6 +346,10 @@
 
             valoresAlimentacao[ano].federal = federal;
             valoresAlimentacao[ano].estadual = estadual;
+        }
+
+        else {
+            console.warn('Configuração inválida para o ano:', ano, config);
         }
     }
 }
