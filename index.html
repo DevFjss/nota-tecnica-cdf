@@ -717,7 +717,7 @@
             // Dados
             for (const item of resumoDados) {
                 html += '<tr>';
-                html += '<td style="text-align:left; font-weight:bold;">' + item.identificador + (item.tipo === 'NTE' ? ' (NTE)' : '') + (item.tipo === 'MUNICIPIO' ? ' (Município)' : '') + '</td>';
+                html += '<td style="text-align:left; font-weight:bold;">' + item.identificador + '</td>';
                 html += '<td class="valor-monetario">' + formatarValorBR(item.faed2023) + '</td>';
                 html += '<td class="valor-monetario">' + formatarValorBR(item.faed2024) + '</td>';
                 html += '<td class="valor-monetario">' + formatarValorBR(item.faed2025) + '</td>';
