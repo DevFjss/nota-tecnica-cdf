@@ -396,22 +396,29 @@
             result.push(current);
             return result;
         }
-        function autoFiltro() {
+       function autoFiltro() {
+            if (escolasData.length === 0) return;
+        
             const tipo = document.getElementById('searchType').value;
-            let valor = document.getElementById('searchValue').value.trim().toLowerCase();
+            let valorOriginal = document.getElementById('searchValue').value.trim();
+            let valor = valorOriginal.toLowerCase();
+        
+            // 🔥 ESSENCIAL PRO RESUMO FUNCIONAR
+            tipoBuscaAtual = tipo;
+            valorBuscaAtual = valorOriginal;
         
             if (!valor) return;
         
             let resultados = [];
         
-            // 🔵 NTE (01 a 27)
+            // 🔵 NTE
             if (tipo === 'NTE') {
                 resultados = escolasData.filter(e =>
                     e.nte.padStart(2, '0').startsWith(valor.padStart(2, '0'))
                 );
             }
         
-            // 🔵 MUNICÍPIO (busca parcial)
+            // 🔵 MUNICÍPIO
             else if (tipo === 'MUNICIPIO') {
                 resultados = escolasData.filter(e =>
                     e.municipio.toLowerCase().includes(valor)
@@ -425,8 +432,10 @@
                 );
             }
         
+            // 🔥 ESSENCIAL PRO RESUMO FUNCIONAR
+            escolasSelecionadas = [...resultados];
+        
             mostrarResultados(resultados);
-            
         }
            function pesquisar() {
         const tipo = document.getElementById('searchType').value;
