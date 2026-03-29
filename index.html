@@ -93,9 +93,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                    <label>VALOR PARA PESQUISAR</label>
-                    <textarea id="searchValue" rows="4"
-                        placeholder="Cole aqui os códigos SEC (um por linha ou coluna do Excel)"></textarea>
+                        <label>VALOR PARA PESQUISAR</label>
+                        <input type="text" id="searchValue" placeholder="Digite o valor exato..." autocomplete="off">
                     </div>
                     <button class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> Pesquisar</button>
                     <!--<button class="btn-secondary" id="clearSearchBtn"><i class="fas fa-eraser"></i> Limpar</button>-->
@@ -399,23 +398,23 @@
         }
         
            function pesquisar() {
-
-    const tipo = document.getElementById('searchType').value;
-    const valor = document.getElementById('searchValue').value.trim();
-
-    if (escolasData.length === 0) {
-        alert('Clique em "Carregar Dados" primeiro');
-        return;
-    }
-
-    tipoBuscaAtual = tipo;
-    valorBuscaAtual = valor;
-
-    let resultados = [];
-
-    if (tipo === 'ESTADO') {
-        resultados = escolasData;
-    } else {
+        const tipo = document.getElementById('searchType').value;
+        const valor = document.getElementById('searchValue').value.trim();
+    
+        if (escolasData.length === 0) {
+            alert('Clique em "Carregar Dados" primeiro');
+            return;
+        }
+    
+        tipoBuscaAtual = tipo;
+        valorBuscaAtual = valor;
+    
+        let resultados = [];
+    
+        if (tipo === 'ESTADO') {
+            // 🔥 traz toda a base
+            resultados = escolasData;
+        } else {
 
         if (!valor) {
             alert('Digite um valor');
@@ -424,43 +423,15 @@
 
         const valorLower = valor.toLowerCase();
 
-        if (tipo === 'NTE') {
-            resultados = escolasData.filter(e =>
-                (e.nte || '').toLowerCase() === valorLower
-            );
-        }
+        if (tipo === 'NTE')
+            resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
 
-        else if (tipo === 'MUNICIPIO') {
-            resultados = escolasData.filter(e =>
-                (e.municipio || '').toLowerCase() === valorLower
-            );
-        }
+        else if (tipo === 'MUNICIPIO')
+            resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
 
-        else if (tipo === 'ESCOLA') {
-
-            // 🔥 SUPORTE A LISTA (SEM QUEBRAR)
-            const listaCodigos = valor
-                .split(/[\n\t,; ]+/)
-                .map(v => v.trim().toLowerCase())
-                .filter(v => v);
-
-            resultados = escolasData.filter(e =>
-                listaCodigos.includes((e.codigoSec || '').toLowerCase())
-            );
-        }
+        else if (tipo === 'ESCOLA')
+            resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
     }
-
-    mostrarResultados(resultados);
-}
-    }
-
-    mostrarResultados(resultados);
-
-    // 🔥 opcional: já seleciona automaticamente
-    if (tipo === 'ESCOLA') {
-        escolasSelecionadas = resultados;
-    }
-}
 
     mostrarResultados(resultados);
 }
