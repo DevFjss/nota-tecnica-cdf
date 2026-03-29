@@ -426,7 +426,7 @@
             }
         
             mostrarResultados(resultados);
-            document.getElementById('searchValue').addEventListener('input', autoFiltro);
+            
         }
            function pesquisar() {
         const tipo = document.getElementById('searchType').value;
@@ -817,6 +817,7 @@
         document.getElementById('exportGerarPDFBtn').onclick = exportGerarPDF;
         document.getElementById('exportGerarExcelBtn').onclick = exportGerarExcel;
         document.getElementById('searchValue').addEventListener('keypress', (e) => { if (e.key === 'Enter') pesquisar(); });
+        document.getElementById('searchValue').addEventListener('input', autoFiltro);
         
         document.querySelectorAll('.tab').forEach(tab => {
             tab.onclick = () => {
