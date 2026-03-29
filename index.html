@@ -396,7 +396,37 @@
             result.push(current);
             return result;
         }
+        function autoFiltro() {
+            const tipo = document.getElementById('searchType').value;
+            let valor = document.getElementById('searchValue').value.trim().toLowerCase();
         
+            if (!valor) return;
+        
+            let resultados = [];
+        
+            // 🔵 NTE (01 a 27)
+            if (tipo === 'NTE') {
+                resultados = escolasData.filter(e =>
+                    e.nte.padStart(2, '0').startsWith(valor.padStart(2, '0'))
+                );
+            }
+        
+            // 🔵 MUNICÍPIO (busca parcial)
+            else if (tipo === 'MUNICIPIO') {
+                resultados = escolasData.filter(e =>
+                    e.municipio.toLowerCase().includes(valor)
+                );
+            }
+        
+            // 🔵 CÓDIGO SEC
+            else if (tipo === 'ESCOLA') {
+                resultados = escolasData.filter(e =>
+                    e.codigoSec.startsWith(valor)
+                );
+            }
+        
+            mostrarResultados(resultados);
+        }
            function pesquisar() {
         const tipo = document.getElementById('searchType').value;
         const valor = document.getElementById('searchValue').value.trim();
