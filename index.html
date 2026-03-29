@@ -93,8 +93,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>VALOR PARA PESQUISAR</label>
-                        <input type="text" id="searchValue" placeholder="Digite o valor exato..." autocomplete="off">
+                    <label>VALOR PARA PESQUISAR</label>
+                    <textarea id="searchValue" rows="4"
+                        placeholder="Cole aqui os códigos SEC (um por linha ou coluna do Excel)"></textarea>
                     </div>
                     <button class="btn-primary" id="searchBtn"><i class="fas fa-search"></i> Pesquisar</button>
                     <!--<button class="btn-secondary" id="clearSearchBtn"><i class="fas fa-eraser"></i> Limpar</button>-->
@@ -429,9 +430,17 @@
         else if (tipo === 'MUNICIPIO')
             resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
 
-        else if (tipo === 'ESCOLA')
-            resultados = escolasData.filter(e => e.codigoSec.toLowerCase() === valorLower);
-    }
+        else if (tipo === 'ESCOLA') {
+
+        const listaCodigos = valor
+            .split(/[\n\t,; ]+/) // aceita Excel, vírgula, espaço, quebra de linha
+            .map(v => v.trim().toLowerCase())
+            .filter(v => v);
+    
+        resultados = escolasData.filter(e =>
+            listaCodigos.includes((e.codigoSec || '').toLowerCase())
+    );
+}
 
     mostrarResultados(resultados);
 }
