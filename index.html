@@ -403,9 +403,26 @@
             let valorOriginal = document.getElementById('searchValue').value.trim();
             let valor = valorOriginal.toLowerCase();
         
-            // 🔥 ESSENCIAL PRO RESUMO FUNCIONAR
+            // 🔥 PADRONIZAÇÃO PARA O RESUMO
             tipoBuscaAtual = tipo;
-            valorBuscaAtual = valorOriginal;
+            
+            if (resultados.length > 0) {
+            
+                if (tipo === 'MUNICIPIO') {
+                    valorBuscaAtual = resultados[0].municipio.toUpperCase();
+                }
+            
+                else if (tipo === 'NTE') {
+                    valorBuscaAtual = 'NTE ' + resultados[0].nte.padStart(2, '0');
+                }
+            
+                else if (tipo === 'ESCOLA') {
+                    valorBuscaAtual = 'SEC ' + resultados[0].codigoSec;
+                }
+            
+            } else {
+                valorBuscaAtual = '';
+            }
         
             if (!valor) return;
         
