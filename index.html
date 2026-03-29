@@ -401,31 +401,10 @@
         
             const tipo = document.getElementById('searchType').value;
             let valorOriginal = document.getElementById('searchValue').value.trim();
+        
+            if (!valorOriginal) return;
+        
             let valor = valorOriginal.toLowerCase();
-        
-            // 🔥 PADRONIZAÇÃO PARA O RESUMO
-            tipoBuscaAtual = tipo;
-            
-            if (resultados.length > 0) {
-            
-                if (tipo === 'MUNICIPIO') {
-                    valorBuscaAtual = resultados[0].municipio.toUpperCase();
-                }
-            
-                else if (tipo === 'NTE') {
-                    valorBuscaAtual = 'NTE ' + resultados[0].nte.padStart(2, '0');
-                }
-            
-                else if (tipo === 'ESCOLA') {
-                    valorBuscaAtual = 'SEC ' + resultados[0].codigoSec;
-                }
-            
-            } else {
-                valorBuscaAtual = '';
-            }
-        
-            if (!valor) return;
-        
             let resultados = [];
         
             // 🔵 NTE
@@ -449,7 +428,28 @@
                 );
             }
         
-            // 🔥 ESSENCIAL PRO RESUMO FUNCIONAR
+            // 🔥 AQUI resolve seu problema do resumo
+            tipoBuscaAtual = tipo;
+        
+            if (resultados.length > 0) {
+        
+                if (tipo === 'MUNICIPIO') {
+                    valorBuscaAtual = resultados[0].municipio.toUpperCase();
+                }
+        
+                else if (tipo === 'NTE') {
+                    valorBuscaAtual = resultados[0].nte.padStart(2, '0');
+                }
+        
+                else if (tipo === 'ESCOLA') {
+                    valorBuscaAtual = resultados[0].codigoSec;
+                }
+        
+            } else {
+                valorBuscaAtual = '';
+            }
+        
+            // 🔥 ESSENCIAL
             escolasSelecionadas = [...resultados];
         
             mostrarResultados(resultados);
