@@ -399,23 +399,26 @@
         }
         
            function pesquisar() {
-        const tipo = document.getElementById('searchType').value;
-        const valor = document.getElementById('searchValue').value.trim();
-    
-        if (escolasData.length === 0) {
-            alert('Clique em "Carregar Dados" primeiro');
-            return;
-        }
-    
-        tipoBuscaAtual = tipo;
-        valorBuscaAtual = valor;
-    
-        let resultados = [];
-    
-        if (tipo === 'ESTADO') {
-            // 🔥 traz toda a base
-            resultados = escolasData;
-        } else {
+
+    const tipo = document.getElementById('searchType').value;
+    const valor = document.getElementById('searchValue').value.trim();
+
+    if (escolasData.length === 0) {
+        alert('Clique em "Carregar Dados" primeiro');
+        return;
+    }
+
+    tipoBuscaAtual = tipo;
+    valorBuscaAtual = valor;
+
+    let resultados = [];
+
+    // 🔥 ESTADO (mantém seu comportamento)
+    if (tipo === 'ESTADO') {
+        resultados = escolasData;
+    }
+
+    else {
 
         if (!valor) {
             alert('Digite um valor');
@@ -424,22 +427,38 @@
 
         const valorLower = valor.toLowerCase();
 
-        if (tipo === 'NTE')
-            resultados = escolasData.filter(e => e.nte.toLowerCase() === valorLower);
+        if (tipo === 'NTE') {
+            resultados = escolasData.filter(e =>
+                (e.nte || '').toLowerCase() === valorLower
+            );
+        }
 
-        else if (tipo === 'MUNICIPIO')
-            resultados = escolasData.filter(e => e.municipio.toLowerCase() === valorLower);
+        else if (tipo === 'MUNICIPIO') {
+            resultados = escolasData.filter(e =>
+                (e.municipio || '').toLowerCase() === valorLower
+            );
+        }
 
+        // 🔥 AQUI ESTÁ A CORREÇÃO SEGURA
         else if (tipo === 'ESCOLA') {
 
-        const listaCodigos = valor
-            .split(/[\n\t,; ]+/) // aceita Excel, vírgula, espaço, quebra de linha
-            .map(v => v.trim().toLowerCase())
-            .filter(v => v);
-    
-        resultados = escolasData.filter(e =>
-            listaCodigos.includes((e.codigoSec || '').toLowerCase())
-    );
+            const listaCodigos = valor
+                .split(/[\n\t,; ]+/)
+                .map(v => v.trim().toLowerCase())
+                .filter(v => v);
+
+            resultados = escolasData.filter(e =>
+                listaCodigos.includes((e.codigoSec || '').toLowerCase())
+            );
+        }
+    }
+
+    mostrarResultados(resultados);
+
+    // 🔥 opcional: já seleciona automaticamente
+    if (tipo === 'ESCOLA') {
+        escolasSelecionadas = resultados;
+    }
 }
 
     mostrarResultados(resultados);
