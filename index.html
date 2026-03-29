@@ -413,12 +413,9 @@
 
     let resultados = [];
 
-    // 🔥 ESTADO (mantém seu comportamento)
     if (tipo === 'ESTADO') {
         resultados = escolasData;
-    }
-
-    else {
+    } else {
 
         if (!valor) {
             alert('Digite um valor');
@@ -439,9 +436,9 @@
             );
         }
 
-        // 🔥 AQUI ESTÁ A CORREÇÃO SEGURA
         else if (tipo === 'ESCOLA') {
 
+            // 🔥 SUPORTE A LISTA (SEM QUEBRAR)
             const listaCodigos = valor
                 .split(/[\n\t,; ]+/)
                 .map(v => v.trim().toLowerCase())
@@ -451,6 +448,10 @@
                 listaCodigos.includes((e.codigoSec || '').toLowerCase())
             );
         }
+    }
+
+    mostrarResultados(resultados);
+}
     }
 
     mostrarResultados(resultados);
