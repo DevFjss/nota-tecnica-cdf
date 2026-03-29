@@ -426,6 +426,7 @@
             }
         
             mostrarResultados(resultados);
+            document.getElementById('searchValue').addEventListener('input', autoFiltro);
         }
            function pesquisar() {
         const tipo = document.getElementById('searchType').value;
