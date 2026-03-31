@@ -202,7 +202,6 @@
         async function carregarDadosPlanilha() {
             const container = document.getElementById('resultsTable');
             container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>';
-            
             resetarGerarValor();
             
             try {
@@ -514,11 +513,11 @@
                 html += '<td>' + (escola.codigoInep || '-') + '</td>';
                 html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '</td>';
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0) + '<\/td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0) + '</td>';
                 }
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0) + '<\/td>';
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0) + '<\/td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0) + '</td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0) + '</td>';
                 }
                 html += '换届';
             }
@@ -602,56 +601,56 @@
             html += '<th rowspan="3" style="background: #edd5be; vertical-align: middle;">REPASSE ESCOLARES</th>';
             html += '<th colspan="4" style="background: #a5d0e6;">MANUTENÇÃO</th>';
             html += '<th colspan="8" style="background: #43fa8f;">ALIMENTAÇÃO</th>';
-            html += '换届';
+            html += '</tr>';
             html += '<tr style="background: #43fa8f; color: white;">';
             html += '<th rowspan="2">2023</th><th rowspan="2">2024</th><th rowspan="2">2025</th><th rowspan="2">2026</th>';
             html += '<th colspan="2">2023</th><th colspan="2">2024</th><th colspan="2">2025</th><th colspan="2">2026</th>';
-            html += '换届';
+            html += '</tr>';
             html += '<tr style="font-size: 0.7rem;">';
             html += '<th style="background:#43fa8f;">Federal</th><th style="background:#43fa8f;">Estadual</th>';
             html += '<th style="background:#43fa8f;">Federal</th><th style="background:#43fa8f;">Estadual</th>';
             html += '<th style="background:#43fa8f;">Federal</th><th style="background:#43fa8f;">Estadual</th>';
             html += '<th style="background:#43fa8f;">Federal</th><th style="background:#43fa8f;">Estadual</th>';
-            html += '换届';
+            html += '</tr>';
             html += '</thead><tbody>';
             
             for (const item of resumoDados) {
-                html += '处';
-                html += '<td style="text-align:left; font-weight:bold;">' + item.identificador + '处';
-                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2023) + '处';
-                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2024) + '处';
-                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2025) + '处';
-                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2026) + '处';
+                html += '<tr>';
+                html += '<td style="text-align:left; font-weight:bold;">' + item.identificador + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2023) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2024) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2025) + '</td>';
+                html += '<td class="valor-monetario">' + formatarValorBR(item.faed2026) + '</td>';
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].federal) + '处';
-                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].estadual) + '处';
+                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].federal) + '</td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(item.alimentacao[ano].estadual) + '</td>';
                 }
-                html += '换届';
+                html += '</tr>';
             }
             
             html += '<tr class="total-row" style="background: #e5e7eb; font-weight: bold;">';
-            html += '<td style="text-align:left;">TOTAL处';
-            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2023]) + '</strong>处';
-            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2024]) + '</strong>处';
-            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2025]) + '</strong>处';
-            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2026]) + '</strong>处';
+            html += '<td style="text-align:left;">TOTAL</td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2023]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2024]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2025]) + '</strong></td>';
+            html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalFAED[2026]) + '</strong></td>';
             for (let ano of [2023, 2024, 2025, 2026]) {
-                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoFederal[ano]) + '</strong>处';
-                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoEstadual[ano]) + '</strong>处';
+                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoFederal[ano]) + '</strong></td>';
+                html += '<td class="valor-monetario"><strong>' + formatarValorBR(totalAlimentacaoEstadual[ano]) + '</strong></td>';
             }
-            html += '换届';
+            html += '</tr>';
             
             html += '<tr class="total-geral" style="background: #d1d5db;">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong>处';
-            html += '<td colspan="12" class="valor-monetario"><strong>' + formatarValorBR(totalGeralManutencao) + '</strong>处';
-            html += '换届';
+            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td>';
+            html += '<td colspan="12" class="valor-monetario"><strong>' + formatarValorBR(totalGeralManutencao) + '</strong></td>';
+            html += '</tr>';
             
             html += '<tr class="total-geral" style="background: #d1d5db;">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong>处';
-            html += '<td colspan="12" class="valor-monetario"><strong>' + formatarValorBR(totalGeralAlimentacao) + '</strong>处';
-            html += '换届';
+            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td>';
+            html += '<td colspan="12" class="valor-monetario"><strong>' + formatarValorBR(totalGeralAlimentacao) + '</strong></td>';
+            html += '</tr>';
             
-            html += '</tbody>}</div>';
+            html += '</tbody>;</div>';
             container.innerHTML = html;
         }
         
