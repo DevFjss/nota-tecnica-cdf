@@ -169,7 +169,6 @@
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // Função para resetar completamente os dados da aba Gerar Valor
         function resetarGerarValor() {
             escolasSelecionadas = [];
             valoresFAED = { 2023: {}, 2024: {}, 2025: {}, 2026: {} };
@@ -204,11 +203,10 @@
             const container = document.getElementById('resultsTable');
             container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando dados...</div>';
             
-            // Resetar os dados da aba Gerar Valor ao carregar novos dados
             resetarGerarValor();
             
             try {
-                const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(SHEET_NAME);
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Erro ao carregar');
                 const csvText = await response.text();
@@ -222,7 +220,7 @@
         
         async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
             try {
-                const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
                 const response = await fetch(url);
                 if (!response.ok) return {};
                 const csvText = await response.text();
@@ -245,7 +243,7 @@
         
         async function carregarValoresAlimentacaoAba(sheetName, codigoCol, federalCol, estadualCol) {
             try {
-                const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
+                const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
                 const response = await fetch(url);
                 if (!response.ok) return { federal: {}, estadual: {} };
                 const csvText = await response.text();
@@ -410,20 +408,25 @@
                 return;
             }
             
-            let html = '<div class="table-wrapper">能able><thead><tr>';
+            let html = '<div class="table-wrapper"><table>';
+            html += '<thead><tr>';
             html += '<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
-            html += '<th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>';
+            html += '<th>NTE</th>';
+            html += '<th>Município</th>';
+            html += '<th>Código SEC</th>';
+            html += '<th>Código INEP</th>';
+            html += '<th>Unidade Escolar</th>';
             html += '</tr></thead><tbody>';
             
             for (const escola of resultados) {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
                 html += '<tr class="' + (isSelected ? 'selected-row' : '') + '">';
-                html += '<td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="' + escola.codigoSec + '" ' + (isSelected ? 'checked' : '') + '>处';
-                html += '<td><strong>' + (escola.nte || '-') + '</strong>处';
-                html += '<td>' + (escola.municipio || '-') + '处';
-                html += '<td>' + (escola.codigoSec || '-') + '处';
-                html += '<td>' + (escola.codigoInep || '-') + '处';
-                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '处';
+                html += '<td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="' + escola.codigoSec + '" ' + (isSelected ? 'checked' : '') + '></td>';
+                html += '<td><strong>' + (escola.nte || '-') + '</strong></td>';
+                html += '<td>' + (escola.municipio || '-') + '</td>';
+                html += '<td>' + (escola.codigoSec || '-') + '</td>';
+                html += '<td>' + (escola.codigoInep || '-') + '</td>';
+                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '</td>';
                 html += '</tr>';
             }
             
@@ -493,7 +496,8 @@
                 return; 
             }
             
-            let html = '<div class="table-wrapper">能able><thead>';
+            let html = '<div class="table-wrapper"><table>';
+            html += '<thead>';
             html += '<tr style="background: #9ca3af;"><th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>';
             html += '<th colspan="4">FAED Manutenção</th><th colspan="8">PNAE - FAED Alimentação</th></tr>';
             html += '<tr style="background: #6b7280;"><th></th><th></th><th></th><th></th><th></th>';
@@ -505,16 +509,16 @@
             for (const escola of escolasSelecionadas) {
                 html += '<tr>';
                 html += '<td>' + (escola.nte || '-') + '</td>';
-                html += '<td>' + (escola.municipio || '-') + '处';
-                html += '<td>' + (escola.codigoSec || '-') + '处';
-                html += '<td>' + (escola.codigoInep || '-') + '处';
-                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '处';
+                html += '<td>' + (escola.municipio || '-') + '</td>';
+                html += '<td>' + (escola.codigoSec || '-') + '</td>';
+                html += '<td>' + (escola.codigoInep || '-') + '</td>';
+                html += '<td style="text-align:left">' + (escola.unidadeEscolar || '-') + '</td>';
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0) + '处';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0) + '<\/td>';
                 }
                 for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0) + '处';
-                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0) + '处';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0) + '<\/td>';
+                    html += '<td class="valor-monetario">' + formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0) + '<\/td>';
                 }
                 html += '换届';
             }
