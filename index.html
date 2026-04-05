@@ -752,49 +752,69 @@
         }
         
         async function enviarParaResumo() {
-            if (escolasSelecionadas.length === 0) {
-                alert('Selecione escolas primeiro');
-                return;
-            }
-            const totais = calcularTotaisEscolas(escolasSelecionadas);
-            
-            let identificador = '';
-            let tipoItem = '';
-            
-            if (tipoBuscaAtual === 'NTE') {
-                identificador = `NTE ${valorBuscaAtual}`;
-                tipoItem = 'NTE';
-            } else if (tipoBuscaAtual === 'MUNICIPIO') {
-                identificador = municipioExatoAtual ? municipioExatoAtual.toUpperCase() : valorBuscaAtual.toUpperCase();
-                tipoItem = 'MUNICIPIO';
-            } else if (tipoBuscaAtual === 'ESCOLA') {
-                identificador = valorBuscaAtual.toUpperCase();
-                tipoItem = 'ESCOLA';
-            } else {
-                if (escolasSelecionadas.length > 0) {
-                    const primeiraEscola = escolasSelecionadas[0];
-                    identificador = primeiraEscola.municipio ? primeiraEscola.municipio.toUpperCase() : `SELEÇÃO ${escolasSelecionadas.length} ESCOLAS`;
-                    tipoItem = 'MANUAL';
-                } else {
-                    identificador = 'SELEÇÃO MANUAL';
-                    tipoItem = 'MANUAL';
-                }
-            }
-            
-            const novoItem = {
-                id: nextId++,
-                identificador: identificador,
-                tipo: tipoItem,
-                faed2023: totais.faed[2023],
-                faed2024: totais.faed[2024],
-                faed2025: totais.faed[2025],
-                faed2026: totais.faed[2026],
-                alimentacao: totais.alimentacao
-            };
-            resumoDados.push(novoItem);
-            renderResumoConsolidado();
-            alert(`Dados de ${identificador} adicionados ao resumo!`);
+    if (escolasSelecionadas.length === 0) {
+        alert('Selecione escolas primeiro');
+        return;
+    }
+    const totais = calcularTotaisEscolas(escolasSelecionadas);
+    
+    let identificador = '';
+    let tipoItem = '';
+    
+    if (tipoBuscaAtual === 'NTE') {
+        identificador = `NTE ${valorBuscaAtual}`;
+        tipoItem = 'NTE';
+    } else if (tipoBuscaAtual === 'MUNICIPIO') {
+        identificador = municipioExatoAtual ? municipioExatoAtual.toUpperCase() : valorBuscaAtual.toUpperCase();
+        tipoItem = 'MUNICIPIO';
+    } else if (tipoBuscaAtual === 'ESCOLA') {
+        identificador = valorBuscaAtual.toUpperCase();
+        tipoItem = 'ESCOLA';
+    } else {
+        if (escolasSelecionadas.length > 0) {
+            const primeiraEscola = escolasSelecionadas[0];
+            identificador = primeiraEscola.municipio ? primeiraEscola.municipio.toUpperCase() : `SELEÇÃO ${escolasSelecionadas.length} ESCOLAS`;
+            tipoItem = 'MANUAL';
+        } else {
+            identificador = 'SELEÇÃO MANUAL';
+            tipoItem = 'MANUAL';
         }
+    }
+    
+    // VERIFICAR SE JÁ EXISTE UM ITEM COM O MESMO IDENTIFICADOR
+    const itemExistente = resumoDados.find(item => item.identificador === identificador && item.tipo === tipoItem);
+    
+    if (itemExistente) {
+        // ATUALIZAR O ITEM EXISTENTE (SOMAR OS VALORES)
+        itemExistente.faed2023 += totais.faed[2023];
+        itemExistente.faed2024 += totais.faed[2024];
+        itemExistente.faed2025 += totais.faed[2025];
+        itemExistente.faed2026 += totais.faed[2026];
+        
+        for (let ano of [2023, 2024, 2025, 2026]) {
+            itemExistente.alimentacao[ano].federal += totais.alimentacao[ano].federal;
+            itemExistente.alimentacao[ano].estadual += totais.alimentacao[ano].estadual;
+        }
+        
+        alert(`Dados de ${identificador} ATUALIZADOS no resumo!`);
+    } else {
+        // CRIAR NOVO ITEM
+        const novoItem = {
+            id: nextId++,
+            identificador: identificador,
+            tipo: tipoItem,
+            faed2023: totais.faed[2023],
+            faed2024: totais.faed[2024],
+            faed2025: totais.faed[2025],
+            faed2026: totais.faed[2026],
+            alimentacao: totais.alimentacao
+        };
+        resumoDados.push(novoItem);
+        alert(`Dados de ${identificador} ADICIONADOS ao resumo!`);
+    }
+    
+    renderResumoConsolidado();
+}
         
         function excluirResumoSelecionados() {
             const checkboxes = document.querySelectorAll('.resumo-item-checkbox:checked');
