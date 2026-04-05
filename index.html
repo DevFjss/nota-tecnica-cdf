@@ -47,7 +47,7 @@
         .btn-info { background: #3b82f6; color: white; }
         .btn-info:hover { background: #2563eb; }
         .table-wrapper { overflow-x: auto; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 1300px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 1200px; }
         th, td { padding: 0.5rem 0.5rem; border: 1px solid #d1d5db; text-align: center; vertical-align: middle; }
         .total-row { background: #e5e7eb; font-weight: bold; }
         .total-geral { background: #d1d5db; font-weight: bold; }
@@ -527,68 +527,67 @@
         }
         
         function autoFiltro() {
-            if (escolasData.length === 0) return;
-            const termo = document.getElementById('searchValue').value.trim();
-            let resultados;
-            
-            if (termo === '') {
-                resultados = escolasData;
-                tipoBuscaAtual = '';
-                valorBuscaAtual = '';
-                municipioExatoAtual = '';
-            } else {
-                const termoNormalizado = normalizarTexto(termo);
-                
-                // 1º - Verificar se é NTE EXATO
-                const nteExato = escolasData.filter(escola => escola.nte === termo);
-                if (nteExato.length > 0) {
-                    resultados = nteExato;
-                    tipoBuscaAtual = 'NTE';
-                    valorBuscaAtual = termo;
+    if (escolasData.length === 0) return;
+    const termo = document.getElementById('searchValue').value.trim();
+    let resultados;
+    
+    if (termo === '') {
+        resultados = escolasData;
+        tipoBuscaAtual = '';
+        valorBuscaAtual = '';
+        municipioExatoAtual = '';
+    } else {
+        const termoNormalizado = normalizarTexto(termo);
+        
+        // 1º - Verificar se é NTE EXATO
+        const nteExato = escolasData.filter(escola => escola.nte === termo);
+        if (nteExato.length > 0) {
+            resultados = nteExato;
+            tipoBuscaAtual = 'NTE';
+            valorBuscaAtual = termo;
+            municipioExatoAtual = '';
+        } 
+        // 2º - Verificar se é MUNICÍPIO EXATO
+        else {
+            const municipioExato = escolasData.filter(escola => normalizarTexto(escola.municipio) === termoNormalizado);
+            if (municipioExato.length > 0) {
+                resultados = municipioExato;
+                tipoBuscaAtual = 'MUNICIPIO';
+                valorBuscaAtual = termoNormalizado;
+                municipioExatoAtual = municipioExato[0].municipio;
+            } 
+            // 3º - Verificar se é MUNICÍPIO PARCIAL (CONTÉM)
+            else {
+                const municipioParcial = escolasData.filter(escola => normalizarTexto(escola.municipio).includes(termoNormalizado));
+                if (municipioParcial.length > 0) {
+                    resultados = municipioParcial;
+                    tipoBuscaAtual = 'MUNICIPIO';
+                    valorBuscaAtual = termoNormalizado;
                     municipioExatoAtual = '';
                 } 
-                // 2º - Verificar se é MUNICÍPIO EXATO
+                // 4º - Buscar por Código SEC, Código INEP ou nome da escola
                 else {
-                    const municipioExato = escolasData.filter(escola => normalizarTexto(escola.municipio) === termoNormalizado);
-                    if (municipioExato.length > 0) {
-                        resultados = municipioExato;
-                        tipoBuscaAtual = 'MUNICIPIO';
-                        valorBuscaAtual = termoNormalizado;
-                        municipioExatoAtual = municipioExato[0].municipio;
-                    } 
-                    // 3º - Verificar se é MUNICÍPIO PARCIAL (CONTÉM)
-                    else {
-                        const municipioParcial = escolasData.filter(escola => normalizarTexto(escola.municipio).includes(termoNormalizado));
-                        if (municipioParcial.length > 0) {
-                            resultados = municipioParcial;
-                            tipoBuscaAtual = 'MUNICIPIO';
-                            valorBuscaAtual = termoNormalizado;
-                            municipioExatoAtual = '';
-                        } 
-                        // 4º - Buscar por Código SEC, Código INEP ou nome da escola
-                        else {
-                            resultados = escolasData.filter(escola => {
-                                return normalizarTexto(escola.codigoSec).includes(termoNormalizado) ||
-                                       normalizarTexto(escola.codigoInep).includes(termoNormalizado) ||
-                                       normalizarTexto(escola.unidadeEscolar).includes(termoNormalizado);
-                            });
-                            if (resultados.length > 0) {
-                                tipoBuscaAtual = 'ESCOLA';
-                                valorBuscaAtual = termo;
-                                municipioExatoAtual = '';
-                            } else {
-                                resultados = [];
-                                tipoBuscaAtual = '';
-                                valorBuscaAtual = '';
-                                municipioExatoAtual = '';
-                            }
-                        }
+                    resultados = escolasData.filter(escola => {
+                        return normalizarTexto(escola.codigoSec).includes(termoNormalizado) ||
+                               normalizarTexto(escola.codigoInep).includes(termoNormalizado) ||
+                               normalizarTexto(escola.unidadeEscolar).includes(termoNormalizado);
+                    });
+                    if (resultados.length > 0) {
+                        tipoBuscaAtual = 'ESCOLA';
+                        valorBuscaAtual = termo;
+                        municipioExatoAtual = '';
+                    } else {
+                        resultados = [];
+                        tipoBuscaAtual = '';
+                        valorBuscaAtual = '';
+                        municipioExatoAtual = '';
                     }
                 }
             }
-            mostrarResultados(resultados);
         }
-        
+    }
+    mostrarResultados(resultados);
+}
         function mostrarResultados(resultados) {
             const container = document.getElementById('resultsTable');
             document.getElementById('resultCount').innerHTML = resultados.length + ' registros';
@@ -652,13 +651,15 @@
             if (selectAll) {
                 selectAll.onchange = (e) => {
                     const isChecked = e.target.checked;
-                    if (isChecked) {
-                        escolasSelecionadas = [...resultados];
-                    } else {
-                        escolasSelecionadas = [];
-                    }
                     document.querySelectorAll('.school-checkbox').forEach(cb => {
                         cb.checked = isChecked;
+                        const codigo = cb.dataset.codigo;
+                        const escola = escolasData.find(e => e.codigoSec === codigo);
+                        if (isChecked && !escolasSelecionadas.some(s => s.codigoSec === codigo)) {
+                            escolasSelecionadas.push(escola);
+                        } else if (!isChecked) {
+                            escolasSelecionadas = [];
+                        }
                         const row = cb.closest('tr');
                         if (row) {
                             if (isChecked) row.classList.add('selected-row');
@@ -700,7 +701,7 @@
             html += '<th>Código SEC</th>';
             html += '<th>Código INEP</th>';
             html += '<th>Unidade Escolar</th>';
-            html += '<th colspan="4">FAED MANUTENÇÃO</th>';
+            html += '<th colspan="4">FAED</th>';
             html += '<th colspan="8">ALIMENTAÇÃO</th>';
             html += '</tr>';
             html += '<tr style="background: #6b7280;">';
@@ -759,8 +760,6 @@
             
             let identificador = '';
             let tipoItem = '';
-            const timestamp = new Date();
-            const dataHora = timestamp.toLocaleDateString('pt-BR') + ' ' + timestamp.toLocaleTimeString('pt-BR');
             
             if (tipoBuscaAtual === 'NTE') {
                 identificador = `NTE ${valorBuscaAtual}`;
@@ -769,42 +768,32 @@
                 identificador = municipioExatoAtual ? municipioExatoAtual.toUpperCase() : valorBuscaAtual.toUpperCase();
                 tipoItem = 'MUNICIPIO';
             } else if (tipoBuscaAtual === 'ESCOLA') {
-                if (escolasSelecionadas.length === 1) {
-                    const escola = escolasSelecionadas[0];
-                    identificador = `${escola.unidadeEscolar || 'Escola'} (${escola.codigoSec})`;
-                } else {
-                    identificador = `Busca: ${valorBuscaAtual.toUpperCase()} (${escolasSelecionadas.length} escolas)`;
-                }
+                identificador = valorBuscaAtual.toUpperCase();
                 tipoItem = 'ESCOLA';
             } else {
-                const primeiraEscola = escolasSelecionadas[0];
-                identificador = `Seleção: ${primeiraEscola.municipio || 'Manual'} - ${dataHora}`;
-                tipoItem = 'MANUAL';
+                if (escolasSelecionadas.length > 0) {
+                    const primeiraEscola = escolasSelecionadas[0];
+                    identificador = primeiraEscola.municipio ? primeiraEscola.municipio.toUpperCase() : `SELEÇÃO ${escolasSelecionadas.length} ESCOLAS`;
+                    tipoItem = 'MANUAL';
+                } else {
+                    identificador = 'SELEÇÃO MANUAL';
+                    tipoItem = 'MANUAL';
+                }
             }
-            
-            identificador = `${identificador} [${dataHora}]`;
             
             const novoItem = {
                 id: nextId++,
                 identificador: identificador,
                 tipo: tipoItem,
-                timestamp: timestamp.getTime(),
-                dataHora: dataHora,
                 faed2023: totais.faed[2023],
                 faed2024: totais.faed[2024],
                 faed2025: totais.faed[2025],
                 faed2026: totais.faed[2026],
-                alimentacao: {
-                    2023: { federal: totais.alimentacao[2023].federal, estadual: totais.alimentacao[2023].estadual },
-                    2024: { federal: totais.alimentacao[2024].federal, estadual: totais.alimentacao[2024].estadual },
-                    2025: { federal: totais.alimentacao[2025].federal, estadual: totais.alimentacao[2025].estadual },
-                    2026: { federal: totais.alimentacao[2026].federal, estadual: totais.alimentacao[2026].estadual }
-                }
+                alimentacao: totais.alimentacao
             };
-            
             resumoDados.push(novoItem);
             renderResumoConsolidado();
-            alert(`Dados de "${identificador}" adicionados ao resumo!`);
+            alert(`Dados de ${identificador} adicionados ao resumo!`);
         }
         
         function excluirResumoSelecionados() {
@@ -834,18 +823,21 @@
                 return;
             }
             
-            // Calcula totais gerais
             let totalGeralFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalGeralAlimFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalGeralAlimEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             
-            // Separa itens por tipo
+            for (const item of resumoDados) {
+                for (let ano of [2023, 2024, 2025, 2026]) {
+                    totalGeralFAED[ano] += item['faed' + ano];
+                    totalGeralAlimFederal[ano] += item.alimentacao[ano].federal;
+                    totalGeralAlimEstadual[ano] += item.alimentacao[ano].estadual;
+                }
+            }
+            
             const itensNTE = resumoDados.filter(item => item.tipo === 'NTE');
             const itensMunicipio = resumoDados.filter(item => item.tipo === 'MUNICIPIO');
-            const itensEscola = resumoDados.filter(item => item.tipo === 'ESCOLA');
-            const itensManual = resumoDados.filter(item => item.tipo === 'MANUAL');
             
-            // Calcula totais para NTE
             let totalNTEFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalNTEAlimFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalNTEAlimEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
@@ -855,13 +847,9 @@
                     totalNTEFAED[ano] += item['faed' + ano];
                     totalNTEAlimFederal[ano] += item.alimentacao[ano].federal;
                     totalNTEAlimEstadual[ano] += item.alimentacao[ano].estadual;
-                    totalGeralFAED[ano] += item['faed' + ano];
-                    totalGeralAlimFederal[ano] += item.alimentacao[ano].federal;
-                    totalGeralAlimEstadual[ano] += item.alimentacao[ano].estadual;
                 }
             }
             
-            // Calcula totais para MUNICIPIO
             let totalMunFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalMunAlimFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalMunAlimEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
@@ -871,169 +859,132 @@
                     totalMunFAED[ano] += item['faed' + ano];
                     totalMunAlimFederal[ano] += item.alimentacao[ano].federal;
                     totalMunAlimEstadual[ano] += item.alimentacao[ano].estadual;
-                    totalGeralFAED[ano] += item['faed' + ano];
-                    totalGeralAlimFederal[ano] += item.alimentacao[ano].federal;
-                    totalGeralAlimEstadual[ano] += item.alimentacao[ano].estadual;
                 }
             }
             
-            // Calcula totais para ESCOLA e MANUAL para o geral
-            for (const item of [...itensEscola, ...itensManual]) {
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    totalGeralFAED[ano] += item['faed' + ano];
-                    totalGeralAlimFederal[ano] += item.alimentacao[ano].federal;
-                    totalGeralAlimEstadual[ano] += item.alimentacao[ano].estadual;
-                }
-            }
-            
-            let html = '<div class="table-wrapper">';
-            html += '<table style="min-width: 1300px;">';
-            html += '<thead>';
-            
-            // PRIMEIRA LINHA DO CABEÇALHO
-            html += '<tr style="background: #374151; color: white;">';
-            html += '<th rowspan="3" class="th-repasse" style="background: #edd5be; vertical-align: middle;">REPASSE ESCOLARES</th>';
-            html += '<th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th>';
-            html += '<th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th>';
-            html += '<th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th>';
-            html += '</tr>';
-            
-            // SEGUNDA LINHA DO CABEÇALHO
-            html += '<tr style="background: #6b7280;">';
-            html += '<th rowspan="2" style="background: #9ca3af;">2023</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2024</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2025</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2026</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2023</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2024</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2025</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2026</th>';
-            html += '</tr>';
-            
-            // TERCEIRA LINHA DO CABEÇALHO
-            html += '<tr style="background: #6b7280;">';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '</tr>';
-            
-            html += '</thead>';
-            html += '<tbody>';
-            
-            // Exibe itens NTE
-            for (const item of itensNTE) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador} <span style="font-size:0.65rem; color:#2f80ed;">(NTE)</span></td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
-                html += '</tr>';
-            }
-            
-            // Exibe itens MUNICIPIO
-            for (const item of itensMunicipio) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador} <span style="font-size:0.65rem; color:#10b981;">(Município)</span></td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
-                html += '</tr>';
-            }
-            
-            // Exibe itens ESCOLA
-            for (const item of itensEscola) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador} <span style="font-size:0.65rem; color:#f59e0b;">(Escola)</span></td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
-                html += '</tr>';
-            }
-            
-            // Exibe itens MANUAL
-            for (const item of itensManual) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador} <span style="font-size:0.65rem; color:#6b7280;">(Manual)</span></td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
-                html += '</tr>';
-            }
-            
-            // LINHA DE TOTAL GERAL MANUTENÇÃO
-            let totalNTEmanutencao = totalNTEFAED[2023] + totalNTEFAED[2024] + totalNTEFAED[2025] + totalNTEFAED[2026];
-            let totalMunmanutencao = totalMunFAED[2023] + totalMunFAED[2024] + totalMunFAED[2025] + totalMunFAED[2026];
-            
-            html += '<tr class="total-geral" style="background: #d1d5db;">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td>';
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalNTEmanutencao)}</strong>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalMunmanutencao)}</strong>`;
-            html += '<td class="valor-monetario"></td>';
-            html += '<td class="valor-monetario"></td>';
-            for (let i = 0; i < 8; i++) { html += '<td class="valor-monetario">'; }
-            html += '<td class="resumo-checkbox-col">';
-            html += '</tr>';
-            
-            // LINHA DE TOTAL GERAL ALIMENTAÇÃO
-            let totalNTEalimentacao = 0;
-            let totalMunalimentacao = 0;
-            for (let ano of [2023, 2024, 2025, 2026]) {
-                totalNTEalimentacao += totalNTEAlimFederal[ano] + totalNTEAlimEstadual[ano];
-                totalMunalimentacao += totalMunAlimFederal[ano] + totalMunAlimEstadual[ano];
-            }
-            
-            html += '<tr class="total-geral" style="background: #d1d5db;">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td>';
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalNTEalimentacao)}</strong>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalMunalimentacao)}</strong>`;
-            html += '<td class="valor-monetario"></td>';
-            html += '<td class="valor-monetario"></td>';
-            for (let i = 0; i < 8; i++) { html += '<td class="valor-monetario">'; }
-            html += '<td class="resumo-checkbox-col">';
-            html += '</tr>';
-            
-            // LINHA DE TOTAL GERAL (SOMA DE TODOS)
             let totalGeralManutencao = totalGeralFAED[2023] + totalGeralFAED[2024] + totalGeralFAED[2025] + totalGeralFAED[2026];
             let totalGeralAlimentacao = 0;
             for (let ano of [2023, 2024, 2025, 2026]) {
                 totalGeralAlimentacao += totalGeralAlimFederal[ano] + totalGeralAlimEstadual[ano];
             }
             
-            html += '<tr class="total-row" style="background: #e5e7eb;">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL (TODOS)</strong></td>';
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong>`;
-            html += '<td class="valor-monetario"></td>';
-            html += '<td class="valor-monetario"></td>';
+            let totalNTEmanutencao = totalNTEFAED[2023] + totalNTEFAED[2024] + totalNTEFAED[2025] + totalNTEFAED[2026];
+            let totalNTEalimentacao = 0;
+            for (let ano of [2023, 2024, 2025, 2026]) {
+                totalNTEalimentacao += totalNTEAlimFederal[ano] + totalNTEAlimEstadual[ano];
+            }
+            
+            let totalMunmanutencao = totalMunFAED[2023] + totalMunFAED[2024] + totalMunFAED[2025] + totalMunFAED[2026];
+            let totalMunalimentacao = 0;
+            for (let ano of [2023, 2024, 2025, 2026]) {
+                totalMunalimentacao += totalMunAlimFederal[ano] + totalMunAlimEstadual[ano];
+            }
+            
+            let html = '<div class="table-wrapper">';
+html += '<table style="min-width: 1300px;">';
+html += '<thead>';
+
+// PRIMEIRA LINHA DO CABEÇALHO - ALTERADA
+html += '<tr style="background: #374151; color: white;">';
+html += '<th rowspan="3" class="th-repasse" style="background: #edd5be; vertical-align: middle;">REPASSE ESCOLARES</th>';
+html += '<th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th>';  // 4 colunas
+html += '<th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th>'; // 8 colunas
+html += '<th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th>';
+html += '</tr>';
+
+// SEGUNDA LINHA DO CABEÇALHO - ALTERADA
+html += '<tr style="background: #6b7280;">';
+html += '<th rowspan="2" style="background: #9ca3af;">2023</th>';
+html += '<th rowspan="2" style="background: #9ca3af;">2024</th>';
+html += '<th rowspan="2" style="background: #9ca3af;">2025</th>';
+html += '<th rowspan="2" style="background: #9ca3af;">2026</th>';
+html += '<th colspan="2" style="background: #fff3cd;">2023</th>';
+html += '<th colspan="2" style="background: #fff3cd;">2024</th>';
+html += '<th colspan="2" style="background: #fff3cd;">2025</th>';
+html += '<th colspan="2" style="background: #fff3cd;">2026</th>';
+html += '</tr>';
+
+// TERCEIRA LINHA DO CABEÇALHO - ALTERADA (SÓ ALIMENTAÇÃO)
+html += '<tr style="background: #6b7280;">';
+html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+html += '</tr>';
+
+html += '</thead>';
+            
+            for (const item of itensNTE) {
+                html += '<tr>';
+                html += `<td style="text-align:left; font-weight:bold;">${item.identificador}</td>`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
+                for (let ano of [2023, 2024, 2025, 2026]) {
+                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
+                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
+                }
+                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
+                html += '</tr>';
+            }
+            
+            for (const item of itensMunicipio) {
+                html += '<tr>';
+                html += `<td style="text-align:left; font-weight:bold;">${item.identificador}</td>`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}`;
+                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}`;
+                for (let ano of [2023, 2024, 2025, 2026]) {
+                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}`;
+                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}`;
+                }
+                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}">`;
+                html += '</tr>';
+            }
+            
+            html += '<tr class="total-row">';
+            html += '<td style="text-align:left;"><strong>TOTAL</strong>';
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralFAED[2023])}</strong>`;
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralFAED[2024])}</strong>`;
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralFAED[2025])}</strong>`;
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralFAED[2026])}</strong>`;
+            for (let ano of [2023, 2024, 2025, 2026]) {
+                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimFederal[ano])}</strong>`;
+                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimEstadual[ano])}</strong>`;
+            }
+            html += '<td class="resumo-checkbox-col">';
+            html += '</tr>';
+            
+            html += '<tr style="background: #e5e7eb;">';
+            html += '<td style="text-align:left;"><strong>&nbsp;</strong>';
+            html += '<td colspan="1" style="text-align:center;"><strong>NTE</strong>';
+            html += '<td colspan="1" style="text-align:center;"><strong>MUNICIPIO</strong>';
+            html += '<td colspan="10">';
+            html += '<td class="resumo-checkbox-col">';
+            html += '</tr>';
+            
+            html += '<tr class="total-geral" style="background: #d1d5db;">';
+            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong>';
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalNTEmanutencao)}</strong>`;
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalMunmanutencao)}</strong>`;
+            html += '<td class="valor-monetario">';
+            html += '<td class="valor-monetario">';
+            for (let i = 0; i < 8; i++) { html += '<td class="valor-monetario">'; }
+            html += '<td class="resumo-checkbox-col">';
+            html += '</tr>';
+            
+            html += '<tr class="total-geral" style="background: #d1d5db;">';
+            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong>';
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalNTEalimentacao)}</strong>`;
+            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalMunalimentacao)}</strong>`;
+            html += '<td class="valor-monetario">';
+            html += '<td class="valor-monetario">';
             for (let i = 0; i < 8; i++) { html += '<td class="valor-monetario">'; }
             html += '<td class="resumo-checkbox-col">';
             html += '</tr>';
@@ -1043,7 +994,6 @@
             html += '</div>';
             container.innerHTML = html;
             
-            // Configura os checkboxes do resumo
             document.querySelectorAll('.resumo-item-checkbox').forEach(cb => {
                 cb.onchange = () => {
                     const allCheckboxes = document.querySelectorAll('.resumo-item-checkbox');
@@ -1071,18 +1021,8 @@
             alert('Alimentação carregada!');
         }
         
-        function limparGerar() { 
-            resetarGerarValor(); 
-            alert('Gerar Valor limpo!'); 
-        }
-        
-        function limparResumo() { 
-            if(confirm('Limpar todo resumo?')) { 
-                resumoDados = []; 
-                renderResumoConsolidado(); 
-                alert('Resumo limpo!'); 
-            } 
-        }
+        function limparGerar() { resetarGerarValor(); alert('Gerar Valor limpo!'); }
+        function limparResumo() { if(confirm('Limpar todo resumo?')) { resumoDados = []; renderResumoConsolidado(); alert('Resumo limpo!'); } }
         
         function exportarParaExcel(tabelaElement, nomeArquivo) {
             if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
