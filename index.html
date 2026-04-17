@@ -2,16 +2,17 @@
 <html lang="pt-BR">
 <head>
 
+    <script>
+    // Verifica se o usuário está logado
+    const usuarioLogado = sessionStorage.getItem('usuarioLogado');
+    if (!usuarioLogado) {
+        // Redireciona para o login
+        window.location.href = 'https://devfjss.github.io/login-nota-tecnica-cdf/';
+    }
+</script>
 
-     <script>
-        // Verifica se o usuário está logado
-        const usuarioLogado = sessionStorage.getItem('usuarioLogado');
-        if (!usuarioLogado) {
-            // Redireciona para o login
-            window.location.href = 'https://devfjss.github.io/login-nota-tecnica-cdf/';
-        }
-    </script>
 
+    
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,42 +71,197 @@
         td:first-child, td:nth-child(2) { text-align: left; }
         .search-with-button { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
         .search-with-button .form-group { flex: 2; min-width: 300px; }
-        .valor-cards-container { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
-        .valor-card { flex: 1; min-width: 200px; background: linear-gradient(135deg, #ffffff 0%, #fafcff 100%); border-radius: 20px; padding: 20px 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; transition: transform 0.2s, box-shadow 0.2s; }
-        .valor-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .valor-card.faed-card { border-left: 5px solid #2f80ed; }
-        .valor-card.alim-card { border-left: 5px solid #10b981; }
-        .valor-card.soma-card { border-left: 5px solid #8b5cf6; background: linear-gradient(135deg, #f8f4ff 0%, #ffffff 100%); }
-        .valor-card .card-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: #5c7b9c; letter-spacing: 0.8px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-        .valor-card .card-value { font-size: 28px; font-weight: 800; color: #0f172a; font-family: 'Courier New', monospace; }
-        .historico-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; transition: all 0.2s; }
-        .historico-item:hover { background: #f1f5f9; transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .historico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
-        .historico-titulo { font-weight: bold; font-size: 1rem; color: #0f172a; }
-        .historico-data { font-size: 0.75rem; color: #64748b; }
-        .historico-descricao { color: #475569; font-size: 0.85rem; margin-bottom: 0.75rem; }
-        .historico-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .btn-small { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
-        .badge-lista { background: #8b5cf6; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; margin-left: 0.5rem; }
-        .badge-nota { background: #2f80ed; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; margin-left: 0.5rem; }
-        .links-container { display: flex; flex-direction: column; gap: 1.5rem; }
-        .download-card { background: #f8fafc; border-radius: 16px; padding: 1.2rem; border: 1px solid #e2e8f0; transition: all 0.2s; }
-        .download-card:hover { background: #f1f5f9; transform: translateX(5px); }
-        .download-card h4 { color: #0f172a; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; }
-        .download-card p { color: #475569; font-size: 0.85rem; margin-bottom: 1rem; }
-        .download-link { display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 10px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s; }
-        .download-link:hover { background: #059669; }
-        .info-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 12px; margin-top: 1rem; }
-        .info-box i { color: #f59e0b; margin-right: 8px; }
-        .resumo-checkbox-col { width: 40px; text-align: center; background: #f8fafc; }
-        .resumo-checkbox-col input { transform: scale(1.1); cursor: pointer; }
-        .delete-selected-btn { background: #dc2626; color: white; }
-        .delete-selected-btn:hover { background: #b91c1c; }
-        .th-manutencao { background: #9ca3af !important; color: #1f2937; }
-        .th-alimentacao { background: #fff3cd !important; color: #856404; }
-        .th-repasse { background: #edd5be !important; color: #5a3e1b; }
-        .usuario-info { background: #e0f2fe; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; }
-        .cloud-badge { background: #10b981; font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 20px; margin-left: 8px; }
+        .search-with-button button { margin-bottom: 0; }
+        
+        .valor-cards-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .valor-card {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #ffffff 0%, #fafcff 100%);
+            border-radius: 20px;
+            padding: 20px 18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .valor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .valor-card.faed-card { border-left: 5px solid #2f80ed; border-top: none; }
+        .valor-card.alim-card { border-left: 5px solid #10b981; border-top: none; }
+        .valor-card.soma-card { border-left: 5px solid #8b5cf6; border-top: none; background: linear-gradient(135deg, #f8f4ff 0%, #ffffff 100%); }
+        .valor-card .card-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #5c7b9c;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .valor-card .card-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Estilos para Histórico (Notas + Listas) */
+        .historico-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .historico-item:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .historico-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .historico-titulo {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #0f172a;
+        }
+        .historico-data {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .historico-descricao {
+            color: #475569;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+        .historico-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-small {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+        .badge-lista {
+            background: #8b5cf6;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+        .badge-nota {
+            background: #2f80ed;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+        
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .download-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .download-card:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+        }
+        .download-card h4 {
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .download-card p {
+            color: #475569;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #10b981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .download-link:hover {
+            background: #059669;
+        }
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        .info-box i {
+            color: #f59e0b;
+            margin-right: 8px;
+        }
+        
+        .resumo-checkbox-col {
+            width: 40px;
+            text-align: center;
+            background: #f8fafc;
+        }
+        .resumo-checkbox-col input {
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+        .delete-selected-btn {
+            background: #dc2626;
+            color: white;
+        }
+        .delete-selected-btn:hover {
+            background: #b91c1c;
+        }
+        
+        .th-manutencao {
+            background: #9ca3af !important;
+            color: #1f2937;
+        }
+        .th-alimentacao {
+            background: #fff3cd !important;
+            color: #856404;
+        }
+        .th-repasse {
+            background: #edd5be !important;
+            color: #5a3e1b;
+        }
+        
         @media print {
             body { background: white; }
             .header, .tabs, .action-buttons, .report-actions, .card-header button, .btn, .search-form, .info-message, .valor-cards-container { display: none !important; }
@@ -139,6 +295,7 @@
     </div>
 
     <div class="main">
+        <!-- Aba Consulta -->
         <div id="consultaTab">
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-filter"></i> Filtrar Escolas</h3></div>
@@ -158,12 +315,14 @@
                     <strong>Selecione as escolas:</strong> Marque os checkboxes e use "Enviar Selecionados" para levar à aba Gerar Valor
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-table-list"></i> Lista de Escolas</h3><span class="badge" id="resultCount">0 registros</span></div>
                 <div id="resultsTable"><div class="empty-state"><i class="fas fa-cloud-download-alt" style="font-size: 3rem;"></i><p>Carregando lista completa de escolas...</p></div></div>
             </div>
         </div>
 
+        <!-- Aba Gerar Valor -->
         <div id="gerarTab" style="display: none;">
             <div class="valor-cards-container">
                 <div class="valor-card faed-card">
@@ -179,21 +338,24 @@
                     <div class="card-value" id="cardTotalGeral">R$ 0,00</div>
                 </div>
             </div>
+
             <div class="action-buttons">
                 <button class="btn-primary" id="buscarFaedBtn"><i class="fas fa-chart-line"></i> Buscar FAED</button>
                 <button class="btn-success" id="buscarAlimentacaoBtn"><i class="fas fa-utensils"></i> Buscar Alimentação</button>
-                <button class="btn-purple" id="salvarListaBtn"><i class="fas fa-save"></i> 💾 Salvar Lista</button>
+                <button class="btn-purple" id="salvarListaBtn"><i class="fas fa-save"></i> 💾 Salvar Histórico</button>
                 <button class="btn-warning" id="enviarResumoBtn"><i class="fas fa-chart-bar"></i> Enviar para Resumo</button>
                 <button class="btn-secondary" id="exportGerarPDFBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
                 <button class="btn-secondary" id="exportGerarExcelBtn"><i class="fas fa-file-excel"></i> Exportar Excel</button>
                 <button class="btn-danger" id="limparGerarBtn"><i class="fas fa-trash"></i> Limpar</button>
             </div>
+
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-school"></i> Escolas Selecionadas</h3><span class="badge" id="gerarCount">0 escolas</span></div>
                 <div id="gerarTabela"><div class="empty-state"><p>Selecione escolas na aba "Consulta Escolas"</p></div></div>
             </div>
         </div>
 
+        <!-- Aba Relatório -->
         <div id="relatorioTab" style="display: none;">
             <div class="report-actions">
                 <button class="btn-primary" id="exportPDFBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
@@ -215,27 +377,30 @@
             </div>
         </div>
 
+        <!-- Aba Histórico (Notas + Listas) -->
         <div id="historicoTab" style="display: none;">
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-file-alt"></i> Notas Técnicas Salvas <span class="cloud-badge"><i class="fas fa-cloud"></i> Cloud (Google Sheets)</span></h3>
-                    <button class="btn-danger btn-small" id="limparHistoricoBtn"><i class="fas fa-trash"></i> Limpar Todas Notas</button>
+                    <h3><i class="fas fa-file-alt"></i> Notas Técnicas Salvas</h3>
+                    <button class="btn-danger btn-small" id="limparHistoricoBtn"><i class="fas fa-trash"></i> Limpar Notas</button>
                 </div>
                 <div id="historicoNotasContainer">
                     <div class="empty-state"><p>📭 Nenhuma nota salva</p></div>
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-list"></i> Listas de Escolas Salvas</h3>
                     <button class="btn-purple btn-small" id="exportarListasBtn"><i class="fas fa-file-excel"></i> Exportar Listas</button>
                 </div>
                 <div id="listasSalvasContainer">
-                    <div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Lista" na aba Gerar Valor para salvar suas listas de escolas.</p></div>
+                    <div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Histórico" na aba Gerar Valor para salvar suas listas de escolas.</p></div>
                 </div>
             </div>
         </div>
 
+        <!-- Aba Links Úteis -->
         <div id="linksTab" style="display: none;">
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-link"></i> Links Úteis</h3></div>
@@ -254,6 +419,7 @@
                             <i class="fas fa-download"></i> Baixar Planilha
                         </a>
                     </div>
+                    
                     <div class="info-box">
                         <i class="fas fa-info-circle"></i>
                         <strong>Informação:</strong> Baixe as planilhas acima para concluir a formatação da nota técnica.
@@ -264,17 +430,11 @@
     </div>
 
     <script>
-        // ============================================
-        // CONFIGURAÇÃO - COLE A URL DO SEU WEB APP AQUI!
-        // ============================================
-        // DEPOIS DE CRIAR A IMPLANTAÇÃO NO GOOGLE APPS SCRIPT,
-        // COPIE A URL E COLE AQUI:
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCeJT12TYgeJn7TzDPSUwLHnRvyUqfR7SxwY0rERbTPYyjtvZDdKxOBmGdNHeDj0d0/exec';
-        // ============================================
-        
+        // Mostrar nome do usuário
         const usuarioNome = sessionStorage.getItem('usuarioNome') || 'Usuário';
         document.getElementById('userNameDisplay').textContent = usuarioNome;
         
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.clear();
@@ -311,170 +471,26 @@
         let municipioExatoAtual = '';
         let nextId = 1;
         
+        // ==================== SISTEMA DE LISTAS SALVAS ====================
         let listasSalvas = [];
-        let historicoNotas = [];
-        
-        // ============================================
-        // FUNÇÕES DO GOOGLE SHEETS (CLOUD)
-        // ============================================
-        
-        async function salvarNotaCloud(nota) {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nota)
-                });
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar na nuvem:', error);
-                return false;
-            }
-        }
-        
-        async function carregarNotasCloud() {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=get`);
-                const data = await response.json();
-                if (data.success && data.notas) {
-                    historicoNotas = data.notas;
-                    renderizarHistoricoNotas();
-                } else {
-                    historicoNotas = [];
-                    renderizarHistoricoNotas();
-                }
-            } catch (error) {
-                console.error('Erro ao carregar notas da nuvem:', error);
-                historicoNotas = [];
-                renderizarHistoricoNotas();
-            }
-        }
         
         function carregarListasSalvas() {
             const saved = localStorage.getItem('listasEscolasSalvas');
             if (saved) {
                 try {
                     listasSalvas = JSON.parse(saved);
-                } catch(e) { listasSalvas = []; }
-            } else { listasSalvas = []; }
+                } catch(e) {
+                    listasSalvas = [];
+                }
+            } else {
+                listasSalvas = [];
+            }
             renderizarListasSalvas();
         }
         
         function salvarListasStorage() {
             localStorage.setItem('listasEscolasSalvas', JSON.stringify(listasSalvas));
             renderizarListasSalvas();
-        }
-        
-        function salvarNotaHistorico() {
-            if (resumoDados.length === 0) {
-                alert('⚠️ Não há dados no resumo para salvar!');
-                return;
-            }
-            
-            const titulo = prompt('📝 Digite um título para esta nota técnica:', `Nota Técnica - ${new Date().toLocaleString('pt-BR')}`);
-            if (!titulo) return;
-            
-            const nomeUsuario = prompt('👤 Digite o nome do usuário responsável pela nota:', usuarioNome);
-            if (!nomeUsuario || nomeUsuario.trim() === '') {
-                alert('⚠️ O nome do usuário é obrigatório!');
-                return;
-            }
-            
-            const descricao = prompt('📌 Digite uma descrição/observação (opcional):', '');
-            
-            const nota = {
-                titulo: titulo,
-                descricao: descricao || '',
-                data: new Date().toISOString(),
-                nomeUsuario: nomeUsuario.trim(),
-                totalEscolas: escolasSelecionadas.length,
-                resumoDados: JSON.parse(JSON.stringify(resumoDados))
-            };
-            
-            salvarNotaCloud(nota);
-            alert(`✅ Nota "${titulo}" salva na nuvem (Google Sheets)!\n👤 Usuário: ${nomeUsuario}\n📊 ${resumoDados.length} item(ns) no resumo\n🏫 ${escolasSelecionadas.length} escola(s)\n\nA nota está disponível para todos os usuários!`);
-            
-            setTimeout(() => carregarNotasCloud(), 1000);
-        }
-        
-        function carregarNotaHistorico(notaId) {
-            const nota = historicoNotas.find(n => n.id === notaId);
-            if (!nota) {
-                alert('Nota não encontrada!');
-                return;
-            }
-            
-            if (confirm(`Deseja carregar a nota "${nota.titulo}" (criada por ${nota.nomeUsuario || 'usuário'})? Isso substituirá o resumo atual.`)) {
-                resumoDados = JSON.parse(JSON.stringify(nota.resumoDados));
-                renderResumoConsolidado();
-                
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector('.tab[data-tab="relatorio"]').classList.add('active');
-                document.getElementById('consultaTab').style.display = 'none';
-                document.getElementById('gerarTab').style.display = 'none';
-                document.getElementById('relatorioTab').style.display = 'block';
-                document.getElementById('historicoTab').style.display = 'none';
-                document.getElementById('linksTab').style.display = 'none';
-                
-                alert(`✅ Nota "${nota.titulo}" carregada!`);
-            }
-        }
-        
-        function excluirNotaHistorico(notaId) {
-            const nota = historicoNotas.find(n => n.id === notaId);
-            if (nota && confirm(`Tem certeza que deseja excluir a nota "${nota.titulo}"?`)) {
-                historicoNotas = historicoNotas.filter(n => n.id !== notaId);
-                renderizarHistoricoNotas();
-                alert('🗑️ Nota excluída localmente! (Para excluir da nuvem, limpe manualmente na planilha)');
-            }
-        }
-        
-        function limparHistoricoNotas() {
-            if (confirm('⚠️ Tem certeza que deseja limpar TODAS as notas do histórico LOCAL?\n\nPara limpar da nuvem, exclua manualmente na planilha do Google Sheets.')) {
-                historicoNotas = [];
-                renderizarHistoricoNotas();
-                alert('🗑️ Histórico local limpo!');
-            }
-        }
-        
-        function renderizarHistoricoNotas() {
-            const container = document.getElementById('historicoNotasContainer');
-            if (!container) return;
-            
-            if (historicoNotas.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma nota salva na nuvem</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "Salvar Nota no Histórico" na aba Relatório para salvar suas notas. Todas as notas ficam visíveis para todos os usuários!</p></div>';
-                return;
-            }
-            
-            let html = '';
-            for (const nota of historicoNotas) {
-                const dataFormatada = new Date(nota.data).toLocaleString('pt-BR');
-                html += `
-                    <div class="historico-item">
-                        <div class="historico-header">
-                            <div class="historico-titulo">
-                                <i class="fas fa-file-alt" style="color: #2f80ed;"></i> ${escapeHtml(nota.titulo)}
-                                <span class="badge-nota"><i class="fas fa-cloud"></i> Cloud</span>
-                            </div>
-                            <div class="historico-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</div>
-                        </div>
-                        ${nota.descricao ? `<div class="historico-descricao"><i class="fas fa-comment"></i> ${escapeHtml(nota.descricao)}</div>` : ''}
-                        <div class="historico-descricao" style="font-size: 0.8rem; background: #e0f2fe; padding: 0.3rem 0.6rem; border-radius: 8px; display: inline-block; margin-bottom: 0.5rem;">
-                            <i class="fas fa-user" style="color: #2f80ed;"></i> <strong>Usuário responsável:</strong> ${escapeHtml(nota.nomeUsuario || 'Não informado')}
-                        </div>
-                        <div class="historico-descricao" style="font-size: 0.75rem;">
-                            <i class="fas fa-chart-bar"></i> ${nota.resumoDados.length} item(ns) no resumo | 
-                            <i class="fas fa-school"></i> ${nota.totalEscolas || 0} escola(s)
-                        </div>
-                        <div class="historico-actions">
-                            <button class="btn-info btn-small" onclick="carregarNotaHistorico('${nota.id}')"><i class="fas fa-download"></i> Carregar</button>
-                            <button class="btn-danger btn-small" onclick="excluirNotaHistorico('${nota.id}')"><i class="fas fa-trash"></i> Excluir</button>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
         }
         
         function salvarListaEscolas() {
@@ -486,15 +502,11 @@
             const nomeLista = prompt('📝 Digite um nome para esta lista de escolas:', `Lista ${new Date().toLocaleString('pt-BR')}`);
             if (!nomeLista) return;
             
-            const nomeUsuario = prompt('👤 Digite o nome do usuário responsável pela lista:', usuarioNome);
-            if (!nomeUsuario || nomeUsuario.trim() === '') {
-                alert('⚠️ O nome do usuário é obrigatório!');
-                return;
-            }
-            
             const existe = listasSalvas.some(lista => lista.nome === nomeLista);
             if (existe) {
-                if (!confirm(`Já existe uma lista com o nome "${nomeLista}". Deseja substituí-la?`)) return;
+                if (!confirm(`Já existe uma lista com o nome "${nomeLista}". Deseja substituí-la?`)) {
+                    return;
+                }
                 listasSalvas = listasSalvas.filter(lista => lista.nome !== nomeLista);
             }
             
@@ -503,7 +515,6 @@
                 nome: nomeLista,
                 tipo: 'lista',
                 data: new Date().toISOString(),
-                nomeUsuario: nomeUsuario.trim(),
                 escolas: escolasSelecionadas.map(escola => ({
                     nte: escola.nte,
                     municipio: escola.municipio,
@@ -515,7 +526,7 @@
             
             listasSalvas.push(novaLista);
             salvarListasStorage();
-            alert(`✅ Lista "${nomeLista}" salva com sucesso por ${nomeUsuario}!\n📚 ${escolasSelecionadas.length} escolas salvas.`);
+            alert(`✅ Lista "${nomeLista}" salva com sucesso! ${escolasSelecionadas.length} escolas salvas. Acesse a aba "Histórico" para ver suas listas.`);
         }
         
         function carregarListaEscolas(listaId) {
@@ -525,7 +536,7 @@
                 return;
             }
             
-            if (confirm(`Deseja carregar a lista "${lista.nome}" (criada por ${lista.nomeUsuario || 'usuário'})? Isso substituirá as escolas atualmente selecionadas.`)) {
+            if (confirm(`Deseja carregar a lista "${lista.nome}"? Isso substituirá as escolas atualmente selecionadas.`)) {
                 escolasSelecionadas = lista.escolas.map(escola => ({
                     nte: escola.nte,
                     municipio: escola.municipio,
@@ -541,6 +552,7 @@
                     atualizarCheckboxesConsulta();
                 }
                 
+                // Mudar para aba Gerar Valor
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelector('.tab[data-tab="gerar"]').classList.add('active');
                 document.getElementById('consultaTab').style.display = 'none';
@@ -549,7 +561,7 @@
                 document.getElementById('historicoTab').style.display = 'none';
                 document.getElementById('linksTab').style.display = 'none';
                 
-                alert(`✅ Lista "${lista.nome}" carregada!\n👤 Usuário: ${lista.nomeUsuario || 'Não informado'}\n🏫 ${escolasSelecionadas.length} escolas selecionadas.`);
+                alert(`✅ Lista "${lista.nome}" carregada! ${escolasSelecionadas.length} escolas selecionadas.`);
             }
         }
         
@@ -568,12 +580,12 @@
                 return;
             }
             
+            // Criar dados para exportar
             const dadosExportar = [];
             for (const lista of listasSalvas) {
                 for (const escola of lista.escolas) {
                     dadosExportar.push({
                         'Lista': lista.nome,
-                        'Usuário': lista.nomeUsuario || 'Não informado',
                         'Data': new Date(lista.data).toLocaleString('pt-BR'),
                         'NTE': escola.nte,
                         'Município': escola.municipio,
@@ -596,7 +608,7 @@
             if (!container) return;
             
             if (listasSalvas.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Lista" na aba Gerar Valor para salvar suas listas de escolas.</p></div>';
+                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Histórico" na aba Gerar Valor para salvar suas listas de escolas.</p></div>';
                 return;
             }
             
@@ -612,9 +624,6 @@
                             </div>
                             <div class="historico-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</div>
                         </div>
-                        <div class="historico-descricao" style="font-size: 0.8rem; background: #e0f2fe; padding: 0.3rem 0.6rem; border-radius: 8px; display: inline-block; margin-bottom: 0.5rem;">
-                            <i class="fas fa-user" style="color: #8b5cf6;"></i> <strong>Usuário responsável:</strong> ${escapeHtml(lista.nomeUsuario || 'Não informado')}
-                        </div>
                         <div class="historico-descricao">
                             <i class="fas fa-school"></i> ${lista.escolas.length} escolas salvas
                         </div>
@@ -628,11 +637,162 @@
             container.innerHTML = html;
         }
         
+        function atualizarCheckboxesConsulta() {
+            const checkboxes = document.querySelectorAll('.school-checkbox');
+            checkboxes.forEach(cb => {
+                const codigo = cb.dataset.codigo;
+                const isSelected = escolasSelecionadas.some(s => s.codigoSec === codigo);
+                cb.checked = isSelected;
+                const row = cb.closest('tr');
+                if (row) {
+                    if (isSelected) row.classList.add('selected-row');
+                    else row.classList.remove('selected-row');
+                }
+            });
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ==================== HISTÓRICO DE NOTAS ====================
+        let historicoNotas = [];
+        
+        function carregarHistoricoNotas() {
+            const saved = localStorage.getItem('notasTecnicasHistorico');
+            if (saved) {
+                try {
+                    historicoNotas = JSON.parse(saved);
+                } catch(e) {
+                    historicoNotas = [];
+                }
+            } else {
+                historicoNotas = [];
+            }
+            renderizarHistoricoNotas();
+        }
+        
+        function salvarHistoricoNotas() {
+            localStorage.setItem('notasTecnicasHistorico', JSON.stringify(historicoNotas));
+            renderizarHistoricoNotas();
+        }
+        
+        function salvarNotaHistorico() {
+            if (resumoDados.length === 0) {
+                alert('⚠️ Não há dados no resumo para salvar!');
+                return;
+            }
+            
+            const titulo = prompt('📝 Digite um título para esta nota técnica:', `Nota Técnica - ${new Date().toLocaleString('pt-BR')}`);
+            if (!titulo) return;
+            
+            const descricao = prompt('📌 Digite uma descrição/observação (opcional):', '');
+            
+            const nota = {
+                id: Date.now(),
+                titulo: titulo,
+                tipo: 'nota',
+                descricao: descricao || '',
+                data: new Date().toISOString(),
+                resumoDados: JSON.parse(JSON.stringify(resumoDados)),
+                tipoBusca: tipoBuscaAtual,
+                valorBusca: valorBuscaAtual,
+                totalEscolas: escolasSelecionadas.length
+            };
+            
+            historicoNotas.unshift(nota);
+            if (historicoNotas.length > 50) historicoNotas = historicoNotas.slice(0, 50);
+            
+            salvarHistoricoNotas();
+            alert(`✅ Nota "${titulo}" salva com sucesso! Acesse a aba "Histórico" para visualizar.`);
+        }
+        
+        function carregarNotaHistorico(notaId) {
+            const nota = historicoNotas.find(n => n.id === notaId);
+            if (!nota) {
+                alert('Nota não encontrada!');
+                return;
+            }
+            
+            if (confirm(`Deseja carregar a nota "${nota.titulo}"? Isso substituirá o resumo atual.`)) {
+                resumoDados = JSON.parse(JSON.stringify(nota.resumoDados));
+                tipoBuscaAtual = nota.tipoBusca || '';
+                valorBuscaAtual = nota.valorBusca || '';
+                renderResumoConsolidado();
+                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('.tab[data-tab="relatorio"]').classList.add('active');
+                document.getElementById('consultaTab').style.display = 'none';
+                document.getElementById('gerarTab').style.display = 'none';
+                document.getElementById('relatorioTab').style.display = 'block';
+                document.getElementById('historicoTab').style.display = 'none';
+                document.getElementById('linksTab').style.display = 'none';
+                
+                alert(`✅ Nota "${nota.titulo}" carregada!`);
+            }
+        }
+        
+        function excluirNotaHistorico(notaId) {
+            if (confirm('Tem certeza que deseja excluir esta nota?')) {
+                historicoNotas = historicoNotas.filter(n => n.id !== notaId);
+                salvarHistoricoNotas();
+                alert('🗑️ Nota excluída!');
+            }
+        }
+        
+        function limparHistoricoNotas() {
+            if (confirm('⚠️ Tem certeza que deseja limpar TODAS as notas do histórico?')) {
+                historicoNotas = [];
+                salvarHistoricoNotas();
+                alert('🗑️ Histórico de notas limpo!');
+            }
+        }
+        
+        function renderizarHistoricoNotas() {
+            const container = document.getElementById('historicoNotasContainer');
+            if (!container) return;
+            
+            if (historicoNotas.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma nota salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "Salvar Nota no Histórico" na aba Relatório para salvar suas notas.</p></div>';
+                return;
+            }
+            
+            let html = '';
+            for (const nota of historicoNotas) {
+                const dataFormatada = new Date(nota.data).toLocaleString('pt-BR');
+                html += `
+                    <div class="historico-item">
+                        <div class="historico-header">
+                            <div class="historico-titulo">
+                                <i class="fas fa-file-alt" style="color: #2f80ed;"></i> ${escapeHtml(nota.titulo)}
+                                <span class="badge-nota"><i class="fas fa-chart-bar"></i> Nota</span>
+                            </div>
+                            <div class="historico-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</div>
+                        </div>
+                        ${nota.descricao ? `<div class="historico-descricao"><i class="fas fa-comment"></i> ${escapeHtml(nota.descricao)}</div>` : ''}
+                        <div class="historico-descricao" style="font-size: 0.75rem;">
+                            <i class="fas fa-chart-bar"></i> ${nota.resumoDados.length} item(ns) no resumo | 
+                            <i class="fas fa-school"></i> ${nota.totalEscolas || 0} escola(s)
+                        </div>
+                        <div class="historico-actions">
+                            <button class="btn-info btn-small" onclick="carregarNotaHistorico(${nota.id})"><i class="fas fa-download"></i> Carregar</button>
+                            <button class="btn-danger btn-small" onclick="excluirNotaHistorico(${nota.id})"><i class="fas fa-trash"></i> Excluir</button>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        
+        // Tornar funções globais
         window.carregarListaEscolas = carregarListaEscolas;
         window.excluirListaSalva = excluirListaSalva;
         window.carregarNotaHistorico = carregarNotaHistorico;
         window.excluirNotaHistorico = excluirNotaHistorico;
         
+        // ==================== FUNÇÕES PRINCIPAIS ====================
         function formatarValorBR(valor) {
             if (valor === undefined || valor === null || isNaN(valor)) return '0,00';
             return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -899,20 +1059,6 @@
             };
         }
         
-        function atualizarCheckboxesConsulta() {
-            const checkboxes = document.querySelectorAll('.school-checkbox');
-            checkboxes.forEach(cb => {
-                const codigo = cb.dataset.codigo;
-                const isSelected = escolasSelecionadas.some(s => s.codigoSec === codigo);
-                cb.checked = isSelected;
-                const row = cb.closest('tr');
-                if (row) {
-                    if (isSelected) row.classList.add('selected-row');
-                    else row.classList.remove('selected-row');
-                }
-            });
-        }
-        
         function exportarParaGerar() {
             if (escolasSelecionadas.length === 0) { alert('Selecione pelo menos uma escola'); return; }
             renderGerarTabela();
@@ -1023,116 +1169,120 @@
             checkboxes.forEach(cb => cb.checked = e.target.checked);
         }
         
-        function renderResumoConsolidado() {
-            const container = document.getElementById('resumoConsolidado');
-            if (resumoDados.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Nenhum dado no resumo.</p></div>';
-                document.getElementById('selectAllResumoCheckbox').checked = false;
-                return;
-            }
-            
-            let totalFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
-            let totalAlimentacaoFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
-            let totalAlimentacaoEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
-            
-            for (const item of resumoDados) {
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    totalFAED[ano] += item['faed' + ano];
-                    totalAlimentacaoFederal[ano] += item.alimentacao[ano].federal;
-                    totalAlimentacaoEstadual[ano] += item.alimentacao[ano].estadual;
-                }
-            }
-            
-            let totalGeralManutencao = totalFAED[2023] + totalFAED[2024] + totalFAED[2025] + totalFAED[2026];
-            let totalGeralAlimentacao = 0;
-            for (let ano of [2023, 2024, 2025, 2026]) {
-                totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano];
-            }
-            
-            let html = '<div class="table-wrapper">';
-            html += '<table style="min-width: 1300px;" id="resumoTable">';
-            html += '<thead>';
-            html += '<tr style="background: #374151; color: white;">';
-            html += '<th rowspan="3" class="th-repasse" style="background: #edd5be; color: #5a3e1b;">REPASSE ESCOLARES</th>';
-            html += '<th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th>';
-            html += '<th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th>';
-            html += '<th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th>';
-            html += '</tr>';
-            html += '<tr style="background: #6b7280;">';
-            html += '<th rowspan="2" style="background: #9ca3af;">2023</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2024</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2025</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2026</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2023</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2024</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2025</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2026</th>';
-            html += '</tr>';
-            html += '<tr style="background: #6b7280;">';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '</tr>';
-            html += '</thead><tbody>';
-            
-            for (const item of resumoDados) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}</td>`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}</td>`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}</td>`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}"></td>`;
-                html += '</tr>';
-            }
-            
-            html += '<tr class="total-row" id="totalRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL</strong></td>';
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2023])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2024])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2025])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2026])}</strong></td>`;
-            for (let ano of [2023, 2024, 2025, 2026]) {
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoFederal[ano])}</strong></td>`;
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoEstadual[ano])}</strong></td>`;
-            }
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '<tr class="total-geral" id="totalManutencaoRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td>';
-            html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>`;
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '<tr class="total-geral" id="totalAlimentacaoRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td>';
-            html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>`;
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-            
-            document.querySelectorAll('.resumo-item-checkbox').forEach(cb => {
-                cb.onchange = () => {
-                    const allCheckboxes = document.querySelectorAll('.resumo-item-checkbox');
-                    const selectAll = document.getElementById('selectAllResumoCheckbox');
-                    if (selectAll) selectAll.checked = Array.from(allCheckboxes).every(c => c.checked);
-                };
-            });
-            const selectAll = document.getElementById('selectAllResumoCheckbox');
-            if (selectAll) selectAll.onchange = selecionarTodosResumo;
+       function renderResumoConsolidado() {
+    const container = document.getElementById('resumoConsolidado');
+    if (resumoDados.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Nenhum dado no resumo.</p></div>';
+        document.getElementById('selectAllResumoCheckbox').checked = false;
+        return;
+    }
+    
+    let totalFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
+    let totalAlimentacaoFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
+    let totalAlimentacaoEstadual = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
+    
+    for (const item of resumoDados) {
+        for (let ano of [2023, 2024, 2025, 2026]) {
+            totalFAED[ano] += item['faed' + ano];
+            totalAlimentacaoFederal[ano] += item.alimentacao[ano].federal;
+            totalAlimentacaoEstadual[ano] += item.alimentacao[ano].estadual;
         }
+    }
+    
+    let totalGeralManutencao = totalFAED[2023] + totalFAED[2024] + totalFAED[2025] + totalFAED[2026];
+    let totalGeralAlimentacao = 0;
+    for (let ano of [2023, 2024, 2025, 2026]) {
+        totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano];
+    }
+    
+    let html = '<div class="table-wrapper">';
+    html += '<table style="min-width: 1300px;" id="resumoTable">';
+    html += '<thead>';
+    html += '<tr style="background: #374151; color: white;">';
+    html += '<th rowspan="3" class="th-repasse" style="background: #edd5be; color: #5a3e1b;">REPASSE ESCOLARES</th>';
+    html += '<th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th>';
+    html += '<th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th>';
+    html += '<th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th>';
+    html += '</tr>';
+    html += '<tr style="background: #6b7280;">';
+    html += '<th rowspan="2" style="background: #9ca3af;">2023</th>';
+    html += '<th rowspan="2" style="background: #9ca3af;">2024</th>';
+    html += '<th rowspan="2" style="background: #9ca3af;">2025</th>';
+    html += '<th rowspan="2" style="background: #9ca3af;">2026</th>';
+    html += '<th colspan="2" style="background: #fff3cd;">2023</th>';
+    html += '<th colspan="2" style="background: #fff3cd;">2024</th>';
+    html += '<th colspan="2" style="background: #fff3cd;">2025</th>';
+    html += '<th colspan="2" style="background: #fff3cd;">2026</th>';
+    html += '</tr>';
+    html += '<tr style="background: #6b7280;">';
+    html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+    html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+    html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+    html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+    html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+    html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+    html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
+    html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
+    html += '</tr>';
+    html += '</thead><tbody>';
+    
+    for (const item of resumoDados) {
+        html += '<tr>';
+        html += `<td style="text-align:left; font-weight:bold;">${item.identificador}</td>`;
+        html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}</td>`;
+        html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}</td>`;
+        html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}</td>`;
+        html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}</td>`;
+        for (let ano of [2023, 2024, 2025, 2026]) {
+            html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}</td>`;
+            html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}</td>`;
+        }
+        html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}"></td>`;
+        html += '</tr>';
+    }
+    
+    // Linha de TOTAL
+    html += '<tr class="total-row" id="totalRow">';
+    html += '<td style="text-align:left;"><strong>TOTAL</strong></td>';
+    html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2023])}</strong></td>`;
+    html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2024])}</strong></td>`;
+    html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2025])}</strong></td>`;
+    html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2026])}</strong></td>`;
+    for (let ano of [2023, 2024, 2025, 2026]) {
+        html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoFederal[ano])}</strong></td>`;
+        html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoEstadual[ano])}</strong></td>`;
+    }
+    html += '<td class="resumo-checkbox-col"></td>';
+    html += '</tr>';
+    
+    // Linha TOTAL GERAL MANUTENÇÃO
+    html += '<tr class="total-geral" id="totalManutencaoRow">';
+    html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td>';
+    html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>`;
+    html += '<td class="resumo-checkbox-col"></td>';
+    html += '</tr>';
+    
+    // Linha TOTAL GERAL ALIMENTAÇÃO
+    html += '<tr class="total-geral" id="totalAlimentacaoRow">';
+    html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td>';
+    html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>`;
+    html += '<td class="resumo-checkbox-col"></td>';
+    html += '</tr>';
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+    
+    // Reaplicar event listeners dos checkboxes
+    document.querySelectorAll('.resumo-item-checkbox').forEach(cb => {
+        cb.onchange = () => {
+            const allCheckboxes = document.querySelectorAll('.resumo-item-checkbox');
+            const selectAll = document.getElementById('selectAllResumoCheckbox');
+            if (selectAll) selectAll.checked = Array.from(allCheckboxes).every(c => c.checked);
+        };
+    });
+    const selectAll = document.getElementById('selectAllResumoCheckbox');
+    if (selectAll) selectAll.onchange = selecionarTodosResumo;
+}
         
         async function buscarFAED() {
             if (escolasSelecionadas.length === 0) { alert('Selecione escolas'); return; }
@@ -1154,21 +1304,61 @@
         function limparResumo() { if(confirm('Limpar todo resumo?')) { resumoDados = []; renderResumoConsolidado(); alert('Resumo limpo!'); } }
         
         function exportarParaExcel(tabelaElement, nomeArquivo) {
-            if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
-            let tabelaParaExportar = tabelaElement;
-            if (tabelaElement.tagName === 'DIV' && tabelaElement.querySelector('table')) {
-                tabelaParaExportar = tabelaElement.querySelector('table');
-            }
-            const tabelaClone = tabelaParaExportar.cloneNode(true);
-            const colunasSelecao = tabelaClone.querySelectorAll('.resumo-checkbox-col');
-            colunasSelecao.forEach(coluna => { coluna.remove(); });
-            const checkboxes = tabelaClone.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.remove());
-            const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
-            XLSX.writeFile(wb, nomeArquivo + '.xlsx');
+    if (!tabelaElement) { 
+        alert('Nenhum dado para exportar'); 
+        return; 
+    }
+    
+    // Se for o resumo consolidado, vamos garantir que a tabela completa seja capturada
+    let tabelaParaExportar = tabelaElement;
+    
+    // Verifica se é o resumo consolidado e se tem uma tabela
+    if (tabelaElement.tagName === 'DIV' && tabelaElement.querySelector('table')) {
+        tabelaParaExportar = tabelaElement.querySelector('table');
+    }
+    
+    // Clona a tabela para não afetar a original
+    const tabelaClone = tabelaParaExportar.cloneNode(true);
+    
+    // Remove a coluna de seleção (checkboxes) se existir
+    const colunasSelecao = tabelaClone.querySelectorAll('.resumo-checkbox-col');
+    colunasSelecao.forEach(coluna => {
+        if (coluna.tagName === 'TH' || coluna.tagName === 'TD') {
+            coluna.remove();
         }
+    });
+    
+    // Remove também os checkboxes dentro da tabela
+    const checkboxes = tabelaClone.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.remove());
+    
+    // Converte para planilha
+    const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
+    
+    // Ajusta a largura das colunas
+    const colunas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+    ws['!cols'] = colunas.map(() => ({ wch: 15 }));
+    ws['!cols'][0] = { wch: 25 }; // Coluna REPASSE ESCOLARES mais larga
+    
+    // Formata células de valores como números
+    for (let i = 1; i <= ws['!ref'].split(':')[1].replace(/[^0-9]/g, ''); i++) {
+        for (let j = 2; j <= 17; j++) { // Colunas B em diante (índice 2)
+            const celula = ws[XLSX.utils.encode_cell({ r: i-1, c: j })];
+            if (celula && celula.v && typeof celula.v === 'string') {
+                const valorNumerico = parseFloat(celula.v.replace(/\./g, '').replace(',', '.').replace('R$', '').trim());
+                if (!isNaN(valorNumerico)) {
+                    celula.t = 'n';
+                    celula.v = valorNumerico;
+                    celula.z = '#,##0.00';
+                }
+            }
+        }
+    }
+    
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
+    XLSX.writeFile(wb, nomeArquivo + '.xlsx');
+}
         
         async function exportarParaPDF(elemento, nomeArquivo) {
             if (!elemento || elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; }
@@ -1177,16 +1367,25 @@
         }
         
         function exportResumoPDF() { exportarParaPDF(document.getElementById('resumoConsolidado'), 'resumo_nota_tecnica'); }
-        function exportResumoExcel() { const tabelaResumo = document.querySelector('#resumoConsolidado table'); if (!tabelaResumo) { alert('Nenhum dado para exportar'); return; } exportarParaExcel(tabelaResumo, 'resumo_nota_tecnica'); }
+        function exportResumoExcel() { 
+    const tabelaResumo = document.querySelector('#resumoConsolidado table');
+    if (!tabelaResumo) {
+        alert('Nenhum dado para exportar');
+        return;
+    }
+    
+    // Verifica se as linhas de total geral existem
+    const totalRows = tabelaResumo.querySelectorAll('.total-geral');
+    if (totalRows.length < 2) {
+        console.warn('Linhas de total geral não encontradas na tabela');
+    }
+    
+    exportarParaExcel(tabelaResumo, 'resumo_nota_tecnica'); 
+}
         function exportGerarPDF() { exportarParaPDF(document.getElementById('gerarTabela'), 'detalhado_escolas'); }
         function exportGerarExcel() { exportarParaExcel(document.querySelector('#gerarTabela table'), 'detalhado_escolas'); }
         
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
+        // Event Listeners
         document.getElementById('loadDataBtn').onclick = carregarDadosPlanilha;
         document.getElementById('exportToGerarBtn').onclick = exportarParaGerar;
         document.getElementById('buscarFaedBtn').onclick = buscarFAED;
@@ -1223,9 +1422,10 @@
             };
         });
         
+        // Inicializar
         carregarDadosPlanilha();
         carregarListasSalvas();
-        carregarNotasCloud();
+        carregarHistoricoNotas();
     </script>
 </body>
 </html>
