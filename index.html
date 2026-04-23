@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-
-     <script>
+   <script>
         // Verifica se o usuário está logado
         const usuarioLogado = sessionStorage.getItem('usuarioLogado');
         if (!usuarioLogado) {
@@ -11,8 +9,8 @@
             window.location.href = 'https://devfjss.github.io/login-nota-tecnica-cdf/';
         }
     </script>
-
-    
+ 
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nota Técnica · CDF - Sistema Integrado</title>
@@ -37,10 +35,14 @@
         .main { padding: 2rem; max-width: 100%; margin: 0 auto; overflow-x: auto; }
         .card { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #eef2f8; flex-wrap: wrap; gap: 0.5rem; }
-        .search-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .search-form { display: flex; flex-direction: column; gap: 1rem; }
+        .search-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
         .form-group { flex: 2; min-width: 300px; }
         .form-group label { display: block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5c7b9c; margin-bottom: 0.3rem; }
         .form-group input { width: 100%; padding: 0.7rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 0.9rem; }
+        .multiline-group { width: 100%; margin-top: 1rem; }
+        .multiline-group label { display: block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5c7b9c; margin-bottom: 0.3rem; }
+        .multiline-group textarea { width: 100%; padding: 0.7rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 0.9rem; font-family: monospace; resize: vertical; min-height: 100px; }
         button { padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; transition: all 0.2s; }
         .btn-primary { background: #2f80ed; color: white; }
         .btn-primary:hover { background: #1a68c7; transform: translateY(-1px); }
@@ -53,6 +55,12 @@
         .btn-info:hover { background: #2563eb; }
         .btn-purple { background: #8b5cf6; color: white; }
         .btn-purple:hover { background: #7c3aed; }
+        .selection-buttons { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .selection-btn { padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; border: 2px solid #cbd5e1; background: white; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .selection-btn.active { background: #2f80ed; color: white; border-color: #2f80ed; }
+        .selection-btn.nte-active { background: #2f80ed; color: white; border-color: #2f80ed; }
+        .selection-btn.municipio-active { background: #10b981; color: white; border-color: #10b981; }
+        .selection-btn.codigo-active { background: #8b5cf6; color: white; border-color: #8b5cf6; }
         .table-wrapper { overflow-x: auto; margin-top: 1rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.7rem; min-width: 1200px; }
         th, td { padding: 0.5rem 0.5rem; border: 1px solid #d1d5db; text-align: center; vertical-align: middle; }
@@ -68,8 +76,6 @@
         .report-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem; flex-wrap: wrap; }
         .info-message { background: #e6f4ff; padding: 0.5rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.8rem; }
         td:first-child, td:nth-child(2) { text-align: left; }
-        .search-with-button { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
-        .search-with-button .form-group { flex: 2; min-width: 300px; }
         .valor-cards-container { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
         .valor-card { flex: 1; min-width: 200px; background: linear-gradient(135deg, #ffffff 0%, #fafcff 100%); border-radius: 20px; padding: 20px 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; transition: transform 0.2s, box-shadow 0.2s; }
         .valor-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
@@ -131,7 +137,7 @@
     </div>
 
     <div class="tabs">
-        <button class="tab active" data-tab="consulta"><i class="fas fa-search"></i> Consulta Escolas</button>
+        <button class="tab active" data-tab="consulta"><i class="fas fa-search"></i> Consultar Escolas</button>
         <button class="tab" data-tab="gerar"><i class="fas fa-chart-line"></i> Gerar Valor</button>
         <button class="tab" data-tab="relatorio"><i class="fas fa-file-alt"></i> Relatório</button>
         <button class="tab" data-tab="historico"><i class="fas fa-history"></i> Histórico</button>
@@ -141,11 +147,11 @@
     <div class="main">
         <div id="consultaTab">
             <div class="card">
-                <div class="card-header"><h3><i class="fas fa-filter"></i> Filtrar Escolas</h3></div>
+                <div class="card-header"><h3><i class="fas fa-filter"></i> Busca Rápida</h3></div>
                 <div class="search-form">
-                    <div class="search-with-button">
+                    <div class="search-row">
                         <div class="form-group">
-                            <label>🔍 VALOR PARA PESQUISAR (NTE, Município, Código SEC, Código INEP ou Unidade Escolar)</label>
+                            <label>🔍 PESQUISA RÁPIDA (NTE, Município, Código SEC, Código INEP ou Unidade Escolar)</label>
                             <input type="text" id="searchValue" placeholder="Digite NTE, Município, Código SEC, Código INEP ou nome da escola..." autocomplete="off">
                         </div>
                         <button class="btn-success" id="loadDataBtn"><i class="fas fa-download"></i> Carregar Dados</button>
@@ -154,10 +160,39 @@
                 </div>
                 <div class="info-message" style="margin-top: 1rem;">
                     <i class="fas fa-info-circle"></i> 
-                    <strong>Filtro automático:</strong> Digite na caixa acima para filtrar por NTE (exato), Município (exato), Código SEC, Código INEP ou Unidade Escolar (contém)<br>
-                    <strong>Selecione as escolas:</strong> Marque os checkboxes e use "Enviar Selecionados" para levar à aba Gerar Valor
+                    <strong>Busca rápida:</strong> Digite na caixa acima para filtrar instantaneamente a lista
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-layer-group"></i> Busca por Grupo (Múltiplos Valores)</h3></div>
+                <div class="selection-buttons">
+                    <button class="selection-btn" id="selectNteBtn">
+                        <i class="fas fa-code-branch"></i> NTE
+                    </button>
+                    <button class="selection-btn" id="selectMunicipioBtn">
+                        <i class="fas fa-city"></i> Município
+                    </button>
+                    <button class="selection-btn" id="selectCodigoBtn">
+                        <i class="fas fa-hashtag"></i> Código SEC
+                    </button>
+                </div>
+                <div class="search-form">
+                    <div class="multiline-group">
+                        <label id="grupoLabel">📋 LISTA DE VALORES (separados por vírgula, espaço ou quebra de linha)</label>
+                        <textarea id="multiValuesInput" placeholder="Exemplo para NTE:&#10;1,2,3&#10;ou&#10;NTE 1&#10;NTE 2&#10;NTE 3&#10;&#10;Exemplo para Município:&#10;São Paulo, Rio de Janeiro, Belo Horizonte&#10;&#10;Exemplo para Código SEC:&#10;123456,789012,345678"></textarea>
+                    </div>
+                    <div class="search-row">
+                        <button class="btn-purple" id="searchMultiBtn"><i class="fas fa-search"></i> Buscar e Selecionar Múltiplos</button>
+                        <button class="btn-info" id="clearSelectionsBtn"><i class="fas fa-times"></i> Limpar Seleções</button>
+                    </div>
+                </div>
+                <div class="info-message" style="margin-top: 1rem; background: #fef3c7;">
+                    <i class="fas fa-lightbulb"></i> 
+                    <strong>Dica:</strong> Selecione NTE, Município ou Código SEC, depois digite os valores separados por vírgula, espaço ou quebra de linha. O sistema buscará TODAS as escolas correspondentes e as marcará automaticamente!
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header"><h3><i class="fas fa-table-list"></i> Lista de Escolas</h3><span class="badge" id="resultCount">0 registros</span></div>
                 <div id="resultsTable"><div class="empty-state"><i class="fas fa-cloud-download-alt" style="font-size: 3rem;"></i><p>Carregando lista completa de escolas...</p></div></div>
@@ -183,7 +218,7 @@
                 <button class="btn-primary" id="buscarFaedBtn"><i class="fas fa-chart-line"></i> Buscar FAED</button>
                 <button class="btn-success" id="buscarAlimentacaoBtn"><i class="fas fa-utensils"></i> Buscar Alimentação</button>
                 <button class="btn-purple" id="salvarListaBtn"><i class="fas fa-save"></i> 💾 Salvar Lista</button>
-                <button class="btn-warning" id="enviarResumoBtn"><i class="fas fa-chart-bar"></i> Enviar para Resumo</button>
+                <button class="btn-warning" id="enviarResumoBtn"><i class="fas fa-chart-bar"></i> Enviar para Resumo (Agrupar)</button>
                 <button class="btn-secondary" id="exportGerarPDFBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
                 <button class="btn-secondary" id="exportGerarExcelBtn"><i class="fas fa-file-excel"></i> Exportar Excel</button>
                 <button class="btn-danger" id="limparGerarBtn"><i class="fas fa-trash"></i> Limpar</button>
@@ -204,35 +239,31 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Resumo Consolidado</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Resumo Consolidado (Agrupado)</h3>
                     <div>
                         <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
                             <input type="checkbox" id="selectAllResumoCheckbox"> Selecionar Todos
                         </label>
                     </div>
                 </div>
-                <div id="resumoConsolidado"><div class="empty-state"><p>Adicione dados ao resumo clicando em "Enviar para Resumo"</p></div></div>
+                <div id="resumoConsolidado"><div class="empty-state"><p>Adicione dados ao resumo clicando em "Enviar para Resumo (Agrupar)" na aba Gerar Valor</p></div></div>
             </div>
         </div>
 
         <div id="historicoTab" style="display: none;">
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-file-alt"></i> Notas Técnicas Salvas <span class="cloud-badge"><i class="fas fa-cloud"></i> Cloud (Google Sheets)</span></h3>
+                    <h3><i class="fas fa-file-alt"></i> Notas Técnicas Salvas <span class="cloud-badge"><i class="fas fa-cloud"></i> Cloud</span></h3>
                     <button class="btn-danger btn-small" id="limparHistoricoBtn"><i class="fas fa-trash"></i> Limpar Todas Notas</button>
                 </div>
-                <div id="historicoNotasContainer">
-                    <div class="empty-state"><p>📭 Nenhuma nota salva</p></div>
-                </div>
+                <div id="historicoNotasContainer"><div class="empty-state"><p>📭 Nenhuma nota salva</p></div></div>
             </div>
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-list"></i> Listas de Escolas Salvas</h3>
                     <button class="btn-purple btn-small" id="exportarListasBtn"><i class="fas fa-file-excel"></i> Exportar Listas</button>
                 </div>
-                <div id="listasSalvasContainer">
-                    <div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Lista" na aba Gerar Valor para salvar suas listas de escolas.</p></div>
-                </div>
+                <div id="listasSalvasContainer"><div class="empty-state"><p>📭 Nenhuma lista salva</p></div></div>
             </div>
         </div>
 
@@ -243,17 +274,14 @@
                     <div class="download-card">
                         <h4><i class="fas fa-file-excel" style="color: #2f80ed;"></i> Lista de Escolas para Tratamento</h4>
                         <p>Planilha com a lista completa de escolas para validação e tratamento de dados.</p>
-                        <a href="https://github.com/DevFjss/ImportarPlanilha/raw/refs/heads/main/Lista%20de%20Escolas%20tratamento.xlsm" class="download-link" target="_blank" download>
-                            <i class="fas fa-download"></i> Baixar Planilha
-                        </a>
+                        <a href="https://github.com/DevFjss/ImportarPlanilha/raw/refs/heads/main/Lista%20de%20Escolas%20tratamento.xlsm" class="download-link" target="_blank" download><i class="fas fa-download"></i> Baixar Planilha</a>
                     </div>
                     <div class="download-card">
                         <h4><i class="fas fa-chart-line" style="color: #10b981;"></i> Tratamento do Resumo</h4>
                         <p>Planilha para consolidação e tratamento dos dados resumidos.</p>
-                        <a href="https://github.com/DevFjss/ImportarPlanilha/raw/refs/heads/main/Tratamento%20do%20resumo.xlsm" class="download-link" target="_blank" download>
-                            <i class="fas fa-download"></i> Baixar Planilha
-                        </a>
+                        <a href="https://github.com/DevFjss/ImportarPlanilha/raw/refs/heads/main/Tratamento%20do%20resumo.xlsm" class="download-link" target="_blank" download><i class="fas fa-download"></i> Baixar Planilha</a>
                     </div>
+
                      <div class="download-card">
                         <h4><i class="fas fa-chart-line" style="color: #10b981;"></i> Verificar atualização dados geradores</h4>
                         <p>Verifica se houve atualização dados geradores na  - WEB.</p>
@@ -261,23 +289,17 @@
                             <i class="fas fa-download"></i> Verificar Atualização
                         </a>
                     </div>
-                    <div class="info-box">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Informação:</strong> Baixe as planilhas acima para concluir a formatação da nota técnica.
-                    </div>
+                  
+
+                   
+                    <div class="info-box"><i class="fas fa-info-circle"></i><strong>Informação:</strong> Baixe as planilhas acima para concluir a formatação da nota técnica.</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // CONFIGURAÇÃO - COLE A URL DO SEU WEB APP AQUI!
-        // ============================================
-        // DEPOIS DE CRIAR A IMPLANTAÇÃO NO GOOGLE APPS SCRIPT,
-        // COPIE A URL E COLE AQUI:
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCeJT12TYgeJn7TzDPSUwLHnRvyUqfR7SxwY0rERbTPYyjtvZDdKxOBmGdNHeDj0d0/exec';
-        // ============================================
         
         const usuarioNome = sessionStorage.getItem('usuarioNome') || 'Usuário';
         document.getElementById('userNameDisplay').textContent = usuarioNome;
@@ -313,109 +335,88 @@
         let valoresFAED = { 2023: {}, 2024: {}, 2025: {}, 2026: {} };
         let valoresAlimentacao = { 2023: { federal: {}, estadual: {} }, 2024: { federal: {}, estadual: {} }, 2025: { federal: {}, estadual: {} }, 2026: { federal: {}, estadual: {} } };
         let resumoDados = [];
-        let tipoBuscaAtual = '';
-        let valorBuscaAtual = '';
-        let municipioExatoAtual = '';
+        let currentSearchType = null;
+        let currentIndividualValues = [];
         let nextId = 1;
         
         let listasSalvas = [];
         let historicoNotas = [];
         
-        // ============================================
-        // FUNÇÕES DO GOOGLE SHEETS (CLOUD)
-        // ============================================
+        let activeSelectionType = null;
         
         async function salvarNotaCloud(nota) {
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nota)
-                });
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nota) });
                 return true;
-            } catch (error) {
-                console.error('Erro ao salvar na nuvem:', error);
-                return false;
-            }
+            } catch(e) { return false; }
         }
         
         async function carregarNotasCloud() {
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=get`);
                 const data = await response.json();
-                if (data.success && data.notas) {
-                    historicoNotas = data.notas;
-                    renderizarHistoricoNotas();
-                } else {
-                    historicoNotas = [];
-                    renderizarHistoricoNotas();
-                }
-            } catch (error) {
-                console.error('Erro ao carregar notas da nuvem:', error);
-                historicoNotas = [];
-                renderizarHistoricoNotas();
-            }
+                if (data.success && data.notas) { historicoNotas = data.notas; renderizarHistoricoNotas(); }
+                else { historicoNotas = []; renderizarHistoricoNotas(); }
+            } catch(e) { historicoNotas = []; renderizarHistoricoNotas(); }
         }
         
         function carregarListasSalvas() {
             const saved = localStorage.getItem('listasEscolasSalvas');
-            if (saved) {
-                try {
-                    listasSalvas = JSON.parse(saved);
-                } catch(e) { listasSalvas = []; }
-            } else { listasSalvas = []; }
+            if (saved) { try { listasSalvas = JSON.parse(saved); } catch(e) { listasSalvas = []; } }
+            else { listasSalvas = []; }
             renderizarListasSalvas();
         }
         
-        function salvarListasStorage() {
-            localStorage.setItem('listasEscolasSalvas', JSON.stringify(listasSalvas));
-            renderizarListasSalvas();
+        function salvarListasStorage() { localStorage.setItem('listasEscolasSalvas', JSON.stringify(listasSalvas)); renderizarListasSalvas(); }
+        
+        function renderizarHistoricoNotas() {
+            const container = document.getElementById('historicoNotasContainer');
+            if (!container) return;
+            if (historicoNotas.length === 0) { container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma nota salva</p></div>'; return; }
+            let html = '';
+            for (const nota of historicoNotas) {
+                html += `<div class="historico-item"><div class="historico-header"><div class="historico-titulo">${escapeHtml(nota.titulo)}<span class="badge-nota"><i class="fas fa-cloud"></i> Cloud</span></div><div class="historico-data">${new Date(nota.data).toLocaleString('pt-BR')}</div></div>${nota.descricao ? `<div class="historico-descricao">${escapeHtml(nota.descricao)}</div>` : ''}<div class="historico-actions"><button class="btn-info btn-small" onclick="carregarNotaHistorico('${nota.id}')"><i class="fas fa-download"></i> Carregar</button><button class="btn-danger btn-small" onclick="excluirNotaHistorico('${nota.id}')"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
+            }
+            container.innerHTML = html;
         }
         
-        function salvarNotaHistorico() {
-            if (resumoDados.length === 0) {
-                alert('⚠️ Não há dados no resumo para salvar!');
-                return;
+        function renderizarListasSalvas() {
+            const container = document.getElementById('listasSalvasContainer');
+            if (!container) return;
+            if (listasSalvas.length === 0) { container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma lista salva</p></div>'; return; }
+            let html = '';
+            for (const lista of listasSalvas) {
+                html += `<div class="historico-item"><div class="historico-header"><div class="historico-titulo">${escapeHtml(lista.nome)}<span class="badge-lista"><i class="fas fa-school"></i> Lista</span></div><div class="historico-data">${new Date(lista.data).toLocaleString('pt-BR')}</div></div><div class="historico-descricao"><i class="fas fa-user"></i> ${escapeHtml(lista.nomeUsuario || 'Não informado')}</div><div class="historico-actions"><button class="btn-info btn-small" onclick="carregarListaEscolas(${lista.id})"><i class="fas fa-download"></i> Carregar</button><button class="btn-danger btn-small" onclick="excluirListaSalva(${lista.id})"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
             }
-            
-            const titulo = prompt('📝 Digite um título para esta nota técnica:', `Nota Técnica - ${new Date().toLocaleString('pt-BR')}`);
-            if (!titulo) return;
-            
-            const nomeUsuario = prompt('👤 Digite o nome do usuário responsável pela nota:', usuarioNome);
-            if (!nomeUsuario || nomeUsuario.trim() === '') {
-                alert('⚠️ O nome do usuário é obrigatório!');
-                return;
-            }
-            
-            const descricao = prompt('📌 Digite uma descrição/observação (opcional):', '');
-            
-            const nota = {
-                titulo: titulo,
-                descricao: descricao || '',
-                data: new Date().toISOString(),
-                nomeUsuario: nomeUsuario.trim(),
-                totalEscolas: escolasSelecionadas.length,
-                resumoDados: JSON.parse(JSON.stringify(resumoDados))
-            };
-            
-            salvarNotaCloud(nota);
-            alert(`✅ Nota "${titulo}" salva na nuvem (Google Sheets)!\n👤 Usuário: ${nomeUsuario}\n📊 ${resumoDados.length} item(ns) no resumo\n🏫 ${escolasSelecionadas.length} escola(s)\n\nA nota está disponível para todos os usuários!`);
-            
-            setTimeout(() => carregarNotasCloud(), 1000);
+            container.innerHTML = html;
         }
         
-        function carregarNotaHistorico(notaId) {
+        window.carregarListaEscolas = function(listaId) {
+            const lista = listasSalvas.find(l => l.id === listaId);
+            if (!lista) return;
+            escolasSelecionadas = lista.escolas;
+            renderGerarTabela();
+            atualizarCardsGerarValor();
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.tab[data-tab="gerar"]').classList.add('active');
+            document.getElementById('consultaTab').style.display = 'none';
+            document.getElementById('gerarTab').style.display = 'block';
+            document.getElementById('relatorioTab').style.display = 'none';
+            document.getElementById('historicoTab').style.display = 'none';
+            document.getElementById('linksTab').style.display = 'none';
+            alert(`✅ Lista "${lista.nome}" carregada com ${escolasSelecionadas.length} escolas!`);
+        };
+        
+        window.excluirListaSalva = function(listaId) {
+            if (confirm('Excluir esta lista?')) { listasSalvas = listasSalvas.filter(l => l.id !== listaId); salvarListasStorage(); }
+        };
+        
+        window.carregarNotaHistorico = function(notaId) {
             const nota = historicoNotas.find(n => n.id === notaId);
-            if (!nota) {
-                alert('Nota não encontrada!');
-                return;
-            }
-            
-            if (confirm(`Deseja carregar a nota "${nota.titulo}" (criada por ${nota.nomeUsuario || 'usuário'})? Isso substituirá o resumo atual.`)) {
+            if (!nota) return;
+            if (confirm(`Carregar nota "${nota.titulo}"?`)) {
                 resumoDados = JSON.parse(JSON.stringify(nota.resumoDados));
                 renderResumoConsolidado();
-                
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelector('.tab[data-tab="relatorio"]').classList.add('active');
                 document.getElementById('consultaTab').style.display = 'none';
@@ -423,227 +424,27 @@
                 document.getElementById('relatorioTab').style.display = 'block';
                 document.getElementById('historicoTab').style.display = 'none';
                 document.getElementById('linksTab').style.display = 'none';
-                
                 alert(`✅ Nota "${nota.titulo}" carregada!`);
             }
-        }
+        };
         
-        function excluirNotaHistorico(notaId) {
-            const nota = historicoNotas.find(n => n.id === notaId);
-            if (nota && confirm(`Tem certeza que deseja excluir a nota "${nota.titulo}"?`)) {
-                historicoNotas = historicoNotas.filter(n => n.id !== notaId);
-                renderizarHistoricoNotas();
-                alert('🗑️ Nota excluída localmente! (Para excluir da nuvem, limpe manualmente na planilha)');
-            }
-        }
-        
-        function limparHistoricoNotas() {
-            if (confirm('⚠️ Tem certeza que deseja limpar TODAS as notas do histórico LOCAL?\n\nPara limpar da nuvem, exclua manualmente na planilha do Google Sheets.')) {
-                historicoNotas = [];
-                renderizarHistoricoNotas();
-                alert('🗑️ Histórico local limpo!');
-            }
-        }
-        
-        function renderizarHistoricoNotas() {
-            const container = document.getElementById('historicoNotasContainer');
-            if (!container) return;
-            
-            if (historicoNotas.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma nota salva na nuvem</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "Salvar Nota no Histórico" na aba Relatório para salvar suas notas. Todas as notas ficam visíveis para todos os usuários!</p></div>';
-                return;
-            }
-            
-            let html = '';
-            for (const nota of historicoNotas) {
-                const dataFormatada = new Date(nota.data).toLocaleString('pt-BR');
-                html += `
-                    <div class="historico-item">
-                        <div class="historico-header">
-                            <div class="historico-titulo">
-                                <i class="fas fa-file-alt" style="color: #2f80ed;"></i> ${escapeHtml(nota.titulo)}
-                                <span class="badge-nota"><i class="fas fa-cloud"></i> Cloud</span>
-                            </div>
-                            <div class="historico-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</div>
-                        </div>
-                        ${nota.descricao ? `<div class="historico-descricao"><i class="fas fa-comment"></i> ${escapeHtml(nota.descricao)}</div>` : ''}
-                        <div class="historico-descricao" style="font-size: 0.8rem; background: #e0f2fe; padding: 0.3rem 0.6rem; border-radius: 8px; display: inline-block; margin-bottom: 0.5rem;">
-                            <i class="fas fa-user" style="color: #2f80ed;"></i> <strong>Usuário responsável:</strong> ${escapeHtml(nota.nomeUsuario || 'Não informado')}
-                        </div>
-                        <div class="historico-descricao" style="font-size: 0.75rem;">
-                            <i class="fas fa-chart-bar"></i> ${nota.resumoDados.length} item(ns) no resumo | 
-                            <i class="fas fa-school"></i> ${nota.totalEscolas || 0} escola(s)
-                        </div>
-                        <div class="historico-actions">
-                            <button class="btn-info btn-small" onclick="carregarNotaHistorico('${nota.id}')"><i class="fas fa-download"></i> Carregar</button>
-                            <button class="btn-danger btn-small" onclick="excluirNotaHistorico('${nota.id}')"><i class="fas fa-trash"></i> Excluir</button>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
+        window.excluirNotaHistorico = function(notaId) {
+            if (confirm('Excluir esta nota?')) { historicoNotas = historicoNotas.filter(n => n.id !== notaId); renderizarHistoricoNotas(); }
+        };
         
         function salvarListaEscolas() {
-            if (escolasSelecionadas.length === 0) {
-                alert('⚠️ Não há escolas selecionadas para salvar!');
-                return;
-            }
-            
-            const nomeLista = prompt('📝 Digite um nome para esta lista de escolas:', `Lista ${new Date().toLocaleString('pt-BR')}`);
+            if (escolasSelecionadas.length === 0) { alert('⚠️ Nenhuma escola selecionada!'); return; }
+            const nomeLista = prompt('📝 Nome da lista:', `Lista ${new Date().toLocaleString('pt-BR')}`);
             if (!nomeLista) return;
-            
-            const nomeUsuario = prompt('👤 Digite o nome do usuário responsável pela lista:', usuarioNome);
-            if (!nomeUsuario || nomeUsuario.trim() === '') {
-                alert('⚠️ O nome do usuário é obrigatório!');
-                return;
-            }
-            
-            const existe = listasSalvas.some(lista => lista.nome === nomeLista);
-            if (existe) {
-                if (!confirm(`Já existe uma lista com o nome "${nomeLista}". Deseja substituí-la?`)) return;
-                listasSalvas = listasSalvas.filter(lista => lista.nome !== nomeLista);
-            }
-            
-            const novaLista = {
-                id: Date.now(),
-                nome: nomeLista,
-                tipo: 'lista',
-                data: new Date().toISOString(),
-                nomeUsuario: nomeUsuario.trim(),
-                escolas: escolasSelecionadas.map(escola => ({
-                    nte: escola.nte,
-                    municipio: escola.municipio,
-                    codigoSec: escola.codigoSec,
-                    codigoInep: escola.codigoInep,
-                    unidadeEscolar: escola.unidadeEscolar
-                }))
-            };
-            
+            const nomeUsuario = prompt('👤 Seu nome:', usuarioNome);
+            if (!nomeUsuario) return;
+            const novaLista = { id: Date.now(), nome: nomeLista, data: new Date().toISOString(), nomeUsuario: nomeUsuario.trim(), escolas: escolasSelecionadas.map(e => ({ nte: e.nte, municipio: e.municipio, codigoSec: e.codigoSec, codigoInep: e.codigoInep, unidadeEscolar: e.unidadeEscolar })) };
             listasSalvas.push(novaLista);
             salvarListasStorage();
-            alert(`✅ Lista "${nomeLista}" salva com sucesso por ${nomeUsuario}!\n📚 ${escolasSelecionadas.length} escolas salvas.`);
+            alert(`✅ Lista "${nomeLista}" salva!`);
         }
         
-        function carregarListaEscolas(listaId) {
-            const lista = listasSalvas.find(l => l.id === listaId);
-            if (!lista) {
-                alert('Lista não encontrada!');
-                return;
-            }
-            
-            if (confirm(`Deseja carregar a lista "${lista.nome}" (criada por ${lista.nomeUsuario || 'usuário'})? Isso substituirá as escolas atualmente selecionadas.`)) {
-                escolasSelecionadas = lista.escolas.map(escola => ({
-                    nte: escola.nte,
-                    municipio: escola.municipio,
-                    codigoSec: escola.codigoSec,
-                    codigoInep: escola.codigoInep,
-                    unidadeEscolar: escola.unidadeEscolar
-                }));
-                
-                renderGerarTabela();
-                atualizarCardsGerarValor();
-                
-                if (document.getElementById('consultaTab').style.display !== 'none') {
-                    atualizarCheckboxesConsulta();
-                }
-                
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector('.tab[data-tab="gerar"]').classList.add('active');
-                document.getElementById('consultaTab').style.display = 'none';
-                document.getElementById('gerarTab').style.display = 'block';
-                document.getElementById('relatorioTab').style.display = 'none';
-                document.getElementById('historicoTab').style.display = 'none';
-                document.getElementById('linksTab').style.display = 'none';
-                
-                alert(`✅ Lista "${lista.nome}" carregada!\n👤 Usuário: ${lista.nomeUsuario || 'Não informado'}\n🏫 ${escolasSelecionadas.length} escolas selecionadas.`);
-            }
-        }
-        
-        function excluirListaSalva(listaId) {
-            const lista = listasSalvas.find(l => l.id === listaId);
-            if (lista && confirm(`Tem certeza que deseja excluir a lista "${lista.nome}"?`)) {
-                listasSalvas = listasSalvas.filter(l => l.id !== listaId);
-                salvarListasStorage();
-                alert(`🗑️ Lista "${lista.nome}" excluída!`);
-            }
-        }
-        
-        function exportarListasExcel() {
-            if (listasSalvas.length === 0) {
-                alert('Nenhuma lista para exportar!');
-                return;
-            }
-            
-            const dadosExportar = [];
-            for (const lista of listasSalvas) {
-                for (const escola of lista.escolas) {
-                    dadosExportar.push({
-                        'Lista': lista.nome,
-                        'Usuário': lista.nomeUsuario || 'Não informado',
-                        'Data': new Date(lista.data).toLocaleString('pt-BR'),
-                        'NTE': escola.nte,
-                        'Município': escola.municipio,
-                        'Código SEC': escola.codigoSec,
-                        'Código INEP': escola.codigoInep,
-                        'Unidade Escolar': escola.unidadeEscolar
-                    });
-                }
-            }
-            
-            const ws = XLSX.utils.json_to_sheet(dadosExportar);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Listas de Escolas');
-            XLSX.writeFile(wb, `listas_escolas_${new Date().toISOString().slice(0,19)}.xlsx`);
-            alert('📊 Listas exportadas com sucesso!');
-        }
-        
-        function renderizarListasSalvas() {
-            const container = document.getElementById('listasSalvasContainer');
-            if (!container) return;
-            
-            if (listasSalvas.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma lista salva</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Clique em "💾 Salvar Lista" na aba Gerar Valor para salvar suas listas de escolas.</p></div>';
-                return;
-            }
-            
-            let html = '';
-            for (const lista of listasSalvas) {
-                const dataFormatada = new Date(lista.data).toLocaleString('pt-BR');
-                html += `
-                    <div class="historico-item">
-                        <div class="historico-header">
-                            <div class="historico-titulo">
-                                <i class="fas fa-list" style="color: #8b5cf6;"></i> ${escapeHtml(lista.nome)}
-                                <span class="badge-lista"><i class="fas fa-school"></i> Lista</span>
-                            </div>
-                            <div class="historico-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</div>
-                        </div>
-                        <div class="historico-descricao" style="font-size: 0.8rem; background: #e0f2fe; padding: 0.3rem 0.6rem; border-radius: 8px; display: inline-block; margin-bottom: 0.5rem;">
-                            <i class="fas fa-user" style="color: #8b5cf6;"></i> <strong>Usuário responsável:</strong> ${escapeHtml(lista.nomeUsuario || 'Não informado')}
-                        </div>
-                        <div class="historico-descricao">
-                            <i class="fas fa-school"></i> ${lista.escolas.length} escolas salvas
-                        </div>
-                        <div class="historico-actions">
-                            <button class="btn-info btn-small" onclick="carregarListaEscolas(${lista.id})"><i class="fas fa-download"></i> Carregar</button>
-                            <button class="btn-danger btn-small" onclick="excluirListaSalva(${lista.id})"><i class="fas fa-trash"></i> Excluir</button>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-        
-        window.carregarListaEscolas = carregarListaEscolas;
-        window.excluirListaSalva = excluirListaSalva;
-        window.carregarNotaHistorico = carregarNotaHistorico;
-        window.excluirNotaHistorico = excluirNotaHistorico;
-        
-        function formatarValorBR(valor) {
-            if (valor === undefined || valor === null || isNaN(valor)) return '0,00';
-            return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
+        function formatarValorBR(valor) { return (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
         
         function atualizarCardsGerarValor() {
             let totalFaed = 0, totalAlimentacao = 0;
@@ -659,14 +460,6 @@
             document.getElementById('cardTotalGeral').innerHTML = `R$ ${formatarValorBR(totalFaed + totalAlimentacao)}`;
         }
         
-        function resetarGerarValor() {
-            escolasSelecionadas = [];
-            valoresFAED = { 2023: {}, 2024: {}, 2025: {}, 2026: {} };
-            valoresAlimentacao = { 2023: { federal: {}, estadual: {} }, 2024: { federal: {}, estadual: {} }, 2025: { federal: {}, estadual: {} }, 2026: { federal: {}, estadual: {} } };
-            renderGerarTabela();
-            atualizarCardsGerarValor();
-        }
-        
         async function carregarDadosPlanilha() {
             const container = document.getElementById('resultsTable');
             container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Carregando...</div>';
@@ -677,9 +470,7 @@
                 escolasData = parseCSV(csvText);
                 mostrarResultados(escolasData);
                 document.getElementById('resultCount').innerHTML = escolasData.length + ' registros';
-            } catch (error) {
-                container.innerHTML = '<div class="empty-state"><p>Erro ao carregar.</p></div>';
-            }
+            } catch(e) { container.innerHTML = '<div class="empty-state"><p>Erro ao carregar.</p></div>'; }
         }
         
         async function carregarValoresDaAba(sheetName, codigoCol, valorCol) {
@@ -741,25 +532,19 @@
         }
         
         async function carregarValoresFAED() {
-            for (const ano of [2023, 2024, 2025, 2026]) {
-                const config = FAED_CONFIG[ano];
-                valoresFAED[ano] = await carregarValoresDaAba(config.sheetName, config.codigoCol, config.valorCol);
-            }
+            for (const ano of [2023, 2024, 2025, 2026]) { valoresFAED[ano] = await carregarValoresDaAba(FAED_CONFIG[ano].sheetName, FAED_CONFIG[ano].codigoCol, FAED_CONFIG[ano].valorCol); }
         }
         
         async function carregarValoresAlimentacao() {
             for (const ano of [2023, 2024, 2025, 2026]) {
                 const config = ALIMENTACAO_CONFIG[ano];
-                if (!config) continue;
-                if (config.federalCol && config.estadualCol) {
+                if (config.federalCol) {
                     const { federal, estadual } = await carregarValoresAlimentacaoAba(config.sheetName, config.codigoCol, config.federalCol, config.estadualCol);
                     valoresAlimentacao[ano].federal = federal;
                     valoresAlimentacao[ano].estadual = estadual;
-                } else if (config.federal && config.estadual) {
-                    const federal = await carregarValoresDaAba(config.federal.sheetName, config.federal.codigoCol, config.federal.valorCol);
-                    const estadual = await carregarValoresDaAba(config.estadual.sheetName, config.estadual.codigoCol, config.estadual.valorCol);
-                    valoresAlimentacao[ano].federal = federal;
-                    valoresAlimentacao[ano].estadual = estadual;
+                } else {
+                    valoresAlimentacao[ano].federal = await carregarValoresDaAba(config.federal.sheetName, config.federal.codigoCol, config.federal.valorCol);
+                    valoresAlimentacao[ano].estadual = await carregarValoresDaAba(config.estadual.sheetName, config.estadual.codigoCol, config.estadual.valorCol);
                 }
             }
         }
@@ -786,10 +571,7 @@
         function parseCSVGeneric(csvText) {
             const lines = csvText.split('\n').filter(l => l.trim());
             const dados = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
-                if (values.length > 0) dados.push(values);
-            }
+            for (let i = 1; i < lines.length; i++) { dados.push(parseCSVLine(lines[i])); }
             return dados;
         }
         
@@ -806,9 +588,114 @@
             return result;
         }
         
-        function normalizarTexto(texto) {
-            if (!texto) return '';
-            return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+        function normalizarTexto(texto) { return texto ? texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase() : ''; }
+        
+        function atualizarBotoesSelecao(tipo) {
+            const btnNte = document.getElementById('selectNteBtn');
+            const btnMunicipio = document.getElementById('selectMunicipioBtn');
+            const btnCodigo = document.getElementById('selectCodigoBtn');
+            const label = document.getElementById('grupoLabel');
+            
+            btnNte.classList.remove('nte-active');
+            btnMunicipio.classList.remove('municipio-active');
+            btnCodigo.classList.remove('codigo-active');
+            
+            if (tipo === 'nte') {
+                btnNte.classList.add('nte-active');
+                label.innerHTML = '📋 LISTA DE NTEs (separados por vírgula, espaço ou quebra de linha)';
+                document.getElementById('multiValuesInput').placeholder = 'Exemplo:\n1,2,3\nou\nNTE 1\nNTE 2\nNTE 3';
+            } else if (tipo === 'municipio') {
+                btnMunicipio.classList.add('municipio-active');
+                label.innerHTML = '📋 LISTA DE MUNICÍPIOS (separados por vírgula, espaço ou quebra de linha)';
+                document.getElementById('multiValuesInput').placeholder = 'Exemplo:\nSão Paulo, Rio de Janeiro, Belo Horizonte\nou\nSão Paulo\nRio de Janeiro';
+            } else if (tipo === 'codigo') {
+                btnCodigo.classList.add('codigo-active');
+                label.innerHTML = '📋 LISTA DE CÓDIGOS SEC (separados por vírgula, espaço ou quebra de linha)';
+                document.getElementById('multiValuesInput').placeholder = 'Exemplo:\n123456,789012,345678\nou\n123456\n789012';
+            }
+        }
+        
+        function buscarMultiplos() {
+            if (!activeSelectionType) {
+                alert('⚠️ Selecione primeiro o tipo de busca: NTE, Município ou Código SEC');
+                return;
+            }
+            
+            const rawInput = document.getElementById('multiValuesInput').value;
+            if (!rawInput.trim()) {
+                alert('Digite os valores para buscar!');
+                return;
+            }
+            
+            let valores = [];
+            if (rawInput.includes(',') || rawInput.includes('\n')) {
+                valores = rawInput.split(/[,\n]+/).map(v => v.trim().replace(/^NTE\s+/i, '').replace(/^MUNICÍPIO\s+/i, '').replace(/^CÓDIGO\s+/i, '')).filter(v => v);
+            } else {
+                valores = [rawInput.trim()];
+            }
+            
+            const valoresNormalizados = valores.map(v => normalizarTexto(v));
+            
+            if (activeSelectionType === 'nte') {
+                currentIndividualValues = [];
+                for (const valor of valores) {
+                    const encontradas = escolasData.filter(e => e.nte === valor);
+                    if (encontradas.length > 0) {
+                        for (const escola of encontradas) {
+                            if (!escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec)) {
+                                escolasSelecionadas.push(escola);
+                            }
+                        }
+                        currentIndividualValues.push({ type: 'nte', value: valor });
+                    }
+                }
+            } else if (activeSelectionType === 'municipio') {
+                currentIndividualValues = [];
+                for (const valor of valores) {
+                    const valorNorm = normalizarTexto(valor);
+                    const encontradas = escolasData.filter(e => normalizarTexto(e.municipio) === valorNorm);
+                    if (encontradas.length > 0) {
+                        for (const escola of encontradas) {
+                            if (!escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec)) {
+                                escolasSelecionadas.push(escola);
+                            }
+                        }
+                        currentIndividualValues.push({ type: 'municipio', value: valor });
+                    }
+                }
+            } else if (activeSelectionType === 'codigo') {
+                currentIndividualValues = [];
+                for (const valor of valores) {
+                    const encontradas = escolasData.filter(e => e.codigoSec === valor);
+                    if (encontradas.length > 0) {
+                        for (const escola of encontradas) {
+                            if (!escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec)) {
+                                escolasSelecionadas.push(escola);
+                            }
+                        }
+                        currentIndividualValues.push({ type: 'codigo', value: valor });
+                    }
+                }
+            }
+            
+            currentSearchType = activeSelectionType;
+            
+            mostrarResultados(escolasData);
+            renderGerarTabela();
+            atualizarCardsGerarValor();
+            
+            alert(`✅ ${escolasSelecionadas.length} escola(s) selecionada(s) no total!`);
+        }
+        
+        function limparSelecoes() {
+            if (confirm('Tem certeza que deseja limpar TODAS as escolas selecionadas?')) {
+                escolasSelecionadas = [];
+                currentIndividualValues = [];
+                mostrarResultados(escolasData);
+                renderGerarTabela();
+                atualizarCardsGerarValor();
+                alert('✅ Todas as seleções foram removidas!');
+            }
         }
         
         function autoFiltro() {
@@ -817,42 +704,15 @@
             let resultados;
             if (termo === '') {
                 resultados = escolasData;
-                tipoBuscaAtual = '';
-                valorBuscaAtual = '';
-                municipioExatoAtual = '';
             } else {
                 const termoNormalizado = normalizarTexto(termo);
-                const nteExato = escolasData.filter(escola => escola.nte === termo);
-                if (nteExato.length > 0) {
-                    resultados = nteExato;
-                    tipoBuscaAtual = 'NTE';
-                    valorBuscaAtual = termo;
-                    municipioExatoAtual = '';
-                } else {
-                    const municipioExato = escolasData.filter(escola => normalizarTexto(escola.municipio) === termoNormalizado);
-                    if (municipioExato.length > 0) {
-                        resultados = municipioExato;
-                        tipoBuscaAtual = 'MUNICIPIO';
-                        valorBuscaAtual = termoNormalizado;
-                        municipioExatoAtual = municipioExato[0].municipio;
-                    } else {
-                        resultados = escolasData.filter(escola => {
-                            return normalizarTexto(escola.codigoSec).includes(termoNormalizado) ||
-                                   normalizarTexto(escola.codigoInep).includes(termoNormalizado) ||
-                                   normalizarTexto(escola.unidadeEscolar).includes(termoNormalizado);
-                        });
-                        if (resultados.length > 0) {
-                            tipoBuscaAtual = 'ESCOLA';
-                            valorBuscaAtual = termo;
-                            municipioExatoAtual = '';
-                        } else {
-                            resultados = [];
-                            tipoBuscaAtual = '';
-                            valorBuscaAtual = '';
-                            municipioExatoAtual = '';
-                        }
-                    }
-                }
+                resultados = escolasData.filter(escola => {
+                    return normalizarTexto(escola.nte).includes(termoNormalizado) ||
+                           normalizarTexto(escola.municipio).includes(termoNormalizado) ||
+                           normalizarTexto(escola.codigoSec).includes(termoNormalizado) ||
+                           normalizarTexto(escola.codigoInep).includes(termoNormalizado) ||
+                           normalizarTexto(escola.unidadeEscolar).includes(termoNormalizado);
+                });
             }
             mostrarResultados(resultados);
         }
@@ -860,26 +720,13 @@
         function mostrarResultados(resultados) {
             const container = document.getElementById('resultsTable');
             document.getElementById('resultCount').innerHTML = resultados.length + ' registros';
-            if (resultados.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Nenhum resultado</p></div>';
-                return;
-            }
-            let html = '<div class="table-wrapper">\n<table>\n<thead>\n<tr>';
-            html += '<th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th>';
-            html += '<th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>';
-            html += '</tr></thead><tbody>';
+            if (resultados.length === 0) { container.innerHTML = '<div class="empty-state"><p>Nenhum resultado</p></div>'; return; }
+            let html = '<div class="table-wrapper"><table><thead><tr><th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox"></th><th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th></tr></thead><tbody>';
             for (const escola of resultados) {
                 const isSelected = escolasSelecionadas.some(s => s.codigoSec === escola.codigoSec);
-                html += `<tr class="${isSelected ? 'selected-row' : ''}">`;
-                html += `<td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}></td>`;
-                html += `<td><strong>${escola.nte || '-'}</strong></td>`;
-                html += `<td>${escola.municipio || '-'}</td>`;
-                html += `<td>${escola.codigoSec || '-'}</td>`;
-                html += `<td>${escola.codigoInep || '-'}</td>`;
-                html += `<td style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
-                html += `</tr>`;
+                html += `<tr class="${isSelected ? 'selected-row' : ''}"><td class="checkbox-col"><input type="checkbox" class="school-checkbox" data-codigo="${escola.codigoSec}" ${isSelected ? 'checked' : ''}></td><td><strong>${escola.nte || '-'}</strong></td><td>${escola.municipio || '-'}</td><td>${escola.codigoSec || '-'}</td><td>${escola.codigoInep || '-'}</td><td style="text-align:left">${escola.unidadeEscolar || '-'}</td></tr>`;
             }
-            html += '</tbody></table></div>';
+            html += '</tbody>}</div>';
             container.innerHTML = html;
             
             document.querySelectorAll('.school-checkbox').forEach(cb => {
@@ -906,20 +753,6 @@
             };
         }
         
-        function atualizarCheckboxesConsulta() {
-            const checkboxes = document.querySelectorAll('.school-checkbox');
-            checkboxes.forEach(cb => {
-                const codigo = cb.dataset.codigo;
-                const isSelected = escolasSelecionadas.some(s => s.codigoSec === codigo);
-                cb.checked = isSelected;
-                const row = cb.closest('tr');
-                if (row) {
-                    if (isSelected) row.classList.add('selected-row');
-                    else row.classList.remove('selected-row');
-                }
-            });
-        }
-        
         function exportarParaGerar() {
             if (escolasSelecionadas.length === 0) { alert('Selecione pelo menos uma escola'); return; }
             renderGerarTabela();
@@ -935,88 +768,98 @@
         function renderGerarTabela() {
             const container = document.getElementById('gerarTabela');
             document.getElementById('gerarCount').innerHTML = escolasSelecionadas.length + ' escolas';
-            if (escolasSelecionadas.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Nenhuma escola selecionada</p></div>';
-                return;
-            }
-            let html = '<div class="table-wrapper">\n<table>\n<thead>';
-            html += '<tr style="background: #9ca3af;"><th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th>';
-            html += '<th colspan="4">FAED</th><th colspan="8">ALIMENTAÇÃO</th></tr>';
-            html += '<tr style="background: #6b7280;"><th></th><th></th><th></th><th></th><th></th>';
-            html += '<th>2023</th><th>2024</th><th>2025</th><th>2026</th>';
-            html += '<th>Fed23</th><th>Est23</th><th>Fed24</th><th>Est24</th><th>Fed25</th><th>Est25</th><th>Fed26</th><th>Est26</th></tr>';
-            html += '</thead><tbody>';
+            if (escolasSelecionadas.length === 0) { container.innerHTML = '<div class="empty-state"><p>Nenhuma escola selecionada</p></div>'; return; }
+            let html = '<div class="table-wrapper">\n<table>\n<thead><tr style="background: #9ca3af;"><th>NTE</th><th>Município</th><th>Código SEC</th><th>Código INEP</th><th>Unidade Escolar</th><th colspan="4">FAED</th><th colspan="8">ALIMENTAÇÃO</th></tr><tr style="background: #6b7280;"><th></th><th></th><th></th><th></th><th></th><th>2023</th><th>2024</th><th>2025</th><th>2026</th><th>Fed23</th><th>Est23</th><th>Fed24</th><th>Est24</th><th>Fed25</th><th>Est25</th><th>Fed26</th><th>Est26</th></tr></thead><tbody>';
             for (const escola of escolasSelecionadas) {
-                html += '<tr>';
-                html += `<td>${escola.nte || '-'}</td>`;
-                html += `<td>${escola.municipio || '-'}</td>`;
-                html += `<td>${escola.codigoSec || '-'}</td>`;
-                html += `<td>${escola.codigoInep || '-'}</td>`;
-                html += `<td style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0)}</td>`;
-                }
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0)}</td>`;
-                    html += `<td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0)}</td>`;
-                }
+                html += `<tr><td>${escola.nte || '-'}</td><td>${escola.municipio || '-'}</td><td>${escola.codigoSec || '-'}</td><td>${escola.codigoInep || '-'}</td><td style="text-align:left">${escola.unidadeEscolar || '-'}</td>`;
+                for (let ano of [2023, 2024, 2025, 2026]) { html += `<td class="valor-monetario">${formatarValorBR(valoresFAED[ano][escola.codigoSec] || 0)}</td>`; }
+                for (let ano of [2023, 2024, 2025, 2026]) { html += `<td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].federal[escola.codigoSec] || 0)}</td><td class="valor-monetario">${formatarValorBR(valoresAlimentacao[ano].estadual[escola.codigoSec] || 0)}</td>`; }
                 html += `</tr>`;
             }
             html += '</tbody></table></div>';
             container.innerHTML = html;
         }
         
-        function calcularTotaisEscolas(escolas) {
+        function calcularTotaisPorEscola(escola) {
             let faed = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let alimentacao = { 2023: { federal: 0, estadual: 0 }, 2024: { federal: 0, estadual: 0 }, 2025: { federal: 0, estadual: 0 }, 2026: { federal: 0, estadual: 0 } };
-            for (const escola of escolas) {
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    faed[ano] += valoresFAED[ano][escola.codigoSec] || 0;
-                    alimentacao[ano].federal += valoresAlimentacao[ano].federal[escola.codigoSec] || 0;
-                    alimentacao[ano].estadual += valoresAlimentacao[ano].estadual[escola.codigoSec] || 0;
-                }
+            for (let ano of [2023, 2024, 2025, 2026]) {
+                faed[ano] += valoresFAED[ano][escola.codigoSec] || 0;
+                alimentacao[ano].federal += valoresAlimentacao[ano].federal[escola.codigoSec] || 0;
+                alimentacao[ano].estadual += valoresAlimentacao[ano].estadual[escola.codigoSec] || 0;
             }
             return { faed, alimentacao };
         }
         
-        async function enviarParaResumo() {
-            if (escolasSelecionadas.length === 0) {
-                alert('Selecione escolas primeiro');
+        function agruparPorValor() {
+            const grupos = new Map();
+            
+            for (const item of currentIndividualValues) {
+                const escolasDoGrupo = escolasSelecionadas.filter(escola => {
+                    if (item.type === 'nte') return escola.nte === item.value;
+                    if (item.type === 'municipio') return normalizarTexto(escola.municipio) === normalizarTexto(item.value);
+                    if (item.type === 'codigo') return escola.codigoSec === item.value;
+                    return false;
+                });
+                
+                if (escolasDoGrupo.length > 0) {
+                    let faedTotal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
+                    let alimentacaoTotal = { 2023: { federal: 0, estadual: 0 }, 2024: { federal: 0, estadual: 0 }, 2025: { federal: 0, estadual: 0 }, 2026: { federal: 0, estadual: 0 } };
+                    
+                    for (const escola of escolasDoGrupo) {
+                        const totais = calcularTotaisPorEscola(escola);
+                        for (let ano of [2023, 2024, 2025, 2026]) {
+                            faedTotal[ano] += totais.faed[ano];
+                            alimentacaoTotal[ano].federal += totais.alimentacao[ano].federal;
+                            alimentacaoTotal[ano].estadual += totais.alimentacao[ano].estadual;
+                        }
+                    }
+                    
+                    let identificador = '';
+                    if (item.type === 'nte') identificador = `NTE ${item.value}`;
+                    else if (item.type === 'municipio') identificador = `MUNICÍPIO ${item.value.toUpperCase()}`;
+                    else identificador = `CÓDIGO SEC ${item.value}`;
+                    
+                    grupos.set(identificador, {
+                        identificador: identificador,
+                        faed2023: faedTotal[2023],
+                        faed2024: faedTotal[2024],
+                        faed2025: faedTotal[2025],
+                        faed2026: faedTotal[2026],
+                        alimentacao: alimentacaoTotal
+                    });
+                }
+            }
+            
+            return grupos;
+        }
+        
+        function enviarParaResumo() {
+            if (escolasSelecionadas.length === 0) { alert('Selecione escolas primeiro'); return; }
+            if (currentIndividualValues.length === 0) {
+                alert('⚠️ Para enviar ao resumo, primeiro use "Buscar e Selecionar Múltiplos" na aba Consulta Escolas.');
                 return;
             }
-            const totais = calcularTotaisEscolas(escolasSelecionadas);
             
-            let identificador = '';
-            if (tipoBuscaAtual === 'NTE') {
-                identificador = `NTE ${valorBuscaAtual}`;
-            } else if (tipoBuscaAtual === 'MUNICIPIO') {
-                identificador = municipioExatoAtual ? municipioExatoAtual.toUpperCase() : valorBuscaAtual.toUpperCase();
-            } else if (tipoBuscaAtual === 'ESCOLA') {
-                identificador = `ESCOLA: ${valorBuscaAtual.toUpperCase()}`;
-            } else {
-                identificador = 'ESTADO';
+            const grupos = agruparPorValor();
+            
+            for (const [identificador, dadosGrupo] of grupos) {
+                const existeIndex = resumoDados.findIndex(item => item.identificador === identificador);
+                if (existeIndex !== -1) {
+                    if (!confirm(`Já existe um item "${identificador}" no resumo. Deseja substituí-lo?`)) continue;
+                    resumoDados[existeIndex] = { id: resumoDados[existeIndex].id, ...dadosGrupo };
+                } else {
+                    resumoDados.push({ id: nextId++, ...dadosGrupo });
+                }
             }
             
-            const novoItem = {
-                id: nextId++,
-                identificador: identificador,
-                faed2023: totais.faed[2023],
-                faed2024: totais.faed[2024],
-                faed2025: totais.faed[2025],
-                faed2026: totais.faed[2026],
-                alimentacao: totais.alimentacao
-            };
-            resumoDados.push(novoItem);
             renderResumoConsolidado();
-            alert(`✅ Dados de ${identificador} adicionados ao resumo!`);
+            alert(`✅ ${grupos.size} grupo(s) adicionado(s)/substituído(s) no resumo!\n📊 Total de escolas: ${escolasSelecionadas.length}`);
         }
         
         function excluirResumoSelecionados() {
             const checkboxes = document.querySelectorAll('.resumo-item-checkbox:checked');
-            if (checkboxes.length === 0) {
-                alert('Selecione pelo menos um item para excluir.');
-                return;
-            }
+            if (checkboxes.length === 0) { alert('Selecione pelo menos um item para excluir.'); return; }
             const idsParaExcluir = Array.from(checkboxes).map(cb => parseInt(cb.value));
             if (confirm(`Excluir ${idsParaExcluir.length} item(ns) do resumo?`)) {
                 resumoDados = resumoDados.filter(item => !idsParaExcluir.includes(item.id));
@@ -1025,18 +868,11 @@
             }
         }
         
-        function selecionarTodosResumo(e) {
-            const checkboxes = document.querySelectorAll('.resumo-item-checkbox');
-            checkboxes.forEach(cb => cb.checked = e.target.checked);
-        }
+        function selecionarTodosResumo(e) { document.querySelectorAll('.resumo-item-checkbox').forEach(cb => cb.checked = e.target.checked); }
         
         function renderResumoConsolidado() {
             const container = document.getElementById('resumoConsolidado');
-            if (resumoDados.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Nenhum dado no resumo.</p></div>';
-                document.getElementById('selectAllResumoCheckbox').checked = false;
-                return;
-            }
+            if (resumoDados.length === 0) { container.innerHTML = '<div class="empty-state"><p>Nenhum dado no resumo.</p></div>'; return; }
             
             let totalFAED = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
             let totalAlimentacaoFederal = { 2023: 0, 2024: 0, 2025: 0, 2026: 0 };
@@ -1052,147 +888,45 @@
             
             let totalGeralManutencao = totalFAED[2023] + totalFAED[2024] + totalFAED[2025] + totalFAED[2026];
             let totalGeralAlimentacao = 0;
-            for (let ano of [2023, 2024, 2025, 2026]) {
-                totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano];
-            }
+            for (let ano of [2023, 2024, 2025, 2026]) { totalGeralAlimentacao += totalAlimentacaoFederal[ano] + totalAlimentacaoEstadual[ano]; }
             
-            let html = '<div class="table-wrapper">';
-            html += '<table style="min-width: 1300px;" id="resumoTable">';
-            html += '<thead>';
-            html += '<tr style="background: #374151; color: white;">';
-            html += '<th rowspan="3" class="th-repasse" style="background: #edd5be; color: #5a3e1b;">REPASSE ESCOLARES</th>';
-            html += '<th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th>';
-            html += '<th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th>';
-            html += '<th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th>';
-            html += '</tr>';
-            html += '<tr style="background: #6b7280;">';
-            html += '<th rowspan="2" style="background: #9ca3af;">2023</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2024</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2025</th>';
-            html += '<th rowspan="2" style="background: #9ca3af;">2026</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2023</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2024</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2025</th>';
-            html += '<th colspan="2" style="background: #fff3cd;">2026</th>';
-            html += '</tr>';
-            html += '<tr style="background: #6b7280;">';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '<th style="background: #fff3cd;">Federal - PNAE</th>';
-            html += '<th style="background: #fff3cd;">Estadual - FAED</th>';
-            html += '</tr>';
-            html += '</thead><tbody>';
+            let html = '<div class="table-wrapper"><table style="min-width: 1300px;"><thead><tr style="background: #374151; color: white;"><th rowspan="3" class="th-repasse" style="background: #edd5be; color: #5a3e1b;">REPASSES ESCOLARES</th><th colspan="4" class="th-manutencao" style="background: #9ca3af;">MANUTENÇÃO</th><th colspan="8" class="th-alimentacao" style="background: #fff3cd;">ALIMENTAÇÃO</th><th rowspan="3" style="width: 50px; background: #f8fafc;">Selecionar</th></tr>';
+            html += '<tr style="background: #6b7280;"><th rowspan="2" style="background: #9ca3af;">2023</th><th rowspan="2" style="background: #9ca3af;">2024</th><th rowspan="2" style="background: #9ca3af;">2025</th><th rowspan="2" style="background: #9ca3af;">2026</th><th colspan="2" style="background: #fff3cd;">2023</th><th colspan="2" style="background: #fff3cd;">2024</th><th colspan="2" style="background: #fff3cd;">2025</th><th colspan="2" style="background: #fff3cd;">2026</th></tr>';
+            html += '<tr style="background: #6b7280;"><th style="background: #fff3cd;">Federal - PNAE</th><th style="background: #fff3cd;">Estadual - FAED</th><th style="background: #fff3cd;">Federal - PNAE</th><th style="background: #fff3cd;">Estadual - FAED</th><th style="background: #fff3cd;">Federal - PNAE</th><th style="background: #fff3cd;">Estadual - FAED</th><th style="background: #fff3cd;">Federal - PNAE</th><th style="background: #fff3cd;">Estadual - FAED</th></tr></thead><tbody>';
             
             for (const item of resumoDados) {
-                html += '<tr>';
-                html += `<td style="text-align:left; font-weight:bold;">${item.identificador}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2023)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2024)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2025)}</td>`;
-                html += `<td class="valor-monetario">${formatarValorBR(item.faed2026)}</td>`;
-                for (let ano of [2023, 2024, 2025, 2026]) {
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}</td>`;
-                    html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}</td>`;
-                }
-                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}"></td>`;
-                html += '</tr>';
+                html += `<tr><td style="text-align:left; font-weight:bold;">${item.identificador}</td><td class="valor-monetario">${formatarValorBR(item.faed2023)}</td><td class="valor-monetario">${formatarValorBR(item.faed2024)}</td><td class="valor-monetario">${formatarValorBR(item.faed2025)}</td><td class="valor-monetario">${formatarValorBR(item.faed2026)}</td>`;
+                for (let ano of [2023, 2024, 2025, 2026]) { html += `<td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].federal)}</td><td class="valor-monetario">${formatarValorBR(item.alimentacao[ano].estadual)}</td>`; }
+                html += `<td class="resumo-checkbox-col"><input type="checkbox" class="resumo-item-checkbox" value="${item.id}"></td></tr>`;
             }
             
-            html += '<tr class="total-row" id="totalRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL</strong></td>';
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2023])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2024])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2025])}</strong></td>`;
-            html += `<td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2026])}</strong></td>`;
-            for (let ano of [2023, 2024, 2025, 2026]) {
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoFederal[ano])}</strong></td>`;
-                html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoEstadual[ano])}</strong></td>`;
-            }
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '<tr class="total-geral" id="totalManutencaoRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td>';
-            html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td>`;
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '<tr class="total-geral" id="totalAlimentacaoRow">';
-            html += '<td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td>';
-            html += `<td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td>`;
-            html += '<td class="resumo-checkbox-col"></td>';
-            html += '</tr>';
-            
-            html += '</tbody></table></div>';
+            html += `<tr class="total-row"><td style="text-align:left;"><strong>TOTAL</strong></td><td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2023])}</strong></td><td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2024])}</strong></td><td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2025])}</strong></td><td class="valor-monetario"><strong>${formatarValorBR(totalFAED[2026])}</strong></td>`;
+            for (let ano of [2023, 2024, 2025, 2026]) { html += `<td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoFederal[ano])}</strong></td><td class="valor-monetario"><strong>${formatarValorBR(totalAlimentacaoEstadual[ano])}</strong></td>`; }
+            html += `<td class="resumo-checkbox-col"></td></tr>`;
+            html += `<tr class="total-geral"><td style="text-align:left;"><strong>TOTAL GERAL MANUTENÇÃO</strong></td><td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralManutencao)}</strong></td><td class="resumo-checkbox-col"></td></td>`;
+            html += `<tr class="total-geral"><td style="text-align:left;"><strong>TOTAL GERAL ALIMENTAÇÃO</strong></td><td colspan="12" class="valor-monetario"><strong>${formatarValorBR(totalGeralAlimentacao)}</strong></td><td class="resumo-checkbox-col"></td></tr>`;
+            html += '</tbody>}</div>';
             container.innerHTML = html;
             
-            document.querySelectorAll('.resumo-item-checkbox').forEach(cb => {
-                cb.onchange = () => {
-                    const allCheckboxes = document.querySelectorAll('.resumo-item-checkbox');
-                    const selectAll = document.getElementById('selectAllResumoCheckbox');
-                    if (selectAll) selectAll.checked = Array.from(allCheckboxes).every(c => c.checked);
-                };
-            });
+            document.querySelectorAll('.resumo-item-checkbox').forEach(cb => { cb.onchange = () => { const selectAll = document.getElementById('selectAllResumoCheckbox'); if (selectAll) selectAll.checked = Array.from(document.querySelectorAll('.resumo-item-checkbox')).every(c => c.checked); }; });
             const selectAll = document.getElementById('selectAllResumoCheckbox');
             if (selectAll) selectAll.onchange = selecionarTodosResumo;
         }
         
-        async function buscarFAED() {
-            if (escolasSelecionadas.length === 0) { alert('Selecione escolas'); return; }
-            await carregarValoresFAED();
-            renderGerarTabela();
-            atualizarCardsGerarValor();
-            alert('✅ FAED carregado!');
-        }
-        
-        async function buscarAlimentacao() {
-            if (escolasSelecionadas.length === 0) { alert('Selecione escolas'); return; }
-            await carregarValoresAlimentacao();
-            renderGerarTabela();
-            atualizarCardsGerarValor();
-            alert('✅ Alimentação carregada!');
-        }
-        
-        function limparGerar() { resetarGerarValor(); alert('Gerar Valor limpo!'); }
+        async function buscarFAED() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas'); return; } await carregarValoresFAED(); renderGerarTabela(); atualizarCardsGerarValor(); alert('✅ FAED carregado!'); }
+        async function buscarAlimentacao() { if (escolasSelecionadas.length === 0) { alert('Selecione escolas'); return; } await carregarValoresAlimentacao(); renderGerarTabela(); atualizarCardsGerarValor(); alert('✅ Alimentação carregada!'); }
+        function limparGerar() { escolasSelecionadas = []; currentIndividualValues = []; renderGerarTabela(); atualizarCardsGerarValor(); alert('Gerar Valor limpo!'); }
         function limparResumo() { if(confirm('Limpar todo resumo?')) { resumoDados = []; renderResumoConsolidado(); alert('Resumo limpo!'); } }
-        
-        function exportarParaExcel(tabelaElement, nomeArquivo) {
-            if (!tabelaElement) { alert('Nenhum dado para exportar'); return; }
-            let tabelaParaExportar = tabelaElement;
-            if (tabelaElement.tagName === 'DIV' && tabelaElement.querySelector('table')) {
-                tabelaParaExportar = tabelaElement.querySelector('table');
-            }
-            const tabelaClone = tabelaParaExportar.cloneNode(true);
-            const colunasSelecao = tabelaClone.querySelectorAll('.resumo-checkbox-col');
-            colunasSelecao.forEach(coluna => { coluna.remove(); });
-            const checkboxes = tabelaClone.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.remove());
-            const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true });
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Relatorio');
-            XLSX.writeFile(wb, nomeArquivo + '.xlsx');
-        }
-        
-        async function exportarParaPDF(elemento, nomeArquivo) {
-            if (!elemento || elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; }
-            const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: nomeArquivo + '.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } };
-            html2pdf().set(opt).from(elemento).save();
-        }
-        
+        function exportarParaExcel(tabelaElement, nomeArquivo) { if (!tabelaElement) { alert('Nenhum dado para exportar'); return; } let tabelaParaExportar = tabelaElement; if (tabelaElement.tagName === 'DIV' && tabelaElement.querySelector('table')) { tabelaParaExportar = tabelaElement.querySelector('table'); } const tabelaClone = tabelaParaExportar.cloneNode(true); const colunasSelecao = tabelaClone.querySelectorAll('.resumo-checkbox-col'); colunasSelecao.forEach(coluna => { coluna.remove(); }); const checkboxes = tabelaClone.querySelectorAll('input[type="checkbox"]'); checkboxes.forEach(cb => cb.remove()); const ws = XLSX.utils.table_to_sheet(tabelaClone, { raw: true }); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Relatorio'); XLSX.writeFile(wb, nomeArquivo + '.xlsx'); }
+        async function exportarParaPDF(elemento, nomeArquivo) { if (!elemento || elemento.innerHTML.includes('Nenhum dado')) { alert('Nenhum dado para exportar'); return; } const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: nomeArquivo + '.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' } }; html2pdf().set(opt).from(elemento).save(); }
         function exportResumoPDF() { exportarParaPDF(document.getElementById('resumoConsolidado'), 'resumo_nota_tecnica'); }
         function exportResumoExcel() { const tabelaResumo = document.querySelector('#resumoConsolidado table'); if (!tabelaResumo) { alert('Nenhum dado para exportar'); return; } exportarParaExcel(tabelaResumo, 'resumo_nota_tecnica'); }
         function exportGerarPDF() { exportarParaPDF(document.getElementById('gerarTabela'), 'detalhado_escolas'); }
         function exportGerarExcel() { exportarParaExcel(document.querySelector('#gerarTabela table'), 'detalhado_escolas'); }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        function salvarNotaHistorico() { if (resumoDados.length === 0) { alert('⚠️ Não há dados no resumo!'); return; } const titulo = prompt('📝 Título da nota:', `Nota Técnica - ${new Date().toLocaleString('pt-BR')}`); if (!titulo) return; const nomeUsuario = prompt('👤 Seu nome:', usuarioNome); if (!nomeUsuario) return; const descricao = prompt('📌 Descrição (opcional):', ''); const nota = { titulo, descricao: descricao || '', data: new Date().toISOString(), nomeUsuario: nomeUsuario.trim(), totalEscolas: escolasSelecionadas.length, resumoDados: JSON.parse(JSON.stringify(resumoDados)) }; salvarNotaCloud(nota); alert(`✅ Nota "${titulo}" salva!`); setTimeout(() => carregarNotasCloud(), 1000); }
+        function limparHistoricoNotas() { if (confirm('Limpar TODAS as notas do histórico?')) { historicoNotas = []; renderizarHistoricoNotas(); } }
+        function exportarListasExcel() { if (listasSalvas.length === 0) { alert('Nenhuma lista para exportar!'); return; } const dadosExportar = []; for (const lista of listasSalvas) { for (const escola of lista.escolas) { dadosExportar.push({ 'Lista': lista.nome, 'Usuário': lista.nomeUsuario || 'Não informado', 'Data': new Date(lista.data).toLocaleString('pt-BR'), 'NTE': escola.nte, 'Município': escola.municipio, 'Código SEC': escola.codigoSec, 'Código INEP': escola.codigoInep, 'Unidade Escolar': escola.unidadeEscolar }); } } const ws = XLSX.utils.json_to_sheet(dadosExportar); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Listas de Escolas'); XLSX.writeFile(wb, `listas_escolas_${new Date().toISOString().slice(0,19)}.xlsx`); alert('📊 Listas exportadas!'); }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         
         document.getElementById('loadDataBtn').onclick = carregarDadosPlanilha;
         document.getElementById('exportToGerarBtn').onclick = exportarParaGerar;
@@ -1210,7 +944,13 @@
         document.getElementById('salvarHistoricoBtn').onclick = salvarNotaHistorico;
         document.getElementById('limparHistoricoBtn').onclick = limparHistoricoNotas;
         document.getElementById('exportarListasBtn').onclick = exportarListasExcel;
+        document.getElementById('searchMultiBtn').onclick = buscarMultiplos;
+        document.getElementById('clearSelectionsBtn').onclick = limparSelecoes;
         document.getElementById('searchValue').addEventListener('input', autoFiltro);
+        
+        document.getElementById('selectNteBtn').onclick = () => { activeSelectionType = 'nte'; atualizarBotoesSelecao('nte'); };
+        document.getElementById('selectMunicipioBtn').onclick = () => { activeSelectionType = 'municipio'; atualizarBotoesSelecao('municipio'); };
+        document.getElementById('selectCodigoBtn').onclick = () => { activeSelectionType = 'codigo'; atualizarBotoesSelecao('codigo'); };
         
         document.querySelectorAll('.tab').forEach(tab => {
             tab.onclick = () => {
@@ -1223,10 +963,7 @@
                 document.getElementById('linksTab').style.display = 'none';
                 document.getElementById(tab.dataset.tab + 'Tab').style.display = 'block';
                 if (tab.dataset.tab === 'relatorio') renderResumoConsolidado();
-                if (tab.dataset.tab === 'historico') {
-                    renderizarHistoricoNotas();
-                    renderizarListasSalvas();
-                }
+                if (tab.dataset.tab === 'historico') { renderizarHistoricoNotas(); renderizarListasSalvas(); }
             };
         });
         
