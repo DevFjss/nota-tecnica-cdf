@@ -375,7 +375,9 @@
             if (historicoNotas.length === 0) { container.innerHTML = '<div class="empty-state"><p>📭 Nenhuma nota salva</p></div>'; return; }
             let html = '';
             for (const nota of historicoNotas) {
-                html += `<div class="historico-item"><div class="historico-header"><div class="historico-titulo">${escapeHtml(nota.titulo)}<span class="badge-nota"><i class="fas fa-cloud"></i> Cloud</span></div><div class="historico-data">${new Date(nota.data).toLocaleString('pt-BR')}</div></div>${nota.descricao ? `<div class="historico-descricao">${escapeHtml(nota.descricao)}</div>` : ''}<div class="historico-actions"><button class="btn-info btn-small" onclick="carregarNotaHistorico('${nota.id}')"><i class="fas fa-download"></i> Carregar</button><button class="btn-danger btn-small" onclick="excluirNotaHistorico('${nota.id}')"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
+                html += `<div class="historico-item"><div class="historico-header"><div class="historico-titulo">${escapeHtml(nota.titulo)}<span class="badge-nota"><i class="fas fa-cloud"></i> Cloud</span></div><div class="historico-data">${new Date(nota.data).toLocaleString('pt-BR')}</div></div><div class="historico-descricao" style="font-size:0.8rem; background:#e0f2fe; padding:0.3rem 0.6rem; border-radius:8px; margin-bottom:0.5rem;">
+    <i class="fas fa-user" style="color:#2f80ed;"></i> <strong>Usuário responsável:</strong> ${escapeHtml(nota.nomeUsuario || 'Não informado')}
+</div>${nota.descricao ? `<div class="historico-descricao">${escapeHtml(nota.descricao)}</div>` : ''}<div class="historico-actions"><button class="btn-info btn-small" onclick="carregarNotaHistorico('${nota.id}')"><i class="fas fa-download"></i> Carregar</button><button class="btn-danger btn-small" onclick="excluirNotaHistorico('${nota.id}')"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
             }
             container.innerHTML = html;
         }
